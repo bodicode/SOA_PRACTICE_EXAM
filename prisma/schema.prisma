@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 1. User & Auth
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  fullName      String?
+  role          String    @default("student") // 'admin', 'student'
+  createdAt     DateTime  @default(now())
+
+  subscriptions UserSubscription[]
+  questions     Question[]         @relation("UserCreatedQuestions")
+  examSessions  ExamSession[]
+  uploadedFiles UploadedFile[]
+  hostedRooms   BattleRoom[]
+  roomParticipations RoomParticipant[]
+}
+
+// 2. Subscriptions
+model SubscriptionPlan {
+  id           Int      @id @default(autoincrement())
+  name         String
+  price        Decimal
+  durationDays Int
+  features     Json?
+  subscriptions UserSubscription[]
+}
+
+model UserSubscription {
+  id              Int              @id @default(autoincrement())
+  userId          Int
+  planId          Int
+  startDate       DateTime         @default(now())
+  endDate         DateTime
+  status          String           @default("active") 
+  paymentRefId    String?
+
+  user            User             @relation(fields: [userId], references: [id])
+  plan            SubscriptionPlan @relation(fields: [planId], references: [id])
+}
+
+// 3. Question Bank
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String
+  parentId    Int?
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+  questions   Question[]
+}
+
+model Question {
+  id              Int      @id @default(autoincrement())
+  categoryId      Int?
+  creatorId       Int?
+  content         String   // Chứa LaTeX
+  options         Json     // [{"key": "A", "text": "..."}, ...]
+  correctOption   String
+  explanation     String?
+  sourceType      String   @default("system")
+  isPublic        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  category        Category? @relation(fields: [categoryId], references: [id])
+  creator         User?     @relation("UserCreatedQuestions", fields: [creatorId], references: [id])
+  examDetails     ExamDetail[]
+}
+
+model UploadedFile {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  fileUrl    String
+  status     String   // processing, completed
+  uploadedAt DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+// 4. Exam & Analytics
+model ExamSession {
+  id         Int          @id @default(autoincrement())
+  userId     Int
+  mode       String       // practice, mock, battle
+  startTime  DateTime     @default(now())
+  endTime    DateTime?
+  totalScore Decimal?
+
+  user       User         @relation(fields: [userId], references: [id])
+  details    ExamDetail[]
+}
+
+model ExamDetail {
+  id               Int      @id @default(autoincrement())
+  sessionId        Int
+  questionId       Int
+  userChoice       String?
+  isCorrect        Boolean?
+  timeSpentSeconds Int?
+
+  session    ExamSession @relation(fields: [sessionId], references: [id])
+  question   Question    @relation(fields: [questionId], references: [id])
+}
+
+// 5. Battle Rooms
+model BattleRoom {
+  id         Int      @id @default(autoincrement())
+  roomCode   String   @unique
+  hostUserId Int
+  status     String   @default("waiting")
+  createdAt  DateTime @default(now())
+
+  host       User              @relation(fields: [hostUserId], references: [id])
+  participants RoomParticipant[]
+}
+
+model RoomParticipant {
+  id         Int       @id @default(autoincrement())
+  roomId     Int
+  userId     Int
+  score      Int       @default(0)
+  finishedAt DateTime?
+
+  room       BattleRoom @relation(fields: [roomId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+}
