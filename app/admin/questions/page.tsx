@@ -1,586 +1,693 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useRef } from 'react' // Added useRef
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog'
-import MathRender from '@/components/MathRender'
+import { useEffect, useState, useRef } from "react";
+import { createClient } from "@/lib/supabase/client";
+import dynamic from "next/dynamic";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-interface Option {
-    key: string
-    text: string
-}
+// Dynamic import to avoid SSR issues with canvas/DOMMatrix
+const PdfCanvas = dynamic(() => import("@/components/pdf/PdfCanvas").then(m => m.PdfCanvas), {
+    ssr: false,
+    loading: () => <div className="h-96 flex items-center justify-center bg-gray-100 text-gray-400">Loading PDF Viewer...</div>
+});
+const BboxSelector = dynamic(() => import("@/components/pdf/BboxSelector").then(m => m.BboxSelector), { ssr: false });
 
-interface Question {
-    id: number
-    categoryId: number
-    content: string
-    options: Option[]
-    correctOption: string
-    explanation: string
-}
 
-interface Category {
-    id: number
-    name: string
-}
+import { QuestionEditor } from "@/components/admin/QuestionEditor";
 
-export default function QuestionsPage() {
-    const [questions, setQuestions] = useState<Question[]>([])
-    const [categories, setCategories] = useState<Category[]>([])
-    const [isLoading, setIsLoading] = useState(true)
+type PdfAsset = { id: string; title: string; storagePath: string };
 
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [editingQuestion, setEditingQuestion] = useState<Question | null>(null)
+export default function AdminQuestionsPage() {
+    const supabase = createClient();
+    const [assets, setAssets] = useState<any[]>([]);
+    const [selectedAssetId, setSelectedAssetId] = useState<string>("");
 
-    // PDF Import States
-    const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
-    const [importedQuestions, setImportedQuestions] = useState<Question[]>([])
-    const [importCategoryId, setImportCategoryId] = useState<string>('')
-    const questionFileRef = useRef<HTMLInputElement>(null)
-    const solutionFileRef = useRef<HTMLInputElement>(null)
-    const [isParsing, setIsParsing] = useState(false)
+    const [pdfUrl, setPdfUrl] = useState<string>("");
+    // Review State
+    const [savedQuestions, setSavedQuestions] = useState<any[]>([]);
+    const [editingQuestion, setEditingQuestion] = useState<any>(null);
 
-    const [formData, setFormData] = useState({
-        categoryId: '',
-        content: '',
-        optionA: '',
-        optionB: '',
-        optionC: '',
-        optionD: '',
-        optionE: '',
-        correctOption: 'A',
-        explanation: '',
-    })
-    const [searchTerm, setSearchTerm] = useState('')
-    const [filterCategory, setFilterCategory] = useState('')
+    const [pageIndex, setPageIndex] = useState(0);
+    const [viewport, setViewport] = useState<{ width: number; height: number; scale: number } | null>(null);
+    const [rect, setRect] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+    const [questionNo, setQuestionNo] = useState(1);
+    const [status, setStatus] = useState("");
 
-    // Fetch initial data
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [catsRes, qsRes] = await Promise.all([
-                    fetch('/api/categories'),
-                    fetch('/api/questions')
-                ])
+        fetch("/api/pdf-assets").then(res => res.json()).then(data => {
+            if (data.assets) setAssets(data.assets);
+        });
+    }, []);
 
-                if (catsRes.ok) {
-                    const catsData = await catsRes.json()
-                    setCategories(catsData)
-                }
-
-                if (qsRes.ok) {
-                    const qsData = await qsRes.json()
-                    setQuestions(qsData)
-                }
-            } catch (error) {
-                console.error('Failed to fetch data:', error)
-            } finally {
-                setIsLoading(false)
-            }
-        }
-
-        fetchData()
-    }, [])
-
-    const reloadQuestions = async () => {
-        try {
-            const res = await fetch('/api/questions')
-            if (res.ok) {
-                const data = await res.json()
-                setQuestions(data)
-            }
-        } catch (error) {
-            console.error('Failed to reload questions:', error)
-        }
-    }
-
-    const handleFileUpload = async () => {
-        const questionFile = questionFileRef.current?.files?.[0]
-        if (!questionFile) {
-            alert('Vui lòng chọn file câu hỏi')
-            return
-        }
-
-        setIsParsing(true)
-        const formData = new FormData()
-        formData.append('questionFile', questionFile)
-
-        // Add solution file if provided
-        const solutionFile = solutionFileRef.current?.files?.[0]
-        if (solutionFile) {
-            formData.append('solutionFile', solutionFile)
-            console.log('Solution file added:', solutionFile.name)
+    useEffect(() => {
+        if (!selectedAssetId) return;
+        const asset = assets.find(a => a.id === selectedAssetId);
+        if (asset) {
+            const { data } = supabase.storage.from("exam-pdfs").getPublicUrl(asset.storagePath);
+            setPdfUrl(data.publicUrl);
         } else {
-            console.log('No solution file selected')
+            setPdfUrl("");
         }
+    }, [selectedAssetId, assets, supabase]);
+
+    async function save() {
+        if (!rect || !selectedAssetId) return;
+        setStatus("Saving...");
 
         try {
-            console.log('Sending to API with files:', questionFile.name, solutionFile?.name || 'none')
-            const res = await fetch('/api/admin/parse-pdf', {
-                method: 'POST',
-                body: formData
-            })
-
-            if (res.ok) {
-                const data = await res.json()
-                setImportedQuestions(data.questions)
-            } else {
-                alert('Lỗi khi đọc file PDF')
-            }
-        } catch (error) {
-            console.error('Upload error:', error)
-            alert('Có lỗi xảy ra khi tải file')
-        } finally {
-            setIsParsing(false)
-        }
-    }
-
-    const saveImportedQuestions = async () => {
-        if (!importCategoryId) {
-            alert('Vui lòng chọn danh mục cho bộ câu hỏi nhập vào')
-            return
-        }
-
-        try {
-            // Use bulk API for efficient batch insert
-            const res = await fetch('/api/questions/bulk', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+            const res = await fetch("/api/pdf-questions", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
                 body: JSON.stringify({
-                    categoryId: parseInt(importCategoryId),
-                    questions: importedQuestions.map(q => ({
-                        content: q.content,
-                        options: q.options,
-                        correctOption: q.correctOption || 'A'
-                    }))
-                })
-            })
+                    pdfAssetId: selectedAssetId,
+                    questionNo,
+                    pageIndex,
+                    ...rect,
+                }),
+            });
 
-            if (res.ok) {
-                const data = await res.json()
-                alert(`Đã nhập thành công ${data.count} câu hỏi!`)
-                setIsImportDialogOpen(false)
-                setImportedQuestions([])
-                setImportCategoryId('')
-                reloadQuestions()
-            } else {
-                alert('Lỗi khi lưu câu hỏi')
-            }
-        } catch (error) {
-            console.error('Import error:', error)
-            alert('Có lỗi xảy ra khi lưu câu hỏi')
+            if (!res.ok) throw new Error("Failed");
+            setStatus("Saved!");
+            setTimeout(() => setStatus(""), 2000);
+
+            // Auto increment question number
+            setQuestionNo(q => q + 1);
+            setRect(null); // Reset selection
+        } catch (e) {
+            setStatus("Error saving");
         }
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        const options: Option[] = [
-            { key: 'A', text: formData.optionA },
-            { key: 'B', text: formData.optionB },
-            { key: 'C', text: formData.optionC },
-            { key: 'D', text: formData.optionD },
-            { key: 'E', text: formData.optionE },
-        ].filter(o => o.text.trim())
+    const [isAutoDetecting, setIsAutoDetecting] = useState(false);
+
+    // Helper: Load PDFJS dynamically
+    async function loadPdfJs() {
+        const pdfjs = await import("pdfjs-dist");
+        if (typeof window !== "undefined" && !pdfjs.GlobalWorkerOptions.workerSrc) {
+            pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+        }
+        return pdfjs;
+    }
+
+    // Helper to process a single page
+    async function detectOnPage(pdf: any, pIdx: number) {
+        const page = await pdf.getPage(pIdx + 1);
+        const textContent = await page.getTextContent();
+        const viewport = page.getViewport({ scale: 1.0 });
+
+        const items = textContent.items.map((item: any) => ({
+            str: item.str,
+            tx: item.transform[4],
+            ty: item.transform[5],
+            ...item
+        }));
+
+        // Debug extraction
+        console.log(`Page ${pIdx}: Found ${items.length} text items`);
+
+        const questionStarts: { num: number, y: number, x: number }[] = [];
+        items.forEach((item: any) => {
+            const match = item.str.trim().match(/^(\d+)\.?$/);
+            if (match) {
+                const [vx, vy] = viewport.convertToViewportPoint(item.tx, item.ty);
+                // Debug match candidates
+                // console.log(`Candidate ${match[1]} at x=${vx}`);
+                if (Math.abs(vx) < 100) {
+                    questionStarts.push({ num: parseInt(match[1]), y: vy, x: vx });
+                }
+            }
+        });
+
+        console.log(`Page ${pIdx}: Found ${questionStarts.length} question starts:`, questionStarts.map(q => q.num));
+
+        questionStarts.sort((a, b) => a.y - b.y);
+        if (questionStarts.length === 0) return 0;
+
+        // Smart Crop Logic V2
+        const scale = 1.5;
+        const pageWidth = viewport.width * scale; // NOTE: page.getViewport({scale}).width might be better, but this approximates
+        // Wait, viewport is scale 1.0 above. 
+        // We want intended width. 
+        // Let's stick to previous logic `page.getViewport({ scale }).width` but we need to re-call getViewport or multiply.
+        const scaledViewport = page.getViewport({ scale });
+        const realPageWidth = scaledViewport.width;
+
+        const isFooter = (y: number) => y > viewport.height * 0.9;
+
+        let saved = 0;
+
+        for (let i = 0; i < questionStarts.length; i++) {
+            const current = questionStarts[i];
+            const next = questionStarts[i + 1];
+            const topY = current.y;
+            const nextY = next ? next.y : viewport.height;
+
+            let maxContentY = topY;
+
+            // Scan content for bottom bound
+            items.forEach((item: any) => {
+                const [, iy] = viewport.convertToViewportPoint(item.tx, item.ty);
+                if (iy > topY && iy < nextY && !isFooter(iy)) {
+                    maxContentY = Math.max(maxContentY, iy);
+                }
+            });
+
+            // If last question on page, rely heavily on content end
+            let bottomY = maxContentY + 50; // Increased padding to prevent cutting (E)
+
+            // If internal question, ensure we don't overlap next one
+            if (next) {
+                // Cut halfway or at content end, whichever is smaller, but usually content end is safe
+                bottomY = Math.min(bottomY, nextY - 15);
+            } else {
+                // Last question: Check if bottomY is unreasonably high (empty space), limit to page bottom
+                bottomY = Math.min(bottomY, viewport.height);
+            }
+
+            // Fallback if content scan failed (empty)
+            if (bottomY <= topY) bottomY = Math.min(topY + 100, nextY - 10);
+
+            const startY = Math.max(0, topY - 10);
+
+            // Extract text content for this region
+            const regionItems = items.filter((item: any) => {
+                const [, iy] = viewport.convertToViewportPoint(item.tx, item.ty);
+                return iy >= topY && iy <= bottomY;
+            });
+
+            // Sort by Y (desc) -> X (asc) to reconstruct reading order
+            regionItems.sort((a: any, b: any) => {
+                const [, ay] = viewport.convertToViewportPoint(a.tx, a.ty);
+                const [, by] = viewport.convertToViewportPoint(b.tx, b.ty);
+                if (Math.abs(ay - by) > 5) return ay - by; // Top to bottom (smaller Y is top? No, in PDF coords 0,0 is bottom-left usually, but viewport convert handles it)
+                // Wait, viewport.convertToViewportPoint might flip Y? 
+                // Usually PDF is bottom-up, Viewport is top-down? 
+                // Assuming `iy` is already top-down because we used it for `topY` logic above.
+                // So smaller Y is TOP.
+                return ay - by;
+            });
+
+            // Reconstruct text
+            let currentLineY = -1;
+            let textContent = "";
+            regionItems.forEach((item: any) => {
+                const [, iy] = viewport.convertToViewportPoint(item.tx, item.ty);
+                if (currentLineY === -1) currentLineY = iy;
+
+                if (Math.abs(iy - currentLineY) > 8) {
+                    textContent += "\n";
+                    currentLineY = iy;
+                }
+                textContent += item.str + " ";
+            });
+
+            // Post-process hygiene
+            textContent = textContent.replace(/[ \t]+/g, " ").trim(); // Collapse spaces but keep newlines
+
+            // Smart Formatting: Insert double newlines before structure markers
+            // 1. Options (A) (B) ... (E) OR A. B. C. OR A) B) C)
+            // Ensure they are on own lines
+            textContent = textContent.replace(/\s+(\(?\s*[A-E]\s*[\.:\)]\s*)/g, "\n$1");
+
+            // 2. Roman numerals (i) (ii) (iii) ...
+            textContent = textContent.replace(/\s+(\([ivx]+\))\s+/g, "\n$1 ");
+
+            // 3. Numbered lists "1." "2." (careful not to match decimals)
+            textContent = textContent.replace(/\s+(\d+\.)\s+/g, "\n$1 ");
+
+            // --- Auto-Extract Options ---
+            const options: any[] = [];
+            // Regex to capture:
+            // 1. (A) Content
+            // 2. A. Content
+            // 3. A) Content
+            const optRegex = /(?:^|\n)\s*(?:\(?([A-E])[\.:\)]|[A-E]\.|Question \d+)\s+(.*)/g;
+            // Wait, "Question \d+" is bad there.
+
+            // Clean regex for A-E
+            const strictOptRegex = /(?:^|\n)\s*(?:\(?([A-E])[\.:\)])\s+(.*)/g;
+
+            let optMatch;
+            const extractedOpts: Record<string, string> = {};
+
+            // We iterate to find all matches in the CLEANED text
+            let scanText = textContent;
+            while ((optMatch = strictOptRegex.exec(scanText)) !== null) {
+                const letter = optMatch[1];
+                const content = optMatch[2].trim();
+                extractedOpts[letter] = content;
+            }
+
+            // Construct standardized ABCDE array
+            if (Object.keys(extractedOpts).length > 0) {
+                ["A", "B", "C", "D", "E"].forEach(letter => {
+                    options.push({
+                        id: letter,
+                        text: extractedOpts[letter] || "",
+                        isCorrect: false
+                    });
+                });
+            }
+
+            try {
+                const res = await fetch("/api/pdf-questions", {
+                    method: "POST",
+                    headers: { "content-type": "application/json" },
+                    body: JSON.stringify({
+                        pdfAssetId: selectedAssetId,
+                        questionNo: current.num,
+                        pageIndex: pIdx,
+                        x: 0,
+                        y: startY * scale,
+                        w: realPageWidth,
+                        h: (bottomY - startY) * scale,
+                        textContent: textContent,
+                        options: options.length > 0 ? options : undefined // Send options if found
+                    }),
+                });
+                if (!res.ok) console.error(`Failed to save Q${current.num}`, await res.text());
+                else saved++;
+            } catch (err) {
+                console.error(`Error saving Q${current.num}`, err);
+            }
+        }
+        return saved;
+    }
+
+    async function handleAutoDetect() {
+        if (!selectedAssetId || !pdfUrl) return;
+        setIsAutoDetecting(true);
+        setStatus("Detecting current page...");
 
         try {
-            const url = editingQuestion ? `/api/questions/${editingQuestion.id}` : '/api/questions'
-            const method = editingQuestion ? 'PUT' : 'POST'
+            const pdfjs = await loadPdfJs();
+            const loadingTask = pdfjs.getDocument(pdfUrl);
+            const pdf = await loadingTask.promise;
 
-            const payload = {
-                categoryId: parseInt(formData.categoryId),
-                content: formData.content,
-                options,
-                correctOption: formData.correctOption,
-                explanation: formData.explanation,
-            }
+            const count = await detectOnPage(pdf, pageIndex);
 
-            const res = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-
-            if (res.ok) {
-                await reloadQuestions()
-                setIsDialogOpen(false)
-                resetForm()
-            } else {
-                alert('Có lỗi xảy ra. Kiểm tra lại dữ liệu.')
-            }
-        } catch (error) {
-            console.error('Error saving question:', error)
+            setStatus(`Saved ${count} questions on Page ${pageIndex}`);
+        } catch (e) {
+            console.error(e);
+            setStatus("Failed");
+        } finally {
+            setIsAutoDetecting(false);
         }
     }
 
-    const resetForm = () => {
-        setEditingQuestion(null)
-        setFormData({
-            categoryId: '',
-            content: '',
-            optionA: '',
-            optionB: '',
-            optionC: '',
-            optionD: '',
-            optionE: '',
-            correctOption: 'A',
-            explanation: '',
-        })
+    async function handleBatchDetect() {
+        if (!selectedAssetId || !pdfUrl) return;
+        if (!confirm("This will scan ALL pages starting from the current one. Continue?")) return;
+
+        setIsAutoDetecting(true);
+
+        try {
+            const pdfjs = await loadPdfJs();
+            const loadingTask = pdfjs.getDocument(pdfUrl);
+            const pdf = await loadingTask.promise;
+            let totalSaved = 0;
+
+            for (let i = pageIndex; i < pdf.numPages; i++) {
+                setPageIndex(i); // Update UI
+                setStatus(`Scanning Page ${i} / ${pdf.numPages}...`);
+
+                // Small delay to allow UI to update (optional)
+                await new Promise(r => setTimeout(r, 100));
+
+                const count = await detectOnPage(pdf, i);
+                totalSaved += count;
+            }
+
+            setStatus(`Batch Complete! Saved ${totalSaved} questions.`);
+        } catch (e) {
+            console.error(e);
+            setStatus("Batch failed");
+        } finally {
+            setIsAutoDetecting(false);
+        }
     }
 
-    const handleEdit = (question: Question) => {
-        setEditingQuestion(question)
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-        // Helper to get option text safely
-        const getOpt = (key: string) => question.options.find(o => o.key === key)?.text || ''
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-        setFormData({
-            categoryId: question.categoryId.toString(),
-            content: question.content,
-            optionA: getOpt('A'),
-            optionB: getOpt('B'),
-            optionC: getOpt('C'),
-            optionD: getOpt('D'),
-            optionE: getOpt('E'),
-            correctOption: question.correctOption,
-            explanation: question.explanation || '',
-        })
-        setIsDialogOpen(true)
-    }
+        setStatus("Uploading...");
+        try {
+            // 1. Upload to Supabase Storage
+            const filename = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+            const { data, error } = await supabase.storage
+                .from("exam-pdfs")
+                .upload(filename, file);
 
-    const handleDelete = async (id: number) => {
-        if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
-            try {
-                const res = await fetch(`/api/questions/${id}`, { method: 'DELETE' })
-                if (res.ok) {
-                    reloadQuestions()
-                } else {
-                    alert('Không thể xóa câu hỏi')
+            if (error) throw error;
+
+            // 2. Create Asset in DB
+            const res = await fetch("/api/pdf-assets", {
+                method: "POST",
+                body: JSON.stringify({ title: file.name, storagePath: filename })
+            });
+            const assetData = await res.json();
+
+            if (assetData.asset) {
+                setAssets([assetData.asset, ...assets]);
+                setSelectedAssetId(assetData.asset.id);
+                setStatus("Uploaded!");
+                setTimeout(() => setStatus(""), 2000);
+            }
+        } catch (err) {
+            console.error(err);
+            setStatus("Upload failed");
+        } finally {
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+    };
+
+    const handleSolutionUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !selectedAssetId) return;
+
+        setStatus("Parsing Solution PDF...");
+        try {
+            const pdfjs = await loadPdfJs();
+            const arrayBuffer = await file.arrayBuffer();
+            const loadingTask = pdfjs.getDocument(arrayBuffer);
+            const pdf = await loadingTask.promise;
+
+            let extractedData: { qNo: number, ans?: string, text?: string }[] = [];
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const tokenizedText = await page.getTextContent();
+
+                // 1. Sort items to reconstruct reading order (Top->Bottom, Left->Right)
+                const items = tokenizedText.items.map((item: any) => ({
+                    str: item.str,
+                    x: item.transform[4],
+                    y: item.transform[5],
+                    h: item.height
+                })).sort((a: any, b: any) => {
+                    // Group by line (tolerance of ~half height)
+                    if (Math.abs(a.y - b.y) > (a.h || 10) * 0.5) return b.y - a.y;
+                    return a.x - b.x;
+                });
+
+                // 2. Reconstruct text with newlines
+                let fullPageText = "";
+                let lastY = items[0]?.y;
+
+                items.forEach((item: any) => {
+                    if (lastY !== undefined && (lastY - item.y) > 10) {
+                        fullPageText += "\n";
+                    }
+                    fullPageText += item.str + " "; // Add space between tokens
+                    lastY = item.y;
+                });
+
+                // 3. Regex Splitting
+                // Look for "1.", "2." etc. at start of lines
+                // Regex: (Start or Newline) (Number) (Dot or Colon) (Space)
+                const questionRegex = /(?:^|\n)(\d+)[\.:]\s/g;
+                let match;
+                let lastIndex = 0;
+                let lastQNo = null;
+
+                // We need to capture the text BETWEEN matches
+                // Find all start indices first
+                const indices: { qNo: number, index: number }[] = [];
+                while ((match = questionRegex.exec(fullPageText)) !== null) {
+                    indices.push({ qNo: parseInt(match[1]), index: match.index });
                 }
-            } catch (error) {
-                console.error('Error deleting question:', error)
+
+                // Slice text
+                for (let k = 0; k < indices.length; k++) {
+                    const current = indices[k];
+                    const next = indices[k + 1];
+                    const end = next ? next.index : fullPageText.length;
+
+                    // The text block for this question
+                    let rawBlock = fullPageText.substring(current.index, end).trim();
+
+                    // Remove the number prefix "1. "
+                    rawBlock = rawBlock.replace(/^(\d+)[\.:]\s*/, "");
+
+                    // 4. Extract Answer Key
+                    // Look for "Solution: A" or "(A)" or just "A" at start
+                    // Common formats: "Solution: A", "Key: A", "(A)", "Answer is A"
+                    let ans = null;
+                    const ansMatch = rawBlock.match(/(?:Solution|Key|Answer)?\s*[:.-]?\s*\(?([A-E])\)?/i);
+
+                    if (ansMatch) {
+                        ans = ansMatch[1].toUpperCase();
+                        // Optional: Remove the answer key from the explanation text to clean it up
+                        // rawBlock = rawBlock.replace(ansMatch[0], "").trim();
+                    }
+
+                    // The rest is solution text
+                    const solutionText = rawBlock.trim();
+
+                    if (ans || solutionText) {
+                        extractedData.push({ qNo: current.qNo, ans: ans || undefined, text: solutionText });
+                    }
+                }
             }
+
+            setStatus(`Found ${extractedData.length} items. Syncing...`);
+
+            // 5. Batch Update
+            let updatedCount = 0;
+            for (const item of extractedData) {
+                // We use handleSaveEdit directly since it now handles logic
+                // But handleSaveEdit expects ID, which we don't have here easily without map.
+                // We should use the API directly with PDF ID + QNo
+
+                await fetch("/api/pdf-questions", {
+                    method: "POST",
+                    headers: { "content-type": "application/json" },
+                    body: JSON.stringify({
+                        pdfAssetId: selectedAssetId,
+                        questionNo: item.qNo,
+                        correctAnswer: item.ans,
+                        solutionText: item.text // Send the full explanation!
+                    }),
+                });
+                updatedCount++;
+            }
+
+            setStatus(`Successfully imported ${updatedCount} solutions!`);
+            fetchQuestions();
+
+        } catch (err) {
+            console.error(err);
+            setStatus("Failed to parse solution PDF");
+        } finally {
+            // Reset input
+            e.target.value = "";
+        }
+    };
+
+    // Review Handlers
+    async function fetchQuestions() {
+        if (!selectedAssetId) return;
+        try {
+            const res = await fetch(`/api/pdf-questions?pdfAssetId=${selectedAssetId}`);
+            const data = await res.json();
+            if (data.questions) {
+                // Sort by question number
+                setSavedQuestions(data.questions.sort((a: any, b: any) => a.questionNo - b.questionNo));
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function handleSaveEdit(id: string, newText: string | null, correctAnswer: string | null, solutionText: string | null, category: string | null, options: any) {
+        // Find existing to get required fields
+        const original = savedQuestions.find(q => q.id === id);
+        if (!original) return;
+
+        try {
+            const res = await fetch("/api/pdf-questions", {
+                method: "POST", // This upserts based on assetId + qNo
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                    pdfAssetId: original.pdfAssetId,
+                    questionNo: original.questionNo,
+                    pageIndex: original.pageIndex,
+                    x: original.x,
+                    y: original.y,
+                    w: original.w,
+                    h: original.h,
+                    correctAnswer: correctAnswer,
+                    textContent: newText,
+                    solutionText: solutionText,
+                    category: category, // Added
+                    options: options
+                }),
+            });
+            if (res.ok) {
+                setStatus(`Updated Question ${original.questionNo}`);
+                fetchQuestions(); // Refresh UI
+            } else {
+                alert("Failed to update");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Error updating");
         }
     }
 
-    const filteredQuestions = questions.filter(q => {
-        const matchesSearch = q.content.toLowerCase().includes(searchTerm.toLowerCase())
-        const matchesCategory = !filterCategory || q.categoryId === parseInt(filterCategory)
-        return matchesSearch && matchesCategory
-    })
+    useEffect(() => {
+        if (selectedAssetId) fetchQuestions();
+    }, [selectedAssetId]);
+
+    const handleNavigate = (direction: number) => {
+        if (!editingQuestion || savedQuestions.length === 0) return;
+
+        // Use a more robust finding method (by ID or index in array)
+        const currentIndex = savedQuestions.findIndex(q => q.id === editingQuestion.id);
+        if (currentIndex === -1) return;
+
+        const newIndex = currentIndex + direction;
+
+        // Bounds check
+        if (newIndex >= 0 && newIndex < savedQuestions.length) {
+            setEditingQuestion(savedQuestions[newIndex]);
+        }
+    };
+
 
     return (
-        <div className="p-8">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Quản Lý Câu Hỏi</h1>
-                    <p className="text-gray-600 mt-1">Tạo và quản lý ngân hàng câu hỏi</p>
-                </div>
+        <div className="p-6 space-y-6">
+            <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-bold">PDF Question Annotator</h1>
                 <div className="flex gap-2">
-                    <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
-                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                </svg>
-                                Import PDF
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-[95vw] sm:max-w-[95vw] w-full max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                                <DialogTitle>Nhập câu hỏi từ PDF</DialogTitle>
-                                <DialogDescription>Chọn file PDF đề thi để hệ thống tự động nhận diện câu hỏi.</DialogDescription>
-                            </DialogHeader>
+                    <Button onClick={handleAutoDetect} disabled={!pdfUrl || isAutoDetecting} variant="secondary">
+                        Detect Page
+                    </Button>
+                    <Button onClick={handleBatchDetect} disabled={!pdfUrl || isAutoDetecting} variant="destructive">
+                        ⚡ Detect ALL
+                    </Button>
 
-                            <div className="space-y-4 py-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label>File PDF Câu Hỏi <span className="text-red-500">*</span></Label>
-                                        <Input
-                                            type="file"
-                                            accept=".pdf"
-                                            ref={questionFileRef}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>File PDF Đáp Án (tùy chọn)</Label>
-                                        <Input
-                                            type="file"
-                                            accept=".pdf"
-                                            ref={solutionFileRef}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex gap-4 items-end">
-                                    <div className="flex-1 space-y-2">
-                                        <Label>Chọn danh mục lưu</Label>
-                                        <select
-                                            value={importCategoryId}
-                                            onChange={(e) => setImportCategoryId(e.target.value)}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                                        >
-                                            <option value="">-- Chọn danh mục --</option>
-                                            {categories.map(c => (
-                                                <option key={c.id} value={c.id}>{c.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <Button
-                                        onClick={handleFileUpload}
-                                        disabled={isParsing}
-                                        className="bg-blue-600 hover:bg-blue-700"
-                                    >
-                                        {isParsing ? 'Đang xử lý...' : 'Phân Tích PDF'}
-                                    </Button>
-                                </div>
+                    <div className="relative">
+                        <input
+                            type="file"
+                            accept=".pdf"
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            onChange={handleSolutionUpload}
+                        />
+                        <Button variant="outline">📂 Upload Solution Key</Button>
+                    </div>
 
-                                {isParsing && <div className="text-center py-4 text-blue-600">Đang phân tích file PDF...</div>}
-
-                                {importedQuestions.length > 0 && (
-                                    <div className="border rounded-md p-4 bg-gray-50">
-                                        <h3 className="font-medium mb-3">Kết quả đọc được ({importedQuestions.length} câu):</h3>
-                                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-                                            {importedQuestions.map((q, idx) => (
-                                                <div key={idx} className="bg-white p-3 rounded border">
-                                                    <div className="flex justify-between items-center mb-1">
-                                                        <div className="font-medium text-sm text-gray-700">Câu {q.id}:</div>
-                                                        <div className="text-xs font-medium px-2 py-1 rounded bg-green-100 text-green-700">
-                                                            Đáp án: {q.correctOption}
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-sm mb-2"><MathRender text={q.content} /></div>
-                                                    <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
-                                                        {q.options.map(o => (
-                                                            <div
-                                                                key={o.key}
-                                                                className={o.key === q.correctOption ? 'font-semibold text-green-700' : ''}
-                                                            >
-                                                                {o.key}. <MathRender text={o.text} />
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsImportDialogOpen(false)}>Hủy</Button>
-                                <Button
-                                    onClick={saveImportedQuestions}
-                                    disabled={importedQuestions.length === 0 || !importCategoryId}
-                                    className="bg-blue-600 hover:bg-blue-700"
-                                >
-                                    Lưu {importedQuestions.length} Câu Hỏi
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button onClick={resetForm} className="bg-blue-600 hover:bg-blue-700">
-                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                                Thêm Câu Hỏi
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                                <DialogTitle>{editingQuestion ? 'Sửa Câu Hỏi' : 'Thêm Câu Hỏi Mới'}</DialogTitle>
-                                <DialogDescription>
-                                    Hỗ trợ LaTeX: Dùng $...$ cho công thức inline
-                                </DialogDescription>
-                            </DialogHeader>
-                            <form onSubmit={handleSubmit}>
-                                <div className="space-y-4 py-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="categoryId">Danh mục</Label>
-                                            <select
-                                                id="categoryId"
-                                                value={formData.categoryId}
-                                                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                required
-                                            >
-                                                <option value="">-- Chọn danh mục --</option>
-                                                {categories.map(c => (
-                                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="content">Nội dung câu hỏi</Label>
-                                        <Textarea
-                                            id="content"
-                                            value={formData.content}
-                                            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                                            placeholder="VD: Tính xác suất $P(X > 2)$ với $X \sim N(0,1)$"
-                                            rows={4}
-                                            required
-                                        />
-                                        {formData.content && (
-                                            <div className="p-3 bg-gray-50 rounded-md border">
-                                                <p className="text-xs text-gray-500 mb-1">Xem trước:</p>
-                                                <MathRender text={formData.content} />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        <Label>Các đáp án</Label>
-                                        {['A', 'B', 'C', 'D', 'E'].map((key) => (
-                                            <div key={key} className="flex items-center gap-3">
-                                                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${formData.correctOption === key ? 'bg-green-500 text-white' : 'bg-gray-200'
-                                                    }`}>
-                                                    {key}
-                                                </span>
-                                                <Input
-                                                    value={formData[`option${key}` as keyof typeof formData] as string}
-                                                    onChange={(e) => setFormData({ ...formData, [`option${key}`]: e.target.value })}
-                                                    placeholder={`Đáp án ${key}`}
-                                                    className="flex-1"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setFormData({ ...formData, correctOption: key })}
-                                                    className={`px-3 py-1 rounded text-sm ${formData.correctOption === key
-                                                        ? 'bg-green-500 text-white'
-                                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                                        }`}
-                                                >
-                                                    {formData.correctOption === key ? '✓ Đáp án đúng' : 'Chọn'}
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="explanation">Lời giải (tùy chọn)</Label>
-                                        <Textarea
-                                            id="explanation"
-                                            value={formData.explanation}
-                                            onChange={(e) => setFormData({ ...formData, explanation: e.target.value })}
-                                            placeholder="Giải thích đáp án đúng..."
-                                            rows={3}
-                                        />
-                                    </div>
-                                </div>
-                                <DialogFooter>
-                                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                                        Hủy
-                                    </Button>
-                                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                                        {editingQuestion ? 'Cập Nhật' : 'Tạo Mới'}
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
+                    <div>
+                        <input
+                            type="file"
+                            accept=".pdf"
+                            className="hidden"
+                            ref={fileInputRef}
+                            onChange={handleFileSelect}
+                        />
+                        <Button onClick={() => fileInputRef.current?.click()} variant="outline">
+                            + Upload PDF
+                        </Button>
+                    </div>
                 </div>
             </div>
 
-            {/* Filters */}
-            <div className="flex gap-4 mb-6">
-                <Input
-                    placeholder="Tìm kiếm câu hỏi..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="max-w-sm"
-                />
-                <select
-                    value={filterCategory}
-                    onChange={(e) => setFilterCategory(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    <option value="">Tất cả danh mục</option>
-                    {categories.map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                </select>
+            <div className="flex flex-wrap gap-4 items-end bg-card p-4 rounded-lg border shadow-sm">
+                <div className="space-y-2 min-w-[200px]">
+                    <Label>Select PDF</Label>
+                    <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        value={selectedAssetId}
+                        onChange={e => setSelectedAssetId(e.target.value)}
+                    >
+                        <option value="">-- Choose PDF --</option>
+                        {assets.map(a => (
+                            <option key={a.id} value={a.id}>{a.title} ({a.storagePath})</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="space-y-2 w-24">
+                    <Label>Page (0-idx)</Label>
+                    <Input
+                        type="number"
+                        min={0}
+                        value={pageIndex}
+                        onChange={(e) => setPageIndex(Number(e.target.value))}
+                    />
+                </div>
+
+                <div className="space-y-2 w-24">
+                    <Label>Question #</Label>
+                    <Input
+                        type="number"
+                        min={1}
+                        value={questionNo}
+                        onChange={(e) => setQuestionNo(Number(e.target.value))}
+                    />
+                </div>
+
+                <Button onClick={save} disabled={!rect || !selectedAssetId}>
+                    Save Question {questionNo}
+                </Button>
+
+                {status && <span className="text-sm font-medium animate-pulse text-green-600 self-center">{status}</span>}
             </div>
 
-            {/* Questions List */}
-            <div className="space-y-4">
-                {isLoading ? (
-                    <div className="text-center py-12 text-gray-500">Đang tải dữ liệu...</div>
-                ) : filteredQuestions.map((question) => (
-                    <Card key={question.id} className="border-0 shadow-sm">
-                        <CardContent className="p-6">
-                            <div className="flex justify-between items-start gap-4">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded">
-                                            {categories.find(c => c.id === question.categoryId)?.name}
-                                        </span>
-                                        <span className="text-xs text-gray-400">
-                                            #{question.id}
-                                        </span>
-                                    </div>
-                                    <div className="text-gray-900 mb-4">
-                                        <MathRender text={question.content} />
-                                    </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                                        {question.options.map((opt) => (
-                                            <div
-                                                key={opt.key}
-                                                className={`px-3 py-2 rounded-lg text-sm ${opt.key === question.correctOption
-                                                    ? 'bg-green-100 text-green-800 border border-green-300'
-                                                    : 'bg-gray-50 text-gray-700'
-                                                    }`}
-                                            >
-                                                <span className="font-medium">{opt.key}.</span>{' '}
-                                                <MathRender text={opt.text} />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleEdit(question)}
-                                        className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                                    >
-                                        Sửa
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleDelete(question.id)}
-                                        className="text-red-600 border-red-200 hover:bg-red-50"
-                                    >
-                                        Xóa
-                                    </Button>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+            {/* Review Section */}
+            {selectedAssetId && (
+                <div className="border rounded-lg bg-white p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-bold">Review Saved Questions ({savedQuestions.length})</h2>
+                        <Button variant="outline" size="sm" onClick={fetchQuestions}>Refresh List</Button>
+                    </div>
 
-            {!isLoading && filteredQuestions.length === 0 && (
-                <div className="text-center py-12 text-gray-500">
-                    Không tìm thấy câu hỏi nào
+                    <div className="grid grid-cols-5 gap-2 max-h-[300px] overflow-y-auto">
+                        {savedQuestions.map(q => (
+                            <Button
+                                key={q.id}
+                                variant={q.textContent ? "default" : "secondary"} // Highlight text-ready Qs
+                                className={`w-full justify-start ${!q.textContent && q.correctAnswer ? "border-green-500 border-2" : ""}`}
+                                onClick={() => setEditingQuestion(q)}
+                            >
+                                Q{q.questionNo} {q.textContent ? "📝" : "🖼️"} {q.correctAnswer ? `(${q.correctAnswer})` : ""}
+                            </Button>
+                        ))}
+                    </div>
                 </div>
             )}
+
+            {/* Editor Modal */}
+            <QuestionEditor
+                question={editingQuestion}
+                pdfUrl={pdfUrl}
+                isOpen={!!editingQuestion}
+                onClose={() => setEditingQuestion(null)}
+                onSave={handleSaveEdit}
+                onNavigate={handleNavigate}
+            />
+
+            {selectedAssetId && pdfUrl ? (
+                <div className="relative inline-block border bg-gray-50 rounded-lg overflow-hidden shadow">
+                    <PdfCanvas url={pdfUrl} pageIndex={pageIndex} scale={1.5} onViewport={setViewport} />
+                    {viewport && (
+                        <BboxSelector width={viewport.width} height={viewport.height} onChange={setRect} />
+                    )}
+                </div>
+            ) : (
+                <div className="h-64 grid place-items-center bg-muted/30 border-2 dashed rounded-xl">
+                    <span className="text-muted-foreground">Select a PDF to start annotating</span>
+                </div>
+            )}
+
+            <div className="text-xs text-muted-foreground font-mono mt-4">
+                Debug: {JSON.stringify({ rect, viewport }, null, 2)}
+            </div>
         </div>
-    )
+    );
 }
+

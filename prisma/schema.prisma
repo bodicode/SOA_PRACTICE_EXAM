@@ -21,6 +21,7 @@ model User {
   uploadedFiles UploadedFile[]
   hostedRooms   BattleRoom[]
   roomParticipations RoomParticipant[]
+  pdfAssetsUploaded  PdfAsset[]        @relation("PdfAssetUploader")
 }
 
 // 2. Subscriptions
@@ -129,4 +130,46 @@ model RoomParticipant {
 
   room       BattleRoom @relation(fields: [roomId], references: [id])
   user       User       @relation(fields: [userId], references: [id])
+}
+
+// 6. PDF Import
+model PdfAsset {
+  id          String   @id @default(cuid())
+  title       String
+  bucket      String   @default("exam-pdfs")
+  storagePath String
+  pageCount   Int?
+  status      String   @default("uploaded") // uploaded, ready, archived
+
+  uploadedById Int?
+  uploadedBy   User?    @relation("PdfAssetUploader", fields: [uploadedById], references: [id])
+
+  createdAt   DateTime @default(now())
+  regionQuestions PdfRegionQuestion[]
+
+  @@unique([bucket, storagePath])
+}
+
+model PdfRegionQuestion {
+  id         String   @id @default(cuid())
+  pdfAssetId String
+  questionNo Int
+  pageIndex  Int
+  x          Float
+  y          Float
+  w          Float
+  h          Float
+  
+  correctAnswer String? // "A", "B", "C", "D", "E"
+  textContent   String? @db.Text // Store full text of question
+  solutionText  String? @db.Text // Store full text of solution
+  category      String? // Exam Category (e.g., "P", "FM")
+  options       Json?    // Store structured options [{"id": "1", "text": "...", "label": "A"}]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  pdfAsset   PdfAsset @relation(fields: [pdfAssetId], references: [id])
+
+  @@unique([pdfAssetId, questionNo])
 }
