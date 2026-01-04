@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SOA Exam Practice - Luyện thi Actuary",
   description: "Nền tảng luyện thi SOA Actuarial #1 Việt Nam với hàng ngàn câu hỏi, theo dõi tiến độ và chế độ thi đấu.",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({

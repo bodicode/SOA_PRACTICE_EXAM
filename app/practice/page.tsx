@@ -1,23 +1,32 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useEffect, useState } from 'react'
 import { Category, examService } from '@/services/exam.service'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 
 export default function PracticePage() {
     const { user } = useUserStore()
+    const router = useRouter()
     const [examCategories, setExamCategories] = useState<Category[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [showLoginDialog, setShowLoginDialog] = useState(false)
 
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const data = await examService.getCategories()
-                // Filter only main exams if structure implies hierarchy, or display all. 
-                // Assuming top-level categories are exams for now.
                 setExamCategories(data)
             } catch (error) {
                 console.error('Failed to fetch categories:', error)
@@ -28,11 +37,16 @@ export default function PracticePage() {
         fetchCategories()
     }, [])
 
+    const handleStart = (examId: number) => {
+        if (!user) {
+            setShowLoginDialog(true)
+        } else {
+            router.push(`/practice/${examId}`)
+        }
+    }
+
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-
-
             {/* Main Content */}
             <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <h1 className="text-4xl font-bold text-[#003366] mb-8">
@@ -90,18 +104,18 @@ export default function PracticePage() {
                                 <CardHeader className="pb-2">
                                     <CardTitle className="text-[#003366] text-lg">{exam.name}</CardTitle>
                                     <CardDescription>
-                                        {/* Since description isn't in Category interface, we might need to map it or omit it for now */}
                                         {exam.parentName ? `Thuộc: ${exam.parentName}` : 'Kỳ thi chính thức'}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="flex justify-between items-center">
                                     <span className="text-sm text-gray-500">{exam.questionsCount} câu hỏi</span>
-                                    {/* Pass the ID to the dynamic route */}
-                                    <Link href={`/practice/${exam.id}`}>
-                                        <Button size="sm" className="bg-[#003366] hover:bg-[#002244]">
-                                            Bắt đầu
-                                        </Button>
-                                    </Link>
+                                    <Button
+                                        size="sm"
+                                        className="bg-[#003366] hover:bg-[#002244]"
+                                        onClick={() => handleStart(exam.id)}
+                                    >
+                                        Bắt đầu
+                                    </Button>
                                 </CardContent>
                             </Card>
                         ))}
@@ -121,7 +135,26 @@ export default function PracticePage() {
                 </div>
             </main>
 
-
+            <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Yêu cầu đăng nhập</DialogTitle>
+                        <DialogDescription>
+                            Bạn cần đăng nhập để bắt đầu làm bài thi thử. Tài khoản của bạn sẽ được lưu quá trình học tập.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowLoginDialog(false)}>
+                            Hủy
+                        </Button>
+                        <Link href="/login">
+                            <Button onClick={() => setShowLoginDialog(false)}>
+                                Đăng nhập ngay
+                            </Button>
+                        </Link>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

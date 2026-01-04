@@ -1,12 +1,13 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
 import { LayoutDashboard, LogOut } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -19,8 +20,29 @@ import {
 export function Navbar() {
     const { user, isLoading, logout } = useUserStore()
     const router = useRouter()
-    const supabase = createClient()
+    const [supabase] = useState(() => createClient())
     const [isOpen, setIsOpen] = useState(false)
+    const [isVisible, setIsVisible] = useState(true)
+    const [lastScrollY, setLastScrollY] = useState(0)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY
+
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // Scrolling down & past threshold
+                setIsVisible(false)
+            } else {
+                // Scrolling up
+                setIsVisible(true)
+            }
+
+            setLastScrollY(currentScrollY)
+        }
+
+        window.addEventListener('scroll', handleScroll, { passive: true })
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [lastScrollY])
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
@@ -30,27 +52,34 @@ export function Navbar() {
     }
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60">
+        <header
+            className={`sticky top-0 z-50 w-full border-b border-gray-100 bg-white transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
+                }`}
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
+                <div className="flex justify-between items-center h-20">
                     <div className="flex items-center gap-8">
                         <Link href="/" className="flex items-center gap-2 group">
-                            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-105 transition-transform">
-                                <span className="text-white text-lg font-bold">S</span>
+                            <div className="relative w-40 h-16 flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden">
+                                <Image
+                                    src="/logo.png"
+                                    alt="SOA Prep Logo"
+                                    fill
+                                    className="object-contain object-center scale-[2.5]"
+                                    priority
+                                />
                             </div>
-                            <span className="font-bold text-xl text-gray-900 tracking-tight">SOA Prep</span>
                         </Link>
-                        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
-                            <Link href="/exams" className="hover:text-blue-600 transition-colors">
-                                Danh Mục Đề Thi
-                            </Link>
-                            <Link href="/progress" className="hover:text-blue-600 transition-colors">
-                                Tiến độ học tập
-                            </Link>
-                            <Link href="/pricing" className="hover:text-blue-600 transition-colors">
-                                Bảng Giá
-                            </Link>
-                        </nav>
+                        {user && (
+                            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
+                                <Link href="/practice" className="hover:text-blue-600 transition-colors">
+                                    Ôn tập
+                                </Link>
+                                <Link href="/progress" className="hover:text-blue-600 transition-colors">
+                                    Tiến độ học tập
+                                </Link>
+                            </nav>
+                        )}
                     </div>
                     <div className="flex items-center gap-3">
                         {isLoading ? (

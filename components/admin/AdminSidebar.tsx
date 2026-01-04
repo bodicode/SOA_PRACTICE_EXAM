@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useUserStore } from '@/stores/userStore'
 import { cn } from '@/lib/utils'
@@ -61,13 +62,15 @@ export function AdminSidebar() {
         <aside className="w-64 bg-slate-900 min-h-screen text-white flex flex-col">
             {/* Logo */}
             <div className="p-6 border-b border-slate-700">
-                <Link href="/admin" className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold">S</span>
-                    </div>
-                    <div>
-                        <div className="font-bold">SOA Prep</div>
-                        <div className="text-xs text-slate-400">Admin Panel</div>
+                <Link href="/admin" className="flex items-center gap-3 w-full">
+                    <div className="relative w-full h-24 flex items-center justify-center overflow-hidden">
+                        <Image
+                            src="/logo-admin.png"
+                            alt="SOA Prep Logo"
+                            fill
+                            className="object-contain object-center scale-[2.5]"
+                            priority
+                        />
                     </div>
                 </Link>
             </div>

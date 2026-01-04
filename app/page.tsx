@@ -177,7 +177,7 @@ export default function Home() {
                     AN
                   </div>
                   <div>
-                    <div className="font-bold text-white text-lg">Nguyễn Minh Anh</div>
+                    <div className="font-bold text-white text-lg">Nguyễn Phước Thịnh</div>
                     <div className="text-blue-200">Associate of the Society of Actuaries (ASA)</div>
                   </div>
                 </div>
@@ -205,99 +205,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Mock Exam Section */}
-      <section className="relative py-24 overflow-hidden bg-gray-900">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-blue-900/50" />
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
-        </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-wider mb-6">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                Exam Simulation
-              </div>
-              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
-                Chế Độ Thi Thử <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
-                  Mô Phỏng Phòng Thi
-                </span>
-              </h2>
-              <p className="text-lg text-gray-400 mb-8 leading-relaxed max-w-lg">
-                Tạo không gian thi cử nghiêm túc với đồng hồ đếm ngược và giao diện y hệt thi thật.
-                Giúp bạn làm quen với áp lực thời gian và rèn luyện tâm lý vững vàng.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/practice">
-                  <Button size="lg" className="h-14 px-8 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white border-0 shadow-lg shadow-red-900/20 rounded-full font-bold text-lg group">
-                    <Target className="w-5 h-5 mr-2 group-hover:rotate-180 transition-transform duration-500" />
-                    Vào Phòng Thi Ngay
-                  </Button>
-                </Link>
-                <Link href="/leaderboard">
-                  <Button size="lg" variant="outline" className="h-14 px-8 border-gray-700 text-gray-300 hover:text-white hover:bg-white/5 rounded-full text-lg">
-                    Bảng Xếp Hạng
-                  </Button>
-                </Link>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="relative lg:h-[500px] flex items-center justify-center"
-            >
-              <div className="relative z-10 w-full max-w-md bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-3xl p-6 shadow-2xl">
-                <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-700">
-                  <div>
-                    <p className="text-gray-400 text-sm">Exam P</p>
-                    <p className="text-white font-bold text-xl">Mock Exam #204</p>
-                  </div>
-                  <div className="px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-sm font-mono font-bold">
-                    02:59:45
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {[1, 2, 3].map((_, i) => (
-                    <div key={i} className="h-16 rounded-xl bg-gray-700/30 border border-gray-700/50 animate-pulse" />
-                  ))}
-                </div>
-
-                <div className="mt-6 pt-6 border-t border-gray-700 flex justify-between items-center">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 text-gray-400 text-sm">
-                      <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                      Online
-                    </div>
-                    <div className="h-4 w-px bg-gray-700"></div>
-                    <div className="text-gray-300 font-medium text-sm">
-                      30 Câu hỏi
-                    </div>
-                  </div>
-                  <div className="text-white font-bold text-sm bg-blue-600/20 px-3 py-1.5 rounded-lg border border-blue-500/30">
-                    Tiến độ: 15/30
-                  </div>
-                </div>
-              </div>
-
-              {/* Decorative rings */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-gray-800/50 rounded-full" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-gray-800/50 rounded-full" />
-            </motion.div>
-          </div>
-        </div>
-      </section>
 
       {/* Footer */}
 

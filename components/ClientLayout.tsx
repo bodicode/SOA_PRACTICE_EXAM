@@ -17,7 +17,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         <>
             <Navbar />
             {/* Main content wrapper with top padding to account for fixed navbar */}
-            <main className="min-h-screen pt-16">
+            <main className="min-h-screen">
                 {children}
             </main>
             <Footer />
