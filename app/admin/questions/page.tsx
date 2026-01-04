@@ -432,8 +432,8 @@ export default function AdminQuestionsPage() {
                     // The text block for this question
                     let rawBlock = fullPageText.substring(current.index, end).trim();
 
-                    // Remove the number prefix "1. "
-                    rawBlock = rawBlock.replace(/^(\d+)[\.:]\s*/, "");
+                    // Remove the number prefix "1. " -> DISABLED per user request (keep numbering)
+                    // rawBlock = rawBlock.replace(/^(\d+)[\.:]\s*/, "");
 
                     // 4. Extract Answer Key
                     // Look for "Solution: A" or "(A)" or just "A" at start

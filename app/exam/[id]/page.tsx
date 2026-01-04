@@ -247,6 +247,16 @@ export default function ExamPage() {
 
     const currentQuestion = questions[currentQuestionIndex]
 
+    // Smart Numbering Helper
+    const formatQuestionContent = (index: number, content: string) => {
+        const trimmed = content.trim();
+        // Remove existing numbering if present (e.g. "1.", "1)", "Question 1") to avoid duplicates/mismatches
+        const cleanContent = trimmed.replace(/^(?:Question\s+)?\d+[\.:\)]\s*/i, "");
+
+        // Always prepend the current index + 1 in Bold to ensure it's visible and matches the UI counter
+        return `**${index + 1}.** ${cleanContent}`;
+    };
+
     return (
         <div className="flex flex-col h-[calc(100vh-4rem)] bg-gray-100">
             {/* Top Bar */}
@@ -339,7 +349,7 @@ export default function ExamPage() {
 
                     <Card className="flex-1 p-8 shadow-sm flex flex-col mb-6 overflow-auto">
                         <div className="text-lg mb-8 leading-relaxed">
-                            <MathRender text={currentQuestion.content ?? ""} />
+                            <MathRender text={formatQuestionContent(currentQuestionIndex, currentQuestion.content ?? "")} />
                         </div>
 
                         <RadioGroup
