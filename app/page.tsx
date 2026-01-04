@@ -7,6 +7,7 @@ import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import { ArrowRight, CheckCircle2, BarChart2, BookOpen, Target, LogOut, LayoutDashboard, ChevronRight } from 'lucide-react'
+import { HeroSection } from '@/components/HeroSection'
 
 export default function Home() {
   const { user, isLoading } = useUserStore()
@@ -36,67 +37,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Sticky Header */}
-      <motion.header
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className="sticky top-0 z-50 w-full border-b border-white/10 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-8">
-              <Link href="/" className="flex items-center gap-2 group">
-                <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-105 transition-transform">
-                  <span className="text-white text-lg font-bold">S</span>
-                </div>
-                <span className="font-bold text-xl text-gray-900 tracking-tight">SOA Prep</span>
-              </Link>
-              <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
-                <Link href="/exams" className="hover:text-blue-600 transition-colors">
-                  Danh Mục Đề Thi
-                </Link>
-                <Link href="/pricing" className="hover:text-blue-600 transition-colors">
-                  Bảng Giá
-                </Link>
-              </nav>
-            </div>
-            <div className="flex items-center gap-3">
-              {isLoading ? (
-                <div className="w-24 h-9 bg-gray-100 animate-pulse rounded-full" />
-              ) : user ? (
-                <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                    {user.fullName || user.email?.split('@')[0]}
-                  </span>
-                  <Link href="/dashboard">
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 rounded-full px-5">
-                      <LayoutDashboard className="w-4 h-4 mr-2" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <a href="/api/auth/signout">
-                    <Button variant="ghost" size="icon" className="text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full">
-                      <LogOut className="w-5 h-5" />
-                    </Button>
-                  </a>
-                </div>
-              ) : (
-                <>
-                  <Link href="/login">
-                    <Button variant="ghost" className="text-gray-600 hover:text-gray-900 font-medium">
-                      Đăng Nhập
-                    </Button>
-                  </Link>
-                  <Link href="/register">
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 rounded-full px-6 transition-transform hover:scale-105">
-                      Đăng Ký
-                    </Button>
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </motion.header>
+
 
       {/* Hero Section */}
       <section className="relative pt-20 pb-32 lg:pt-32 lg:pb-40 overflow-hidden">
@@ -139,14 +80,6 @@ export default function Home() {
               initial="hidden"
               animate="visible"
             >
-              <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-blue-100 text-blue-700 text-sm font-semibold mb-8 shadow-sm hover:shadow-md transition-shadow cursor-default">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-600"></span>
-                </span>
-                TÍNH NĂNG MỚI ĐÃ CÓ
-              </motion.div>
-
               <motion.h1 variants={itemVariants} className="text-5xl lg:text-7xl font-bold text-gray-900 leading-[1.1] mb-6 tracking-tight">
                 Chinh Phục <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 bg-[length:200%_auto] animate-gradient">
@@ -161,7 +94,7 @@ export default function Home() {
               </motion.p>
 
               <motion.div variants={itemVariants} className="flex flex-wrap gap-4">
-                <Link href="/register">
+                <Link href="/practice">
                   <Button size="lg" className="h-14 px-8 text-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-600/20 rounded-full transition-all hover:scale-105 active:scale-95 group relative overflow-hidden">
                     <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12" />
                     Ôn tập ngay
@@ -171,84 +104,7 @@ export default function Home() {
               </motion.div>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-              className="relative perspective-1000"
-            >
-              <div className="relative z-10 bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(30,58,138,0.15)] border border-white/50 p-8 overflow-hidden transform-gpu hover:scale-[1.02] transition-transform duration-500">
-                <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500" />
-                <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
-
-                <div className="relative mb-6">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-                      Thử Tài Actuary
-                    </div>
-                    <span className="text-xs font-semibold text-gray-400">Exam P • Probability</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 leading-tight mt-3">
-                    Tung một đồng xu cân đối 3 lần. Xác suất để có đúng 2 mặt ngửa là?
-                  </h3>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 relative z-20">
-                  {['1/8', '3/8', '1/2', '5/8'].map((option, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setSelectedOption(idx)}
-                      className={`
-                        relative px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 border-2
-                        ${selectedOption === idx
-                          ? option === '3/8'
-                            ? 'bg-green-50 border-green-500 text-green-700 shadow-sm'
-                            : 'bg-red-50 border-red-500 text-red-700 shadow-sm'
-                          : 'bg-white border-transparent hover:border-blue-200 text-gray-600 hover:bg-blue-50'
-                        }
-                      `}
-                    >
-                      {option}
-                      {selectedOption === idx && (
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2">
-                          {option === '3/8'
-                            ? <CheckCircle2 className="w-4 h-4 text-green-600" />
-                            : <div className="w-4 h-4 rounded-full bg-red-100 flex items-center justify-center"><span className="text-red-600 text-[10px]">✕</span></div>
-                          }
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-
-                {selectedOption !== null && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`mt-6 text-sm font-medium p-4 rounded-xl flex items-center gap-3 ${selectedOption === 1 ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}
-                  >
-                    {selectedOption === 1 ? (
-                      <>
-                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">🥳</div>
-                        <div>
-                          <p className="font-bold">Chính xác!</p>
-                          <p className="text-xs opacity-80">Số trường hợp: {`{HHN, HNH, NHH}`} = 3</p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">🤔</div>
-                        <div>
-                          <p className="font-bold">Chưa đúng rồi</p>
-                          <p className="text-xs opacity-80">Hãy thử liệt kê các trường hợp xem!</p>
-                        </div>
-                      </>
-                    )}
-                  </motion.div>
-                )}
-              </div>
-            </motion.div>
+            <HeroSection />
           </div>
         </div>
       </section>
@@ -444,27 +300,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-gray-100 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white text-sm font-bold">S</span>
-              </div>
-              <span className="font-bold text-gray-900">SOA Prep</span>
-            </div>
-            <nav className="flex flex-wrap justify-center gap-8 text-sm font-medium text-gray-600">
-              <Link href="/support" className="hover:text-blue-600 transition-colors">Hỗ Trợ</Link>
-              <Link href="/exams" className="hover:text-blue-600 transition-colors">Danh Mục Đề Thi</Link>
-              <Link href="/terms" className="hover:text-blue-600 transition-colors">Điều Khoản</Link>
-              <Link href="/privacy" className="hover:text-blue-600 transition-colors">Bảo Mật</Link>
-            </nav>
-            <div className="text-sm text-gray-500">
-              © 2024 SOA Prep. All rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
+
     </div>
   )
 }

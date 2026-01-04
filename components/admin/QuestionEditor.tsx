@@ -57,7 +57,7 @@ type Question = {
     textContent?: string | null;
     correctAnswer?: string | null;
     solutionText?: string | null;
-    category?: string | null;
+    categoryId?: number | null; // Changed from category string
     options?: any; // JSON
 };
 
@@ -66,9 +66,11 @@ type Props = {
     pdfUrl: string;
     isOpen: boolean;
     onClose: () => void;
-    onSave: (id: string, newText: string | null, correctAnswer: string | null, solutionText: string | null, category: string | null, options: any) => Promise<void>;
+    onSave: (id: string, newText: string | null, correctAnswer: string | null, solutionText: string | null, categoryId: string | number | null, options: any) => Promise<void>;
     onNavigate: (direction: number) => void;
 };
+
+// ...
 
 type OptionItem = {
     id: string; // "A", "B", ... or UUID
@@ -80,7 +82,7 @@ export function QuestionEditor({ question, pdfUrl, isOpen, onClose, onSave, onNa
     const [text, setText] = useState("");
     const [solution, setSolution] = useState("");
     const [correctAnswer, setCorrectAnswer] = useState<string | null>(null);
-    const [category, setCategory] = useState<string>("P"); // Default to P
+    const [categoryId, setCategoryId] = useState<string | number>(""); // Changed from category
     const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
     const [optionsList, setOptionsList] = useState<OptionItem[]>([]);
     const [activeTab, setActiveTab] = useState<"question" | "options" | "solution">("question");
@@ -93,19 +95,17 @@ export function QuestionEditor({ question, pdfUrl, isOpen, onClose, onSave, onNa
     const [midWidth, setMidWidth] = useState(40);
     const containerRef = useRef<HTMLDivElement>(null);
     const isResizingRef = useRef<"left" | "mid" | null>(null);
-
     useEffect(() => {
         if (question) {
             setText(question.textContent || "");
             setSolution(question.solutionText || "");
             setCorrectAnswer(question.correctAnswer || null);
-            setCategory(question.category || "P");
+            setCategoryId(question.categoryId || ""); // Use categoryId
 
             // Initialize options
             if (question.options && Array.isArray(question.options) && question.options.length > 0) {
                 setOptionsList(question.options);
             } else {
-                // Default 5 empty options A-E or minimal
                 setOptionsList([
                     { id: "A", text: "", isCorrect: question.correctAnswer === "A" },
                     { id: "B", text: "", isCorrect: question.correctAnswer === "B" },
@@ -376,7 +376,7 @@ export function QuestionEditor({ question, pdfUrl, isOpen, onClose, onSave, onNa
             text || null,
             derivedCorrectAnswer,
             solution || null,
-            category || null,
+            categoryId || null,
             optionsList
         );
         setSaving(false);
@@ -419,20 +419,10 @@ export function QuestionEditor({ question, pdfUrl, isOpen, onClose, onSave, onNa
             }
         }
         setOptionsList(newOptions);
-
-        // Remove options from question text? Optional.
-        // User might want to keep them until verified.
-        // const cleanedText = text.replace(regex, "").trim();
-        // setText(cleanedText);
     };
 
     const handleShuffleOptions = () => {
-        // Shuffle the array
         const shuffled = [...optionsList].sort(() => Math.random() - 0.5);
-        // Re-assign IDs to match positions? No, ID should track the content? 
-        // Actually, for "A, B, C" display, the position matters.
-        // The ID 'A' usually implies position 0.
-        // If we shuffle, we just change the data at declared positions.
         setOptionsList(shuffled);
     };
 
@@ -452,11 +442,10 @@ export function QuestionEditor({ question, pdfUrl, isOpen, onClose, onSave, onNa
     const formatForPreview = (content: string) => {
         let isPreviousLineTable = false;
 
-        // Regex to fix " ** text ** " -> "**text**" (SAFER: Single line only)
         const cleanContent = content
-            .replace(/\*\*\s+([^\r\n*]+?)\s+\*\*/g, "**$1**") // Fix ** text ** -> **text**
-            .replace(/\*\*\s+([^\r\n*]+?)\*\*/g, "**$1**")    // Fix ** text** -> **text**
-            .replace(/\*\*([^\r\n*]+?)\s+\*\*/g, "**$1**");   // Fix **text ** -> **text**
+            .replace(/\*\*\s+([^\r\n*]+?)\s+\*\*/g, "**$1**")
+            .replace(/\*\*\s+([^\r\n*]+?)\*\*/g, "**$1**")
+            .replace(/\*\*([^\r\n*]+?)\s+\*\*/g, "**$1**");
 
         return cleanContent.split("\n").map(line => {
             const preservedLine = line.replace(/^ +/g, (match) => "\u00A0".repeat(match.length));
@@ -464,18 +453,13 @@ export function QuestionEditor({ question, pdfUrl, isOpen, onClose, onSave, onNa
 
             if (trimmed === "") {
                 if (isPreviousLineTable) {
-                    // Critical: Must close the table block with a clean break
                     isPreviousLineTable = false;
                     return "";
                 }
-                // Text mode or already closed: Force visible space
                 return "\u00A0  ";
             }
 
-            // Detect if this line looks like a table row for the NEXT iteration
             isPreviousLineTable = trimmed.startsWith("|");
-
-            // Add 2 spaces at end to force hard break, UNLESS it's a table row
             return preservedLine + (isPreviousLineTable ? "" : "  ");
         }).join("\n");
     };
@@ -495,20 +479,21 @@ export function QuestionEditor({ question, pdfUrl, isOpen, onClose, onSave, onNa
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                         <select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
+                            value={categoryId}
+                            onChange={(e) => setCategoryId(Number(e.target.value))}
                             className="h-9 w-24 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                         >
+                            <option value="">-- Cat --</option>
                             {categories.length > 0 ? (
                                 categories.map((cat) => (
-                                    <option key={cat.id} value={cat.name}>
+                                    <option key={cat.id} value={cat.id}>
                                         {cat.name}
                                     </option>
                                 ))
                             ) : (
                                 <>
-                                    <option value="P">Exam P</option>
-                                    <option value="FM">Exam FM</option>
+                                    <option value="1">Exam P</option>
+                                    <option value="2">Exam FM</option>
                                 </>
                             )}
                         </select>

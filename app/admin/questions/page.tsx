@@ -503,7 +503,7 @@ export default function AdminQuestionsPage() {
         } catch (e) { console.error(e); }
     }
 
-    async function handleSaveEdit(id: string, newText: string | null, correctAnswer: string | null, solutionText: string | null, category: string | null, options: any) {
+    async function handleSaveEdit(id: string, newText: string | null, correctAnswer: string | null, solutionText: string | null, category: string | number | null, options: any) {
         // Find existing to get required fields
         const original = savedQuestions.find(q => q.id === id);
         if (!original) return;
@@ -523,7 +523,7 @@ export default function AdminQuestionsPage() {
                     correctAnswer: correctAnswer,
                     textContent: newText,
                     solutionText: solutionText,
-                    category: category, // Added
+                    category: category, // API handles number/string mapping now
                     options: options
                 }),
             });

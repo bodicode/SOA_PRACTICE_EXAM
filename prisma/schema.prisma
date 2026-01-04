@@ -15,6 +15,13 @@ model User {
   role          String    @default("student") // 'admin', 'student'
   createdAt     DateTime  @default(now())
 
+  // Progress Tracking
+  totalExams    Int       @default(0)
+  totalScore    Float     @default(0) // Accumulator for calculating average
+  averageScore  Float     @default(0)
+  lastStudyDate DateTime?
+  studyStreak   Int       @default(0)
+
   subscriptions UserSubscription[]
   questions     Question[]         @relation("UserCreatedQuestions")
   examSessions  ExamSession[]
@@ -55,6 +62,7 @@ model Category {
   parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children    Category[] @relation("CategoryHierarchy")
   questions   Question[]
+  pdfQuestions PdfRegionQuestion[]
 }
 
 model Question {
@@ -100,13 +108,16 @@ model ExamSession {
 model ExamDetail {
   id               Int      @id @default(autoincrement())
   sessionId        Int
-  questionId       Int
+  questionId       Int?
+  pdfRegionQuestionId String?
+
   userChoice       String?
   isCorrect        Boolean?
   timeSpentSeconds Int?
 
   session    ExamSession @relation(fields: [sessionId], references: [id])
-  question   Question    @relation(fields: [questionId], references: [id])
+  question   Question?   @relation(fields: [questionId], references: [id])
+  pdfQuestion PdfRegionQuestion? @relation(fields: [pdfRegionQuestionId], references: [id])
 }
 
 // 5. Battle Rooms
@@ -163,13 +174,17 @@ model PdfRegionQuestion {
   correctAnswer String? // "A", "B", "C", "D", "E"
   textContent   String? @db.Text // Store full text of question
   solutionText  String? @db.Text // Store full text of solution
-  category      String? // Exam Category (e.g., "P", "FM")
+  
+  categoryId    Int?
+  category      Category? @relation(fields: [categoryId], references: [id]) 
+
   options       Json?    // Store structured options [{"id": "1", "text": "...", "label": "A"}]
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   pdfAsset   PdfAsset @relation(fields: [pdfAssetId], references: [id])
+  examDetails ExamDetail[]
 
   @@unique([pdfAssetId, questionNo])
 }

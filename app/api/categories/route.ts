@@ -7,7 +7,10 @@ export async function GET() {
             include: {
                 parent: true,
                 _count: {
-                    select: { questions: true }
+                    select: {
+                        questions: true,
+                        pdfQuestions: true
+                    }
                 }
             },
             orderBy: { id: 'asc' }
@@ -18,7 +21,7 @@ export async function GET() {
             name: cat.name,
             parentId: cat.parentId,
             parentName: cat.parent?.name,
-            questionsCount: cat._count.questions
+            questionsCount: cat._count.questions + cat._count.pdfQuestions
         }))
 
         return NextResponse.json(formattedCategories)

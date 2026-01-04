@@ -4,72 +4,34 @@ import Link from 'next/link'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEffect, useState } from 'react'
+import { Category, examService } from '@/services/exam.service'
 
 export default function PracticePage() {
     const { user } = useUserStore()
+    const [examCategories, setExamCategories] = useState<Category[]>([])
+    const [isLoading, setIsLoading] = useState(true)
 
-    const examCategories = [
-        { id: 'p', name: 'Exam P - Probability', questions: 850, description: 'Xác suất cơ bản và ứng dụng' },
-        { id: 'fm', name: 'Exam FM - Financial Mathematics', questions: 720, description: 'Toán tài chính và lãi suất' },
-        { id: 'ifm', name: 'Exam IFM - Investment & Financial Markets', questions: 540, description: 'Thị trường đầu tư và tài chính' },
-        { id: 'ltam', name: 'Exam LTAM - Long-Term Actuarial Mathematics', questions: 480, description: 'Toán bảo hiểm nhân thọ' },
-        { id: 'stam', name: 'Exam STAM - Short-Term Actuarial Mathematics', questions: 420, description: 'Toán bảo hiểm phi nhân thọ' },
-        { id: 'pa', name: 'Exam PA - Predictive Analytics', questions: 180, description: 'Phân tích dự đoán' },
-    ]
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await examService.getCategories()
+                // Filter only main exams if structure implies hierarchy, or display all. 
+                // Assuming top-level categories are exams for now.
+                setExamCategories(data)
+            } catch (error) {
+                console.error('Failed to fetch categories:', error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+        fetchCategories()
+    }, [])
 
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <header className="bg-[#003366] text-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <div className="flex items-center gap-8">
-                            <Link href="/" className="flex items-center gap-2">
-                                <div className="w-10 h-10 bg-white/20 rounded flex items-center justify-center">
-                                    <span className="text-xl">🛡️</span>
-                                </div>
-                                <div>
-                                    <div className="font-bold text-sm">SOA EXAM</div>
-                                    <div className="text-xs text-white/70">PRACTICE</div>
-                                </div>
-                            </Link>
-                            <nav className="hidden md:flex items-center gap-6 text-sm">
-                                <Link href="/practice" className="hover:text-blue-200 transition-colors border-b-2 border-white pb-1">
-                                    Đề Thi Mẫu
-                                </Link>
-                                <Link href="/exams" className="hover:text-blue-200 transition-colors">
-                                    Các Kỳ Thi
-                                </Link>
-                                <Link href="/resources" className="hover:text-blue-200 transition-colors">
-                                    Tài Liệu
-                                </Link>
-                                <Link href="/community" className="hover:text-blue-200 transition-colors">
-                                    Cộng Đồng
-                                </Link>
-                                <Link href="/about" className="hover:text-blue-200 transition-colors">
-                                    Giới Thiệu
-                                </Link>
-                            </nav>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            {user ? (
-                                <div className="flex items-center gap-3">
-                                    <span className="text-sm text-white/80 hidden sm:block">{user.fullName || user.email}</span>
-                                    <Button size="sm" className="bg-[#0066cc] hover:bg-[#0055aa] text-white">
-                                        Tài khoản
-                                    </Button>
-                                </div>
-                            ) : (
-                                <Link href="/login">
-                                    <Button size="sm" className="bg-[#0066cc] hover:bg-[#0055aa] text-white">
-                                        Đăng nhập / My SOA
-                                    </Button>
-                                </Link>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </header>
+
 
             {/* Main Content */}
             <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -119,24 +81,32 @@ export default function PracticePage() {
                     Chọn Kỳ Thi Để Bắt Đầu
                 </h2>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                    {examCategories.map((exam) => (
-                        <Card key={exam.id} className="hover:shadow-lg transition-shadow border-l-4 border-[#0066cc]">
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-[#003366] text-lg">{exam.name}</CardTitle>
-                                <CardDescription>{exam.description}</CardDescription>
-                            </CardHeader>
-                            <CardContent className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500">{exam.questions} câu hỏi</span>
-                                <Link href={`/practice/${exam.id}`}>
-                                    <Button size="sm" className="bg-[#003366] hover:bg-[#002244]">
-                                        Bắt đầu
-                                    </Button>
-                                </Link>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+                {isLoading ? (
+                    <div className="text-center py-12">Đang tải dữ liệu...</div>
+                ) : (
+                    <div className="grid md:grid-cols-2 gap-4">
+                        {examCategories.map((exam) => (
+                            <Card key={exam.id} className="hover:shadow-lg transition-shadow border-l-4 border-[#0066cc]">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-[#003366] text-lg">{exam.name}</CardTitle>
+                                    <CardDescription>
+                                        {/* Since description isn't in Category interface, we might need to map it or omit it for now */}
+                                        {exam.parentName ? `Thuộc: ${exam.parentName}` : 'Kỳ thi chính thức'}
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="flex justify-between items-center">
+                                    <span className="text-sm text-gray-500">{exam.questionsCount} câu hỏi</span>
+                                    {/* Pass the ID to the dynamic route */}
+                                    <Link href={`/practice/${exam.id}`}>
+                                        <Button size="sm" className="bg-[#003366] hover:bg-[#002244]">
+                                            Bắt đầu
+                                        </Button>
+                                    </Link>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                )}
 
                 {/* Reporting Errors Box */}
                 <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -151,19 +121,7 @@ export default function PracticePage() {
                 </div>
             </main>
 
-            {/* Footer */}
-            <footer className="bg-[#003366] text-white py-8 mt-16">
-                <div className="max-w-5xl mx-auto px-4 text-center text-sm text-white/70">
-                    <p>© 2024 SOA Exam Practice Vietnam. Mọi quyền được bảo lưu.</p>
-                    <p className="mt-2">
-                        <Link href="/privacy" className="hover:text-white">Chính sách bảo mật</Link>
-                        {' • '}
-                        <Link href="/terms" className="hover:text-white">Điều khoản sử dụng</Link>
-                        {' • '}
-                        <Link href="/contact" className="hover:text-white">Liên hệ</Link>
-                    </p>
-                </div>
-            </footer>
+
         </div>
     )
 }

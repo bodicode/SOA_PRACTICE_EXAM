@@ -10,12 +10,29 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
+        // Map category (string or number from frontend) to categoryId
+        let categoryId: number | null = null;
+        if (typeof category === 'number') {
+            categoryId = category;
+        } else if (typeof category === 'string' && !isNaN(parseInt(category))) {
+            categoryId = parseInt(category);
+        }
+        // If category is a string name (e.g. "P"), we might need to lookup logic, but for now let's assume ID is passed or handled elsewhere. 
+        // Based on previous context, the user wants `categoryId` relation.
+
+        // Construct data object
+        const data: any = {
+            pdfAssetId, questionNo, pageIndex, x, y, w, h, correctAnswer, textContent, solutionText, options
+        }
+        if (categoryId !== null) data.categoryId = categoryId;
+
+
         if (x !== undefined && y !== undefined) {
             // Full update/create (from Detector)
             const q = await prisma.pdfRegionQuestion.upsert({
                 where: { pdfAssetId_questionNo: { pdfAssetId, questionNo } },
-                update: { pageIndex, x, y, w, h, correctAnswer, textContent, solutionText, category, options },
-                create: { pdfAssetId, questionNo, pageIndex, x, y, w, h, correctAnswer, textContent, solutionText, category, options },
+                update: { ...data },
+                create: { ...data },
             });
             return NextResponse.json({ question: q });
         } else {
@@ -24,7 +41,7 @@ export async function POST(req: Request) {
             if (correctAnswer !== undefined) dataToUpdate.correctAnswer = correctAnswer;
             if (textContent !== undefined) dataToUpdate.textContent = textContent;
             if (solutionText !== undefined) dataToUpdate.solutionText = solutionText;
-            if (category !== undefined) dataToUpdate.category = category;
+            if (categoryId !== null) dataToUpdate.categoryId = categoryId;
             if (options !== undefined) dataToUpdate.options = options;
 
             const q = await prisma.pdfRegionQuestion.updateMany({

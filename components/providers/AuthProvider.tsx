@@ -7,10 +7,15 @@ import { useUserStore } from '@/stores/userStore'
 // Function to sync user to database
 async function syncUserToDatabase() {
     try {
-        await fetch('/api/auth/sync-user', { method: 'POST' })
+        const res = await fetch('/api/auth/sync-user', { method: 'POST' })
+        if (res.ok) {
+            const data = await res.json()
+            return data.user
+        }
     } catch (error) {
         console.error('Failed to sync user:', error)
     }
+    return null
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -24,18 +29,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const { data: { user } } = await supabase.auth.getUser()
 
             if (user) {
-                setUser({
+                // Set initial Supabase user
+                const initialUser = {
                     id: user.id,
                     email: user.email || '',
                     fullName: user.user_metadata?.full_name,
                     avatarUrl: user.user_metadata?.avatar_url,
                     role: user.user_metadata?.role || 'student',
-                })
-                // Sync to database
-                await syncUserToDatabase()
+                }
+                setUser(initialUser)
+
+                // Sync and get DB ID
+                const dbUser = await syncUserToDatabase()
+                if (dbUser && dbUser.id) {
+                    setUser({
+                        ...initialUser,
+                        id: dbUser.id.toString(), // Update to DB ID
+                        role: dbUser.role.toLowerCase()
+                    })
+                }
             } else {
                 setUser(null)
             }
+            setLoading(false)
         }
 
         getUser()
@@ -44,16 +60,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
                 if (session?.user) {
-                    setUser({
+                    const initialUser = {
                         id: session.user.id,
                         email: session.user.email || '',
                         fullName: session.user.user_metadata?.full_name,
                         avatarUrl: session.user.user_metadata?.avatar_url,
                         role: session.user.user_metadata?.role || 'student',
-                    })
+                    }
+                    setUser(initialUser)
+
                     // Sync to database on SIGNED_IN or USER_UPDATED
                     if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-                        await syncUserToDatabase()
+                        const dbUser = await syncUserToDatabase()
+                        if (dbUser && dbUser.id) {
+                            setUser({
+                                ...initialUser,
+                                id: dbUser.id.toString(),
+                                role: dbUser.role.toLowerCase()
+                            })
+                        }
                     }
                 } else {
                     setUser(null)
