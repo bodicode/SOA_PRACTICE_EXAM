@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
         // 3. Update User Stats (Only if valid user)
         if (userId > 0) {
-            await prisma.$transaction(async (tx) => {
+            await prisma.$transaction(async (tx: any) => {
                 // ... existing logic ...
             });
         }

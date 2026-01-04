@@ -44,15 +44,15 @@ export async function POST(request: Request) {
             let outputData = ''
             let errorData = ''
 
-            pythonProcess.stdout.on('data', (data) => {
+            pythonProcess.stdout.on('data', (data: any) => {
                 outputData += data.toString()
             })
 
-            pythonProcess.stderr.on('data', (data) => {
+            pythonProcess.stderr.on('data', (data: any) => {
                 errorData += data.toString()
             })
 
-            pythonProcess.on('close', (code) => {
+            pythonProcess.on('close', (code: any) => {
                 if (code !== 0) {
                     reject(new Error(`Python Process exited with code ${code}. Error: ${errorData}`))
                 } else {
