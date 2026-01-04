@@ -16,7 +16,7 @@ export async function GET() {
             orderBy: { id: 'asc' }
         })
 
-        const formattedCategories = categories.map(cat => ({
+        const formattedCategories = categories.map((cat: any) => ({
             id: cat.id,
             name: cat.name,
             parentId: cat.parentId,
