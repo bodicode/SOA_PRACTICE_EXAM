@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown } from 'lucide-react'
+import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import MathRender from '@/components/MathRender'
 import {
@@ -551,15 +551,18 @@ export default function ExamPage() {
                             <ChevronLeft className="w-5 h-5 text-gray-600" />
                         </Button>
                         <Button
-                            className="bg-[#003366] hover:bg-[#002244] w-10 h-10 p-0 rounded-full"
+                            className={cn("bg-[#003366] hover:bg-[#002244] w-10 h-10 p-0 rounded-full", currentQuestionIndex === questions.length - 1 && "bg-green-600 hover:bg-green-700")}
                             onClick={() => {
-                                setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1));
-                                window.scrollTo({ top: 0, behavior: "smooth" });
+                                if (currentQuestionIndex === questions.length - 1) {
+                                    setShowSubmitDialog(true);
+                                } else {
+                                    setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1));
+                                    window.scrollTo({ top: 0, behavior: "smooth" });
+                                }
                             }}
-                            title="Next Question"
-                            disabled={currentQuestionIndex === questions.length - 1}
+                            title={currentQuestionIndex === questions.length - 1 ? "Nộp bài" : "Câu tiếp theo"}
                         >
-                            <ChevronRight className="w-5 h-5" />
+                            {currentQuestionIndex === questions.length - 1 ? <Check className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                         </Button>
                     </div>
                 </main>

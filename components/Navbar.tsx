@@ -93,9 +93,9 @@ export function Navbar() {
                                 >
                                     <DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                                            <Button variant="ghost" className="relative h-auto w-auto p-0 hover:bg-transparent">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-medium text-gray-700 hidden sm:block whitespace-nowrap">
+                                                    <span className="text-sm font-medium text-gray-700 hidden sm:block whitespace-nowrap hover:text-blue-600 transition-colors">
                                                         {user.fullName || user.email?.split('@')[0]}
                                                     </span>
                                                 </div>

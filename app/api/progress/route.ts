@@ -14,7 +14,7 @@ export async function GET(req: Request) {
             where: { id: userId },
             select: {
                 totalExams: true,
-                averageScore: true,
+
                 studyStreak: true,
                 lastStudyDate: true
             }
@@ -29,6 +29,7 @@ export async function GET(req: Request) {
                 mode: true,
                 startTime: true,
                 totalScore: true,
+                questionCount: true,
             }
         });
 

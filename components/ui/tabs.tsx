@@ -8,15 +8,34 @@ const TabsContext = React.createContext<{
     onChange: (v: string) => void;
 } | null>(null);
 
+interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
+    defaultValue?: string;
+    value?: string;
+    onValueChange?: (value: string) => void;
+}
+
 function Tabs({
     defaultValue,
+    value: controlledValue,
+    onValueChange,
     className,
     children,
     ...props
-}: React.HTMLAttributes<HTMLDivElement> & { defaultValue: string }) {
-    const [value, setValue] = React.useState(defaultValue);
+}: TabsProps) {
+    const [internalValue, setInternalValue] = React.useState(defaultValue || "");
+
+    const value = controlledValue !== undefined ? controlledValue : internalValue;
+    const onChange = (v: string) => {
+        if (onValueChange) {
+            onValueChange(v);
+        }
+        if (controlledValue === undefined) {
+            setInternalValue(v);
+        }
+    };
+
     return (
-        <TabsContext.Provider value={{ value, onChange: setValue }}>
+        <TabsContext.Provider value={{ value, onChange }}>
             <div className={cn("", className)} {...props}>
                 {children}
             </div>
@@ -28,7 +47,7 @@ function TabsList({ className, ...props }: React.HTMLAttributes<HTMLDivElement>)
     return (
         <div
             className={cn(
-                "inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground bg-gray-100",
+                "inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground",
                 className
             )}
             {...props}

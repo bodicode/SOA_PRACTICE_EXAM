@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
-import { ArrowRight, CheckCircle2, BarChart2, BookOpen, Target, LogOut, LayoutDashboard, ChevronRight } from 'lucide-react'
+import { ArrowRight, CheckCircle2, BarChart2, BookOpen, Target, LogOut, LayoutDashboard, ChevronRight, Star, Sparkles, Zap } from 'lucide-react'
 import { HeroSection } from '@/components/HeroSection'
 
 export default function Home() {
@@ -80,13 +80,42 @@ export default function Home() {
               initial="hidden"
               animate="visible"
             >
-              <motion.h1 variants={itemVariants} className="text-5xl lg:text-7xl font-bold text-gray-900 leading-[1.1] mb-6 tracking-tight">
-                Chinh Phục <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 bg-[length:200%_auto] animate-gradient">
-                  Exam SOA
-                </span> <br />
-                Dễ Dàng Hơn
-              </motion.h1>
+
+              <div className="relative inline-block mb-4">
+                <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-bold uppercase tracking-wider w-fit">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                  </span>
+                  Nền Tảng Luyện Thi SOA
+                </span>
+              </div>
+
+              <div className="relative">
+                <motion.div
+                  animate={{ y: [0, -10, 0], opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -top-10 -left-10 text-yellow-400 rotate-12"
+                >
+                  <Star className="w-8 h-8 fill-current" />
+                </motion.div>
+
+                <motion.div
+                  animate={{ y: [0, 10, 0], scale: [1, 1.2, 1] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                  className="absolute -top-4 right-20 text-blue-400"
+                >
+                  <Sparkles className="w-6 h-6" />
+                </motion.div>
+
+                <motion.h1 variants={itemVariants} className="text-5xl lg:text-7xl font-bold text-gray-900 leading-[1.1] mb-6 tracking-tight relative z-10">
+                  Chinh Phục <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 bg-[length:200%_auto] animate-gradient">
+                    Exam SOA
+                  </span> <br />
+                  Dễ Dàng Hơn
+                </motion.h1>
+              </div>
 
               <motion.p variants={itemVariants} className="text-xl text-gray-600 mb-10 max-w-lg leading-relaxed">
                 Nền tảng luyện thi thông minh với ngân hàng đề phong phú,
@@ -101,16 +130,20 @@ export default function Home() {
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
+                <div className="flex items-center gap-2 px-4 py-2 bg-white/50 backdrop-blur-sm rounded-full border border-gray-100 shadow-sm text-sm font-semibold text-gray-600">
+                  <Zap className="w-4 h-4 text-orange-500 fill-orange-500" />
+                  <span>+1,000 câu hỏi</span>
+                </div>
               </motion.div>
             </motion.div>
 
             <HeroSection />
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Features Section */}
-      <section className="py-24 bg-gray-50/50">
+      < section className="py-24 bg-gray-50/50" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 max-w-3xl mx-auto">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6 font-display">
@@ -141,24 +174,41 @@ export default function Home() {
             ].map((feature, i) => (
               <motion.div
                 key={i}
-                whileHover={{ y: -5 }}
-                className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
+                whileHover={{ y: -10 }}
+                className="group relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden"
               >
-                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  {feature.icon}
+                {/* Gradient Background on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-blue-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                {/* Decorative Icon Blob */}
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-gray-50 rounded-full blur-2xl group-hover:bg-blue-100/50 transition-colors duration-500" />
+
+                <div className="relative z-10">
+                  <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-white group-hover:shadow-md transition-all duration-300">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-700 transition-colors">{feature.title}</h3>
+                  <p className="text-gray-600 leading-relaxed group-hover:text-gray-700">
+                    {feature.desc}
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {feature.desc}
-                </p>
+
+                {/* Floating Check Icon */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  whileHover={{ opacity: 1, scale: 1 }}
+                  className="absolute bottom-4 right-4 text-blue-200"
+                >
+                  <Target className="w-12 h-12 opacity-20 rotate-[-15deg]" />
+                </motion.div>
               </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </section >
 
       {/* Testimonial Section */}
-      <section className="py-24 overflow-hidden">
+      < section className="py-24 overflow-hidden" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative bg-blue-600 rounded-3xl p-12 lg:p-24 overflow-hidden">
             <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
@@ -203,12 +253,12 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
 
 
       {/* Footer */}
 
-    </div>
+    </div >
   )
 }

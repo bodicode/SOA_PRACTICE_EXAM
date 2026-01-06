@@ -1,14 +1,23 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUserStore } from '@/stores/userStore'
 
 // Function to sync user to database
+let lastSyncTime = 0;
+const SYNC_COOLDOWN = 5000; // 5 seconds
+
 async function syncUserToDatabase() {
+    const now = Date.now();
+    if (now - lastSyncTime < SYNC_COOLDOWN) {
+        return null; // Skip if synced recently
+    }
+
     try {
         const res = await fetch('/api/auth/sync-user', { method: 'POST' })
         if (res.ok) {
+            lastSyncTime = now;
             const data = await res.json()
             return data.user
         }
@@ -20,7 +29,7 @@ async function syncUserToDatabase() {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { setUser, setLoading } = useUserStore()
-    const supabase = createClient()
+    const supabase = useMemo(() => createClient(), [])
 
     useEffect(() => {
         // Get initial session

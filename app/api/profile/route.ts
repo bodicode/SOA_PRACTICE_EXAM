@@ -19,7 +19,7 @@ export async function GET(req: Request) {
                 role: true,
                 createdAt: true,
                 totalExams: true,
-                averageScore: true,
+
                 studyStreak: true
             }
         });

@@ -18,7 +18,7 @@ model User {
   // Progress Tracking
   totalExams    Int       @default(0)
   totalScore    Float     @default(0) // Accumulator for calculating average
-  averageScore  Float     @default(0)
+
   lastStudyDate DateTime?
   studyStreak   Int       @default(0)
 
@@ -100,6 +100,7 @@ model ExamSession {
   startTime  DateTime     @default(now())
   endTime    DateTime?
   totalScore Decimal?
+  questionCount Int       @default(0)
 
   user       User         @relation(fields: [userId], references: [id])
   details    ExamDetail[]

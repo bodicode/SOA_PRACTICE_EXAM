@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { motion } from 'framer-motion'
-import { Loader2, ArrowRight, ShieldCheck, Mail, Lock, ChevronLeft } from 'lucide-react'
+import { Loader2, ArrowRight, ShieldCheck, Mail, Lock, ChevronLeft, Key, Fingerprint } from 'lucide-react'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -101,6 +101,26 @@ export default function LoginPage() {
                         </motion.div>
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">Chào mừng trở lại</h1>
                         <p className="text-gray-500">Đăng nhập để tiếp tục hành trình SOA</p>
+                    </div>
+
+                    {/* Floating Icons */}
+                    <div className="absolute top-20 left-10 hidden lg:block pointer-events-none">
+                        <motion.div
+                            animate={{ y: [0, -15, 0], rotate: [0, 10, 0] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            className="text-blue-300"
+                        >
+                            <Key className="w-12 h-12 opacity-50" />
+                        </motion.div>
+                    </div>
+                    <div className="absolute bottom-20 right-10 hidden lg:block pointer-events-none">
+                        <motion.div
+                            animate={{ y: [0, 15, 0], rotate: [0, -10, 0] }}
+                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                            className="text-indigo-300"
+                        >
+                            <Fingerprint className="w-16 h-16 opacity-50" />
+                        </motion.div>
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-6">

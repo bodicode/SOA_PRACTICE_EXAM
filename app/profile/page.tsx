@@ -108,29 +108,19 @@ export default function ProfilePage() {
                 <div className="grid md:grid-cols-3 gap-6">
                     {/* Stats Cards */}
                     <Card className="md:col-span-3 border-none bg-transparent shadow-none p-0">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Card className="bg-white border-blue-100">
                                 <CardContent className="p-6 flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
                                         <Trophy className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-gray-500">Tổng số đề thi</p>
+                                        <p className="text-sm font-medium text-gray-500">Tổng số lần luyện tập và thi thử</p>
                                         <h3 className="text-2xl font-bold text-gray-900">{stats?.totalExams || 0}</h3>
                                     </div>
                                 </CardContent>
                             </Card>
-                            <Card className="bg-white border-green-100">
-                                <CardContent className="p-6 flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-600">
-                                        <Target className="w-6 h-6" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-500">Điểm trung bình</p>
-                                        <h3 className="text-2xl font-bold text-gray-900">{Math.round(stats?.averageScore || 0)}/30</h3>
-                                    </div>
-                                </CardContent>
-                            </Card>
+
                             <Card className="bg-white border-orange-100">
                                 <CardContent className="p-6 flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">

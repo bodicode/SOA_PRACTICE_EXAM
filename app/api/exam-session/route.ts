@@ -25,16 +25,66 @@ export async function POST(req: Request) {
                 startTime: new Date(startTime),
                 endTime: endTime ? new Date(endTime) : new Date(),
                 totalScore: score,
+                questionCount: totalQuestions || 0,
             }
         });
 
         // 2. Create Details
-        // ... (rest same)
+        const detailsData = details.map((d: any) => ({
+            sessionId: session.id,
+            questionId: d.questionId, // Might be undefined if PDF question
+            pdfRegionQuestionId: d.pdfRegionQuestionId, // Might be undefined if normal question
+            userChoice: d.userChoice,
+            isCorrect: d.isCorrect,
+            timeSpentSeconds: 0 // We don't track per-question time yet
+        }));
+
+        if (detailsData.length > 0) {
+            await prisma.examDetail.createMany({
+                data: detailsData
+            });
+        }
 
         // 3. Update User Stats (Only if valid user)
         if (userId > 0) {
-            await prisma.$transaction(async (tx: any) => {
-                // ... existing logic ...
+            await prisma.$transaction(async (tx) => {
+                const user = await tx.user.findUnique({
+                    where: { id: userId },
+                    select: { lastStudyDate: true, studyStreak: true } // Select minimal fields
+                });
+
+                if (user) {
+                    let newStreak = user.studyStreak;
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (user.lastStudyDate) {
+                        const lastDate = new Date(user.lastStudyDate);
+                        lastDate.setHours(0, 0, 0, 0);
+
+                        const diffTime = Math.abs(today.getTime() - lastDate.getTime());
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                        if (diffDays === 1) {
+                            newStreak += 1; // Consecutive day
+                        } else if (diffDays > 1) {
+                            newStreak = 1; // Broken streak
+                        }
+                        // If diffDays === 0 (same day), keep streak same
+                    } else {
+                        newStreak = 1; // First time
+                    }
+
+                    await tx.user.update({
+                        where: { id: userId },
+                        data: {
+                            totalExams: { increment: 1 },
+                            totalScore: { increment: score }, // Accumulate score
+                            studyStreak: newStreak,
+                            lastStudyDate: new Date()
+                        }
+                    });
+                }
             });
         }
 

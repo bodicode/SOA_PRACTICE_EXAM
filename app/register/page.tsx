@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { motion } from 'framer-motion'
-import { Loader2, ArrowRight, UserPlus, Mail, Lock, User, ChevronLeft } from 'lucide-react'
+import { Loader2, ArrowRight, UserPlus, Mail, Lock, User, ChevronLeft, Rocket, GraduationCap, Stars } from 'lucide-react'
 
 export default function RegisterPage() {
     const [email, setEmail] = useState('')
@@ -168,6 +168,35 @@ export default function RegisterPage() {
                         </motion.div>
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">Tạo tài khoản mới</h1>
                         <p className="text-gray-500">Bắt đầu hành trình chinh phục SOA của bạn</p>
+                    </div>
+
+                    {/* Floating Icons */}
+                    <div className="absolute top-10 right-10 hidden lg:block pointer-events-none">
+                        <motion.div
+                            animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
+                            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                            className="text-purple-300"
+                        >
+                            <Rocket className="w-12 h-12 opacity-50" />
+                        </motion.div>
+                    </div>
+                    <div className="absolute bottom-40 left-5 hidden lg:block pointer-events-none">
+                        <motion.div
+                            animate={{ y: [0, 15, 0], scale: [1, 1.1, 1] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                            className="text-pink-300"
+                        >
+                            <GraduationCap className="w-14 h-14 opacity-50" />
+                        </motion.div>
+                    </div>
+                    <div className="absolute top-1/2 -right-5 hidden lg:block pointer-events-none">
+                        <motion.div
+                            animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.2, 1] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                            className="text-yellow-400"
+                        >
+                            <Stars className="w-8 h-8" />
+                        </motion.div>
                     </div>
 
                     <form onSubmit={handleRegister} className="space-y-5">
