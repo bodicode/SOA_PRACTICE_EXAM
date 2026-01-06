@@ -247,20 +247,16 @@ export default function ExamPage() {
 
     const currentQuestion = questions[currentQuestionIndex]
 
-    // Smart Numbering Helper
     const formatQuestionContent = (index: number, content: string) => {
         const trimmed = content.trim();
-        // Remove existing numbering if present (e.g. "1.", "1)", "Question 1") to avoid duplicates/mismatches
-        const cleanContent = trimmed.replace(/^(?:Question\s+)?\d+[\.:\)]\s*/i, "");
-
-        // Always prepend the current index + 1 in Bold to ensure it's visible and matches the UI counter
-        return `**${index + 1}.** ${cleanContent}`;
+        return trimmed.replace(/^(\d+)\./, "$1\\.");
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] bg-gray-100">
-            {/* Top Bar */}
-            <header className="h-16 bg-[#003366] text-white flex items-center justify-between px-6 shadow-md z-10">
+
+        <div className="flex flex-col min-h-screen bg-gray-100 font-sans">
+            {/* Top Bar - Sticky */}
+            <header className="sticky top-0 h-16 bg-[#003366] text-white flex items-center justify-between px-6 shadow-md z-50">
                 <div className="font-bold text-lg flex items-center gap-4">
                     <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 gap-2" onClick={() => {
                         if (isSubmitted || confirm("Bạn có chắc chắn muốn thoát? Kết quả sẽ không được lưu.")) {
@@ -293,9 +289,9 @@ export default function ExamPage() {
                 </div>
             </header>
 
-            <div className="flex flex-1 overflow-hidden">
-                {/* Main Question Area */}
-                <main className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col max-w-5xl mx-auto w-full">
+            <div className="flex flex-1 items-start relative box-border">
+                {/* Main Question Area - Window Scroll */}
+                <main className="flex-1 p-6 md:p-10 flex flex-col w-full min-h-[calc(100vh-4rem)]">
 
                     {isSubmitted && (
                         <div className="mb-6 bg-white p-6 rounded-lg shadow border border-blue-100 flex items-center justify-between">
@@ -314,7 +310,7 @@ export default function ExamPage() {
                                         localStorage.removeItem(STORAGE_KEY)
                                         window.location.reload()
                                     }}>
-                                        Làm lại đề này
+                                        Làm lại
                                     </Button>
                                     <Button size="sm" variant="secondary" onClick={() => router.push('/practice')}>
                                         Danh sách bài tập
@@ -347,7 +343,7 @@ export default function ExamPage() {
                         </div>
                     </div>
 
-                    <Card className="flex-1 p-8 shadow-sm flex flex-col mb-6 overflow-auto">
+                    <Card className="p-8 shadow-sm flex flex-col mb-6">
                         <div className="text-lg mb-8 leading-relaxed">
                             <MathRender text={formatQuestionContent(currentQuestionIndex, currentQuestion.content ?? "")} />
                         </div>
@@ -385,7 +381,7 @@ export default function ExamPage() {
                         )}
                     </Card>
 
-                    <div className="flex justify-between mt-auto pt-4">
+                    <div className="flex justify-between mt-auto pt-4 pb-10">
                         <Button
                             variant="outline"
                             onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
@@ -404,9 +400,9 @@ export default function ExamPage() {
                     </div>
                 </main>
 
-                {/* Right Sidebar - Navigation Palette */}
-                <aside className="w-72 bg-white border-l border-gray-200 flex flex-col shadow-xl z-20 hidden lg:flex">
-                    <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+                {/* Right Sidebar - Sticky Navigation */}
+                <aside className="sticky top-16 w-72 h-[calc(100vh-4rem)] bg-white border-l border-gray-200 flex flex-col shadow-xl z-40 hidden lg:flex overflow-y-auto">
+                    <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50 shrink-0">
                         <span className="font-bold text-gray-700 flex items-center gap-2">
                             <Grid className="w-4 h-4" /> Danh sách câu hỏi
                         </span>
@@ -419,14 +415,17 @@ export default function ExamPage() {
                             {questions.map((q, idx) => (
                                 <button
                                     key={q.id}
-                                    onClick={() => setCurrentQuestionIndex(idx)}
+                                    onClick={() => {
+                                        setCurrentQuestionIndex(idx);
+                                        window.scrollTo({ top: 0, behavior: "smooth" });
+                                    }}
                                     className={cn(
                                         "w-10 h-10 rounded-md text-sm font-medium flex items-center justify-center transition-all relative border",
                                         currentQuestionIndex === idx
                                             ? "ring-2 ring-offset-1 ring-[#003366] border-[#003366] bg-blue-50 text-[#003366]"
                                             : "border-gray-200 hover:bg-gray-50 text-gray-600",
-                                        answers[q.id] !== undefined && currentQuestionIndex !== idx && "bg-blue-600 text-white border-blue-600",
-                                        flagged[q.id] && "after:content-[''] after:absolute after:top-1 after:right-1 after:w-2 after:h-2 after:bg-yellow-400 after:rounded-full"
+                                        answers[q.id] !== undefined && currentQuestionIndex !== idx && !flagged[q.id] && "bg-blue-600 text-white border-blue-600",
+                                        flagged[q.id] && "bg-yellow-400 border-yellow-500 text-yellow-900 font-bold"
                                     )}
                                 >
                                     {idx + 1}
@@ -434,18 +433,22 @@ export default function ExamPage() {
                             ))}
                         </div>
                     </div>
-                    <div className="p-4 border-t border-gray-100 bg-gray-50 text-xs text-gray-500 space-y-2">
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded bg-blue-600"></div> Đã trả lời
+                    <div className="p-4 border-t border-gray-100 bg-gray-50 text-sm text-gray-700 space-y-3 shrink-0">
+                        <div className="flex items-center gap-3">
+                            <div className="w-5 h-5 rounded bg-blue-600 border border-blue-600 shadow-sm"></div>
+                            <span className="font-medium">Đã trả lời</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded bg-white border border-gray-300"></div> Chưa trả lời
+                        <div className="flex items-center gap-3">
+                            <div className="w-5 h-5 rounded bg-white border border-gray-300 shadow-sm"></div>
+                            <span className="font-medium">Chưa trả lời</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded bg-yellow-400"></div> Đã đánh dấu
+                        <div className="flex items-center gap-3">
+                            <div className="w-5 h-5 rounded bg-blue-50 border border-blue-600 ring-2 ring-blue-100 shadow-sm"></div>
+                            <span className="font-medium">Đang xem</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded bg-blue-50 border border-[#003366]"></div> Đang xem
+                        <div className="flex items-center gap-3">
+                            <div className="w-5 h-5 rounded bg-yellow-400 border border-yellow-500 shadow-sm"></div>
+                            <span className="font-medium">Đã đánh dấu</span>
                         </div>
                     </div>
                 </aside>

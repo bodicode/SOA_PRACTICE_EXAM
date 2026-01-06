@@ -30,6 +30,7 @@ const MATH_TOOLS = [
     { label: "√", code: "$\\sqrt{}$", tooltip: "Square Root", offset: 7 },
     { label: "∫", code: "$\\int_{}^{}$ ", tooltip: "Integral", offset: 7 },
     { label: "Σ", code: "$\\sum_{}^{}$ ", tooltip: "Sum", offset: 7 },
+    { label: "Σ k=n", code: "$\\sum_{k=n}^{50}$", tooltip: "Sum k=n to 50" },
     { label: "∪", code: "$\\cup$", tooltip: "Union" },
     { label: "∩", code: "$\\cap$", tooltip: "Intersection" },
     { label: "∈", code: "$\\in$", tooltip: "Element of" },
