@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check } from 'lucide-react'
+import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import MathRender from '@/components/MathRender'
 import {
@@ -44,6 +44,7 @@ export default function ExamPage() {
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [showSubmitDialog, setShowSubmitDialog] = useState(false)
+    const [isPaused, setIsPaused] = useState(false)
 
     // State persistence key
     const STORAGE_KEY = `exam_state_${categoryId}_${mode}`
@@ -146,7 +147,7 @@ export default function ExamPage() {
 
     // Timer Logic
     useEffect(() => {
-        if (isLoading || isSubmitted || timeLeft <= 0) return
+        if (isLoading || isSubmitted || timeLeft <= 0 || isPaused) return
 
         const timer = setInterval(() => {
             setTimeLeft((prev) => {
@@ -373,6 +374,22 @@ export default function ExamPage() {
                         <Clock className="w-5 h-5" />
                         {formatTime(timeLeft)}
                     </div>
+
+                    {mode === 'practice' && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setIsPaused(!isPaused)}
+                            className={cn(
+                                "text-white hover:bg-white/20 h-auto py-1 px-2",
+                                isPaused && "bg-yellow-500/20 text-yellow-200 animate-pulse"
+                            )}
+                            title={isPaused ? "Tiếp tục" : "Tạm dừng"}
+                        >
+                            {isPaused ? <Play className="w-5 h-5 fill-current" /> : <Pause className="w-5 h-5 fill-current" />}
+                        </Button>
+                    )}
+
                     <Button
                         variant="secondary"
                         size="sm"
