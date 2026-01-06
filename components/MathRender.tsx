@@ -26,7 +26,7 @@ const components = {
         <tr className="hover:bg-gray-50" {...props} />
     ),
     p: ({ node, ...props }: any) => (
-        <p className="mb-2 last:mb-0" {...props} />
+        <p className="mb-1 last:mb-0 leading-normal" {...props} />
     ),
 };
 

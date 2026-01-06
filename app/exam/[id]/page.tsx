@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { Clock, Flag, ChevronLeft, ChevronRight, Grid } from 'lucide-react'
+import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import MathRender from '@/components/MathRender'
 import {
@@ -48,11 +48,36 @@ export default function ExamPage() {
     // State persistence key
     const STORAGE_KEY = `exam_state_${categoryId}_${mode}`
 
+    // Font Settings State
+    const [fontSize, setFontSize] = useState(13)
+    const [fontFamily, setFontFamily] = useState<'serif' | 'sans'>('serif')
+    const [showFontSettings, setShowFontSettings] = useState(false)
+
+    // Load Font Settings
+    useEffect(() => {
+        const savedFont = localStorage.getItem('exam_font_settings')
+        if (savedFont) {
+            try {
+                const parsed = JSON.parse(savedFont)
+                if (parsed.fontSize) setFontSize(parsed.fontSize)
+                if (parsed.fontFamily) setFontFamily(parsed.fontFamily)
+            } catch (e) {
+                console.error("Failed to parse font settings", e)
+            }
+        }
+    }, [])
+
+    // Save Font Settings
+    useEffect(() => {
+        localStorage.setItem('exam_font_settings', JSON.stringify({ fontSize, fontFamily }))
+    }, [fontSize, fontFamily])
+
     // Init Exam
     useEffect(() => {
         const initExam = async () => {
             if (isNaN(categoryId)) return
 
+            // ... (rest of init code) ...
             // Try to load from local storage first
             const savedState = localStorage.getItem(STORAGE_KEY)
             if (savedState) {
@@ -253,10 +278,9 @@ export default function ExamPage() {
     };
 
     return (
-
-        <div className="flex flex-col min-h-screen bg-gray-100 font-sans">
+        <div className="flex flex-col min-h-screen bg-white">
             {/* Top Bar - Sticky */}
-            <header className="sticky top-0 h-16 bg-[#003366] text-white flex items-center justify-between px-6 shadow-md z-50">
+            <header className="sticky top-0 h-16 bg-[#003366] text-white flex items-center justify-between px-6 shadow-md z-50 font-sans text-base">
                 <div className="font-bold text-lg flex items-center gap-4">
                     <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 gap-2" onClick={() => {
                         if (isSubmitted || confirm("Bạn có chắc chắn muốn thoát? Kết quả sẽ không được lưu.")) {
@@ -269,7 +293,79 @@ export default function ExamPage() {
                     </Button>
                     SOA Exam Simulator
                 </div>
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-6 relative">
+                    {/* Font Settings Button */}
+                    <div className="relative">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className={cn("text-white hover:bg-white/20 gap-2 px-3 border border-white/20", showFontSettings && "bg-white/20")}
+                            onClick={() => setShowFontSettings(!showFontSettings)}
+                            title="Cấu hình hiển thị"
+                        >
+                            <span className="font-serif text-lg font-bold">Aa</span>
+                            <span className="hidden sm:inline font-sans text-sm font-normal">Cỡ chữ</span>
+                            <ChevronDown className="w-3 h-3 opacity-70" />
+                        </Button>
+
+                        {showFontSettings && (
+                            <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 p-4 text-gray-800 z-50 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="space-y-4">
+                                    <div>
+                                        <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Size</div>
+                                        <div className="flex items-center gap-2 bg-gray-100 rounded p-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="flex-1 hover:bg-white hover:shadow-sm"
+                                                onClick={() => setFontSize(Math.max(12, fontSize - 1))}
+                                                disabled={fontSize <= 10}
+                                            >
+                                                A-
+                                            </Button>
+                                            <span className="text-sm font-medium w-8 text-center">{fontSize}</span>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="flex-1 hover:bg-white hover:shadow-sm"
+                                                onClick={() => setFontSize(Math.min(24, fontSize + 1))}
+                                                disabled={fontSize >= 24}
+                                            >
+                                                A+
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Font Style</div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <Button
+                                                variant={fontFamily === 'serif' ? 'secondary' : 'outline'}
+                                                size="sm"
+                                                className={cn("font-serif", fontFamily === 'serif' && "bg-blue-100 text-blue-800 border-blue-200 ring-1 ring-blue-300")}
+                                                onClick={() => setFontFamily('serif')}
+                                            >
+                                                Serif
+                                            </Button>
+                                            <Button
+                                                variant={fontFamily === 'sans' ? 'secondary' : 'outline'}
+                                                size="sm"
+                                                className={cn("font-sans", fontFamily === 'sans' && "bg-blue-100 text-blue-800 border-blue-200 ring-1 ring-blue-300")}
+                                                onClick={() => setFontFamily('sans')}
+                                            >
+                                                Sans
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* Click outside to close - Backdrop overlay if needed, or just detailed handler. For now simple toggle works if careful. */}
+                            </div>
+                        )}
+                        {/* Overlay to close when clicking outside */}
+                        {showFontSettings && (
+                            <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShowFontSettings(false)} />
+                        )}
+                    </div>
+
                     <div className={cn(
                         "flex items-center gap-2 font-mono text-xl font-bold px-4 py-1 rounded bg-black/20",
                         timeLeft < 300 && "text-red-300 animate-pulse"
@@ -290,11 +386,70 @@ export default function ExamPage() {
             </header>
 
             <div className="flex flex-1 items-start relative box-border">
+                {/* Left Sidebar - Sticky Navigation */}
+                <aside className="sticky top-16 w-72 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 flex flex-col shadow-lg z-40 hidden lg:flex overflow-y-auto">
+                    <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50 shrink-0 font-sans">
+                        <span className="font-bold text-gray-700 flex items-center gap-2">
+                            <Grid className="w-4 h-4" /> Danh sách câu hỏi
+                        </span>
+                        <div className="text-xs text-gray-500">
+                            {Object.keys(answers).length}/{questions.length} đã làm
+                        </div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4 font-sans">
+                        <div className="grid grid-cols-5 gap-2">
+                            {questions.map((q, idx) => (
+                                <button
+                                    key={q.id}
+                                    onClick={() => {
+                                        setCurrentQuestionIndex(idx);
+                                        window.scrollTo({ top: 0, behavior: "smooth" });
+                                    }}
+                                    className={cn(
+                                        "w-8 h-8 font-medium flex items-center justify-center transition-all relative border",
+                                        currentQuestionIndex === idx
+                                            ? "ring-1 ring-offset-1 ring-[#003366] border-[#003366] bg-blue-50 text-[#003366]"
+                                            : "border-gray-200 hover:bg-gray-50 text-gray-600",
+                                        answers[q.id] !== undefined && currentQuestionIndex !== idx && !flagged[q.id] && "bg-blue-600 text-white border-blue-600",
+                                        flagged[q.id] && "bg-yellow-400 border-yellow-500 text-yellow-900 font-bold"
+                                    )}
+                                >
+                                    {idx + 1}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="p-4 border-t border-gray-100 bg-gray-50 text-sm text-gray-700 space-y-3 shrink-0 font-sans">
+                        <div className="flex items-center gap-3">
+                            <div className="w-4 h-4 rounded bg-blue-600 border border-blue-600 shadow-sm"></div>
+                            <span className="font-medium text-[12px]">Đã trả lời</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="w-4 h-4 rounded bg-white border border-gray-300 shadow-sm"></div>
+                            <span className="font-medium text-[12px]">Chưa trả lời</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="w-4 h-4 rounded bg-blue-50 border border-blue-600 ring-1 ring-blue-100 shadow-sm"></div>
+                            <span className="font-medium text-[12px]">Đang xem</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="w-4 h-4 rounded bg-yellow-400 border border-yellow-500 shadow-sm"></div>
+                            <span className="font-medium text-[12px]">Đã đánh dấu</span>
+                        </div>
+                    </div>
+                </aside>
+
                 {/* Main Question Area - Window Scroll */}
-                <main className="flex-1 p-6 md:p-10 flex flex-col w-full min-h-[calc(100vh-4rem)]">
+                <main
+                    className="flex-1 p-6 md:p-10 flex flex-col w-full min-h-[calc(100vh-4rem)]"
+                    style={{
+                        fontFamily: fontFamily === 'serif' ? '"Times New Roman", Times, serif' : 'ui-sans-serif, system-ui, sans-serif',
+                        fontSize: `${fontSize}px`
+                    }}
+                >
 
                     {isSubmitted && (
-                        <div className="mb-6 bg-white p-6 rounded-lg shadow border border-blue-100 flex items-center justify-between">
+                        <div className="mb-6 bg-white p-6 rounded-lg shadow border border-blue-100 flex items-center justify-between font-sans">
                             <div>
                                 <h3 className="text-2xl font-bold text-[#003366]">Kết Quả Của Bạn</h3>
                                 <p className="text-gray-600">Bạn đã hoàn thành bài thi.</p>
@@ -323,9 +478,9 @@ export default function ExamPage() {
                         </div>
                     )}
 
-                    <div className="flex justify-between items-start mb-6">
-                        <h2 className="text-xl font-bold text-gray-800">
-                            Câu hỏi {currentQuestionIndex + 1} / {questions.length}
+                    <div className="flex justify-between items-start mb-2 border-b pb-1 border-gray-200">
+                        <h2 className="text-[15px] font-bold text-gray-800">
+                            Question {currentQuestionIndex + 1}
                         </h2>
                         <div className="flex items-center gap-2">
                             <Button
@@ -333,18 +488,19 @@ export default function ExamPage() {
                                 size="sm"
                                 onClick={toggleFlag}
                                 className={cn(
-                                    "gap-2",
+                                    "gap-2 h-7 text-xs font-sans",
                                     flagged[currentQuestion.id] && "bg-yellow-100 border-yellow-400 text-yellow-700"
                                 )}
                             >
-                                <Flag className={cn("w-4 h-4", flagged[currentQuestion.id] && "fill-current")} />
-                                {flagged[currentQuestion.id] ? 'Đã đánh dấu' : 'Đánh dấu'}
+                                <Flag className={cn("w-3 h-3", flagged[currentQuestion.id] && "fill-current")} />
+                                {flagged[currentQuestion.id] ? 'Flagged' : 'Flag'}
                             </Button>
                         </div>
                     </div>
 
-                    <Card className="p-8 shadow-sm flex flex-col mb-6">
-                        <div className="text-lg mb-8 leading-relaxed">
+                    <Card className="p-0 border-0 shadow-none flex flex-col mb-2 bg-transparent">
+                        <div className="mb-1 leading-normal text-black">
+                            {/* Question Text */}
                             <MathRender text={formatQuestionContent(currentQuestionIndex, currentQuestion.content ?? "")} />
                         </div>
 
@@ -352,19 +508,19 @@ export default function ExamPage() {
                             key={currentQuestion.id}
                             value={answers[currentQuestion.id]?.toString() ?? ""}
                             onValueChange={(val) => handleAnswer(parseInt(val))}
-                            className="space-y-4"
+                            className="space-y-0"
                         >
                             {currentQuestion.options.map((option, idx) => (
                                 <div key={idx}
                                     onClick={() => handleAnswer(idx)}
                                     className={cn(
-                                        "flex items-start p-4 border rounded-lg transition-colors cursor-pointer hover:bg-gray-50",
-                                        answers[currentQuestion.id] === idx && "border-[#003366] bg-blue-50 ring-1 ring-blue-900",
-                                        isSubmitted && idx === currentQuestion.correctOption && "bg-green-100 border-green-500",
-                                        isSubmitted && answers[currentQuestion.id] === idx && idx !== currentQuestion.correctOption && "bg-red-100 border-red-500"
+                                        "flex items-start py-0.5 px-2 rounded transition-colors cursor-pointer hover:bg-gray-50 group",
+                                        answers[currentQuestion.id] === idx && "bg-blue-50",
+                                        isSubmitted && idx === currentQuestion.correctOption && "bg-green-100",
+                                        isSubmitted && answers[currentQuestion.id] === idx && idx !== currentQuestion.correctOption && "bg-red-100"
                                     )}>
-                                    <RadioGroupItem value={idx.toString()} id={`opt-${idx}`} className="mt-1" disabled={isSubmitted} />
-                                    <Label htmlFor={`opt-${idx}`} className="flex-1 ml-3 cursor-pointer font-normal text-base">
+                                    <RadioGroupItem value={idx.toString()} id={`opt-${idx}`} className="mt-0.5 border-gray-400 text-[#003366]" disabled={isSubmitted} />
+                                    <Label htmlFor={`opt-${idx}`} className="flex-1 ml-2 cursor-pointer font-normal text-black group-hover:text-[#003366]">
                                         <MathRender text={option} />
                                     </Label>
                                 </div>
@@ -373,7 +529,7 @@ export default function ExamPage() {
 
                         {isSubmitted && currentQuestion.explanation && (
                             <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-lg">
-                                <h4 className="font-bold text-green-800 mb-2">Giải thích:</h4>
+                                <h4 className="font-bold text-green-800 mb-2 font-sans text-sm">Giải thích:</h4>
                                 <div className="text-green-900">
                                     <MathRender text={currentQuestion.explanation ?? ""} />
                                 </div>
@@ -381,77 +537,32 @@ export default function ExamPage() {
                         )}
                     </Card>
 
-                    <div className="flex justify-between mt-auto pt-4 pb-10">
+                    <div className="flex justify-start mt-auto pt-4 pb-10 gap-2 font-sans border-t border-gray-200">
                         <Button
                             variant="outline"
-                            onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+                            onClick={() => {
+                                setCurrentQuestionIndex(prev => Math.max(0, prev - 1));
+                                window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
                             disabled={currentQuestionIndex === 0}
-                            className="w-32"
+                            className="w-10 h-10 p-0 rounded-full border-gray-300"
+                            title="Previous Question"
                         >
-                            <ChevronLeft className="w-4 h-4 mr-2" /> Trước
+                            <ChevronLeft className="w-5 h-5 text-gray-600" />
                         </Button>
                         <Button
-                            className="bg-[#003366] hover:bg-[#002244] w-32"
-                            onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
+                            className="bg-[#003366] hover:bg-[#002244] w-10 h-10 p-0 rounded-full"
+                            onClick={() => {
+                                setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1));
+                                window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                            title="Next Question"
                             disabled={currentQuestionIndex === questions.length - 1}
                         >
-                            Sau <ChevronRight className="w-4 h-4 ml-2" />
+                            <ChevronRight className="w-5 h-5" />
                         </Button>
                     </div>
                 </main>
-
-                {/* Right Sidebar - Sticky Navigation */}
-                <aside className="sticky top-16 w-72 h-[calc(100vh-4rem)] bg-white border-l border-gray-200 flex flex-col shadow-xl z-40 hidden lg:flex overflow-y-auto">
-                    <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50 shrink-0">
-                        <span className="font-bold text-gray-700 flex items-center gap-2">
-                            <Grid className="w-4 h-4" /> Danh sách câu hỏi
-                        </span>
-                        <div className="text-xs text-gray-500">
-                            {Object.keys(answers).length}/{questions.length} đã làm
-                        </div>
-                    </div>
-                    <div className="flex-1 overflow-y-auto p-4">
-                        <div className="grid grid-cols-5 gap-2">
-                            {questions.map((q, idx) => (
-                                <button
-                                    key={q.id}
-                                    onClick={() => {
-                                        setCurrentQuestionIndex(idx);
-                                        window.scrollTo({ top: 0, behavior: "smooth" });
-                                    }}
-                                    className={cn(
-                                        "w-10 h-10 rounded-md text-sm font-medium flex items-center justify-center transition-all relative border",
-                                        currentQuestionIndex === idx
-                                            ? "ring-2 ring-offset-1 ring-[#003366] border-[#003366] bg-blue-50 text-[#003366]"
-                                            : "border-gray-200 hover:bg-gray-50 text-gray-600",
-                                        answers[q.id] !== undefined && currentQuestionIndex !== idx && !flagged[q.id] && "bg-blue-600 text-white border-blue-600",
-                                        flagged[q.id] && "bg-yellow-400 border-yellow-500 text-yellow-900 font-bold"
-                                    )}
-                                >
-                                    {idx + 1}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="p-4 border-t border-gray-100 bg-gray-50 text-sm text-gray-700 space-y-3 shrink-0">
-                        <div className="flex items-center gap-3">
-                            <div className="w-5 h-5 rounded bg-blue-600 border border-blue-600 shadow-sm"></div>
-                            <span className="font-medium">Đã trả lời</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="w-5 h-5 rounded bg-white border border-gray-300 shadow-sm"></div>
-                            <span className="font-medium">Chưa trả lời</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="w-5 h-5 rounded bg-blue-50 border border-blue-600 ring-2 ring-blue-100 shadow-sm"></div>
-                            <span className="font-medium">Đang xem</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="w-5 h-5 rounded bg-yellow-400 border border-yellow-500 shadow-sm"></div>
-                            <span className="font-medium">Đã đánh dấu</span>
-                        </div>
-                    </div>
-                </aside>
             </div>
 
             <Dialog open={showSubmitDialog} onOpenChange={setShowSubmitDialog}>
