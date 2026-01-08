@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
 import 'katex/dist/katex.min.css';
 
 // Add custom styling for tables to match professional PDF style
@@ -32,10 +33,10 @@ const components = {
 
 export default function MathRender({ text }: { text: string }) {
     return (
-        <div className="prose prose-sm max-w-none text-gray-800 whitespace-pre-wrap">
+        <div className="prose prose-sm max-w-none text-gray-800">
             <ReactMarkdown
                 remarkPlugins={[remarkMath, remarkGfm]}
-                rehypePlugins={[rehypeKatex]}
+                rehypePlugins={[rehypeKatex, rehypeRaw]}
                 components={components}
             >
                 {text}

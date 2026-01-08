@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause, Play } from 'lucide-react'
+import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause, Play, Highlighter, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import MathRender from '@/components/MathRender'
 import {
@@ -44,7 +44,13 @@ export default function ExamPage() {
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [showSubmitDialog, setShowSubmitDialog] = useState(false)
+    const [showClearHighlightDialog, setShowClearHighlightDialog] = useState(false)
+    const [showExitDialog, setShowExitDialog] = useState(false)
     const [isPaused, setIsPaused] = useState(false)
+
+    // Highlighting State
+    const [highlights, setHighlights] = useState<Record<string, string[]>>({}) // questionId -> array of highlighted texts
+    const [isHighlightMode, setIsHighlightMode] = useState(false)
 
     // State persistence key
     const STORAGE_KEY = `exam_state_${categoryId}_${mode}`
@@ -89,6 +95,8 @@ export default function ExamPage() {
                         setQuestions(parsed.questions)
                         setAnswers(parsed.answers || {})
                         setFlagged(parsed.flagged || {})
+                        setIsSubmitted(parsed.isSubmitted || false)
+                        if (parsed.highlights) setHighlights(parsed.highlights)
                         setCurrentQuestionIndex(parsed.currentQuestionIndex || 0)
                         setTimeLeft(parsed.timeLeft || 0)
                         setIsLoading(false)
@@ -136,11 +144,13 @@ export default function ExamPage() {
                 currentQuestionIndex,
                 timeLeft,
                 isSubmitted,
+
+                highlights,
                 timestamp: Date.now()
             }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
         }
-    }, [questions, answers, flagged, currentQuestionIndex, timeLeft, isSubmitted, isLoading])
+    }, [questions, answers, flagged, currentQuestionIndex, timeLeft, isSubmitted, isLoading, highlights])
 
     // Clear storage on unmount is NOT desired because we want to persist on reload.
     // We only clear on explicit exit or submit.
@@ -262,6 +272,73 @@ export default function ExamPage() {
         }
     }
 
+    const handleExitClick = () => {
+        if (isSubmitted) {
+            confirmExit();
+        } else {
+            setShowExitDialog(true);
+        }
+    }
+
+    const confirmExit = () => {
+        shouldPersist.current = false
+        localStorage.removeItem(STORAGE_KEY)
+        router.push('/practice')
+    }
+
+
+
+
+    // Highlighting Logic
+    const handleHighlight = () => {
+        if (!isHighlightMode) return;
+
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed) return;
+
+        const text = selection.toString().trim();
+        if (!text) return;
+
+        const qId = questions[currentQuestionIndex].id;
+        setHighlights(prev => {
+            const currentHighlights = prev[qId] || [];
+            if (currentHighlights.includes(text)) return prev;
+            return { ...prev, [qId]: [...currentHighlights, text] };
+        });
+
+        selection.removeAllRanges();
+    };
+
+    const clearHighlights = () => {
+        setShowClearHighlightDialog(true);
+    }
+
+    const confirmClearHighlights = () => {
+        const qId = questions[currentQuestionIndex].id;
+        setHighlights(prev => {
+            const newHighlights = { ...prev };
+            delete newHighlights[qId];
+            return newHighlights;
+        });
+        setShowClearHighlightDialog(false);
+    }
+
+    const applyHighlights = (content: string) => {
+        const qId = questions[currentQuestionIndex].id;
+        const currentHighlights = highlights[qId];
+
+        if (!currentHighlights || currentHighlights.length === 0) return content;
+
+        let highlightedContent = content;
+
+        currentHighlights.forEach(highlightText => {
+            const escapedText = highlightText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escapedText})`, 'gi');
+            highlightedContent = highlightedContent.replace(regex, '<mark class="bg-yellow-200 rounded-sm px-0.5 text-black">$1</mark>');
+        });
+
+        return highlightedContent;
+    };
 
     // Determine correctness for review
     const isCorrect = (q: Question) => {
@@ -283,13 +360,7 @@ export default function ExamPage() {
             {/* Top Bar - Sticky */}
             <header className="sticky top-0 h-16 bg-[#003366] text-white flex items-center justify-between px-6 shadow-md z-50 font-sans text-base">
                 <div className="font-bold text-lg flex items-center gap-4">
-                    <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 gap-2" onClick={() => {
-                        if (isSubmitted || confirm("Bạn có chắc chắn muốn thoát? Kết quả sẽ không được lưu.")) {
-                            shouldPersist.current = false
-                            localStorage.removeItem(STORAGE_KEY)
-                            router.push('/practice')
-                        }
-                    }}>
+                    <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 gap-2" onClick={handleExitClick}>
                         <ChevronLeft className="w-4 h-4" /> Thoát
                     </Button>
                     SOA Exam Simulator
@@ -500,6 +571,33 @@ export default function ExamPage() {
                             Question {currentQuestionIndex + 1}
                         </h2>
                         <div className="flex items-center gap-2">
+                            <div className="flex bg-gray-100 rounded-md p-0.5 border border-gray-200 mr-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setIsHighlightMode(!isHighlightMode)}
+                                    className={cn(
+                                        "h-7 px-2 text-xs font-sans gap-2 transition-colors",
+                                        isHighlightMode ? "bg-yellow-200 text-yellow-800 hover:bg-yellow-300" : "text-gray-600 hover:bg-gray-200 hover:text-gray-900"
+                                    )}
+                                    title="Chế độ highlight (Bôi đen văn bản để highlight)"
+                                >
+                                    <Highlighter className="w-3.5 h-3.5" />
+                                    <span className="hidden sm:inline">Highlight</span>
+                                </Button>
+                                {highlights[currentQuestion.id]?.length > 0 && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={clearHighlights}
+                                        className="h-7 w-7 p-0 text-red-400 hover:text-red-600 hover:bg-red-50"
+                                        title="Xóa highlight"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </Button>
+                                )}
+                            </div>
+
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -518,7 +616,9 @@ export default function ExamPage() {
                     <Card className="p-0 border-0 shadow-none flex flex-col mb-2 bg-transparent">
                         <div className="mb-1 leading-normal text-black">
                             {/* Question Text */}
-                            <MathRender text={formatQuestionContent(currentQuestionIndex, currentQuestion.content ?? "")} />
+                            <div onMouseUp={handleHighlight}>
+                                <MathRender text={applyHighlights(formatQuestionContent(currentQuestionIndex, currentQuestion.content ?? ""))} />
+                            </div>
                         </div>
 
                         <RadioGroup
@@ -598,6 +698,36 @@ export default function ExamPage() {
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowSubmitDialog(false)}>Hủy</Button>
                         <Button className="bg-[#003366]" onClick={handleSubmit}>Nộp Bài</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={showClearHighlightDialog} onOpenChange={setShowClearHighlightDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Xóa Highlights</DialogTitle>
+                        <DialogDescription>
+                            Bạn có chắc muốn xóa tất cả highlight của câu hỏi này không?
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowClearHighlightDialog(false)}>Hủy</Button>
+                        <Button variant="destructive" onClick={confirmClearHighlights}>Xóa</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Xác nhận thoát</DialogTitle>
+                        <DialogDescription>
+                            Bạn có chắc chắn muốn thoát? Kết quả bài làm hiện tại sẽ không được lưu.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowExitDialog(false)}>Hủy</Button>
+                        <Button variant="destructive" onClick={confirmExit}>Thoát</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
