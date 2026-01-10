@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as pdfjs from "pdfjs-dist";
 
-// Fix worker source
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
 
 type Props = {
     url: string;
@@ -13,11 +12,16 @@ type Props = {
     onViewport?: (v: { width: number; height: number; scale: number }) => void;
 };
 
-export function PdfCanvas({ url, pageIndex, scale = 1.5, onViewport }: Props) {
+export const PdfCanvas = React.memo(function PdfCanvas({ url, pageIndex, scale = 1.5, onViewport }: Props) {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Set worker locally
+        if (typeof window !== "undefined" && !pdfjs.GlobalWorkerOptions.workerSrc) {
+            pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+        }
+
         let cancelled = false;
 
         async function run() {
@@ -69,4 +73,4 @@ export function PdfCanvas({ url, pageIndex, scale = 1.5, onViewport }: Props) {
             <canvas ref={canvasRef} className="block" />
         </div>
     );
-}
+});

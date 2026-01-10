@@ -49,10 +49,58 @@ export default function ExamPage() {
     const [isPaused, setIsPaused] = useState(false)
 
     // Highlighting State
-    const [highlights, setHighlights] = useState<Record<string, string[]>>({}) // questionId -> array of highlighted texts
+    const [highlights, setHighlights] = useState<Record<string, { text: string, index: number }[]>>({}) // questionId -> array of highlight objects
     const [isHighlightMode, setIsHighlightMode] = useState(false)
 
-    // State persistence key
+    // ... (keep existing persistence code, assume it handles the new shape naturally) ...
+
+    const handleHighlight = () => {
+        if (!isHighlightMode) return;
+
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed) return;
+
+        const text = selection.toString().trim();
+        if (!text) return;
+
+        // Calculate occurrence index
+        // We find the container element for the question text
+        // Note: This relies on the structure. We should traverse up to find the container.
+        let container = selection.anchorNode?.parentElement;
+        while (container && !container.classList.contains('prose')) { // MathRender uses 'prose' class
+            container = container.parentElement;
+        }
+
+        let index = 0;
+        if (container) {
+            // Get all text content up to the selection start
+            const range = selection.getRangeAt(0);
+            const preSelectionRange = range.cloneRange();
+            preSelectionRange.selectNodeContents(container);
+            preSelectionRange.setEnd(range.startContainer, range.startOffset);
+
+            const preText = preSelectionRange.toString();
+            // Count occurrences of 'text' in 'preText'
+            // We need to match exact trimming logic if possible, but simple regex count is a good approximation
+            // Warning: Selection.toString() might differ from raw text with spaces.
+
+            // Allow loose matching: simple regex for the token
+            const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(escapedText, 'gi');
+            const matches = preText.match(regex);
+            index = matches ? matches.length : 0;
+        }
+
+        const qId = questions[currentQuestionIndex].id;
+        setHighlights(prev => {
+            const currentHighlights = prev[qId] || [];
+            // Check for duplicates
+            if (currentHighlights.some(h => h.text === text && h.index === index)) return prev;
+            return { ...prev, [qId]: [...currentHighlights, { text, index }] };
+        });
+
+        selection.removeAllRanges();
+    };
     const STORAGE_KEY = `exam_state_${categoryId}_${mode}`
 
     // Font Settings State
@@ -96,7 +144,20 @@ export default function ExamPage() {
                         setAnswers(parsed.answers || {})
                         setFlagged(parsed.flagged || {})
                         setIsSubmitted(parsed.isSubmitted || false)
-                        if (parsed.highlights) setHighlights(parsed.highlights)
+
+                        // Legacy support for highlights
+                        if (parsed.highlights) {
+                            const valid = Object.values(parsed.highlights).every((arr: any) =>
+                                Array.isArray(arr) && arr.every(item => typeof item === 'object' && item.text !== undefined)
+                            );
+                            if (valid) {
+                                setHighlights(parsed.highlights)
+                            } else {
+                                // Reset invalid highlights to avoid crash
+                                setHighlights({})
+                            }
+                        }
+
                         setCurrentQuestionIndex(parsed.currentQuestionIndex || 0)
                         setTimeLeft(parsed.timeLeft || 0)
                         setIsLoading(false)
@@ -247,8 +308,6 @@ export default function ExamPage() {
                 details: details
             };
 
-            console.log("Submitting exam payload:", payload);
-
             const res = await fetch('/api/exam-session', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -286,28 +345,8 @@ export default function ExamPage() {
         router.push('/practice')
     }
 
-
-
-
     // Highlighting Logic
-    const handleHighlight = () => {
-        if (!isHighlightMode) return;
 
-        const selection = window.getSelection();
-        if (!selection || selection.isCollapsed) return;
-
-        const text = selection.toString().trim();
-        if (!text) return;
-
-        const qId = questions[currentQuestionIndex].id;
-        setHighlights(prev => {
-            const currentHighlights = prev[qId] || [];
-            if (currentHighlights.includes(text)) return prev;
-            return { ...prev, [qId]: [...currentHighlights, text] };
-        });
-
-        selection.removeAllRanges();
-    };
 
     const clearHighlights = () => {
         setShowClearHighlightDialog(true);
@@ -326,18 +365,53 @@ export default function ExamPage() {
     const applyHighlights = (content: string) => {
         const qId = questions[currentQuestionIndex].id;
         const currentHighlights = highlights[qId];
-
         if (!currentHighlights || currentHighlights.length === 0) return content;
-
-        let highlightedContent = content;
-
-        currentHighlights.forEach(highlightText => {
-            const escapedText = highlightText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // Step 1: Calculate absolute ranges for all highlights
+        const ranges: { start: number, end: number }[] = [];
+        currentHighlights.forEach(({ text, index }) => {
+            const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`(${escapedText})`, 'gi');
-            highlightedContent = highlightedContent.replace(regex, '<mark class="bg-yellow-200 rounded-sm px-0.5 text-black">$1</mark>');
+            let match;
+            let matchIndex = 0;
+            // Find the Nth occurrence
+            while ((match = regex.exec(content)) !== null) {
+                if (matchIndex === index) {
+                    ranges.push({ start: match.index, end: match.index + match[0].length });
+                    break;
+                }
+                matchIndex++;
+            }
         });
-
-        return highlightedContent;
+        if (ranges.length === 0) return content;
+        // Step 2: Merge overlapping ranges
+        ranges.sort((a, b) => a.start - b.start);
+        const mergedRanges: { start: number, end: number }[] = [];
+        let currentRange = ranges[0];
+        for (let i = 1; i < ranges.length; i++) {
+            const nextRange = ranges[i];
+            if (nextRange.start <= currentRange.end) {
+                // Overlap or adjacent, merge
+                currentRange.end = Math.max(currentRange.end, nextRange.end);
+            } else {
+                // No overlap, push current and start new
+                mergedRanges.push(currentRange);
+                currentRange = nextRange;
+            }
+        }
+        mergedRanges.push(currentRange);
+        // Step 3: Reconstruct string with merged marks
+        let result = '';
+        let lastIndex = 0;
+        mergedRanges.forEach(range => {
+            // Append text before the highlight
+            result += content.substring(lastIndex, range.start);
+            // Append highlighted text
+            result += `<mark class="bg-yellow-200 rounded-sm px-0.5 text-black">${content.substring(range.start, range.end)}</mark>`;
+            lastIndex = range.end;
+        });
+        // Append remaining text
+        result += content.substring(lastIndex);
+        return result;
     };
 
     // Determine correctness for review
@@ -617,7 +691,7 @@ export default function ExamPage() {
                         <div className="mb-1 leading-normal text-black">
                             {/* Question Text */}
                             <div onMouseUp={handleHighlight}>
-                                <MathRender text={applyHighlights(formatQuestionContent(currentQuestionIndex, currentQuestion.content ?? ""))} />
+                                <MathRender text={formatQuestionContent(currentQuestionIndex, applyHighlights(currentQuestion.content ?? ""))} />
                             </div>
                         </div>
 
