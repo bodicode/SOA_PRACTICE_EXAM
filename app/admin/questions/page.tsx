@@ -87,7 +87,7 @@ export default function AdminQuestionsPage() {
     async function loadPdfJs() {
         const pdfjs = await import("pdfjs-dist");
         if (typeof window !== "undefined" && !pdfjs.GlobalWorkerOptions.workerSrc) {
-            pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+            pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
         }
         return pdfjs;
     }
@@ -105,23 +105,16 @@ export default function AdminQuestionsPage() {
             ...item
         }));
 
-        // Debug extraction
-        console.log(`Page ${pIdx}: Found ${items.length} text items`);
-
         const questionStarts: { num: number, y: number, x: number }[] = [];
         items.forEach((item: any) => {
             const match = item.str.trim().match(/^(\d+)\.?$/);
             if (match) {
                 const [vx, vy] = viewport.convertToViewportPoint(item.tx, item.ty);
-                // Debug match candidates
-                // console.log(`Candidate ${match[1]} at x=${vx}`);
                 if (Math.abs(vx) < 100) {
                     questionStarts.push({ num: parseInt(match[1]), y: vy, x: vx });
                 }
             }
         });
-
-        console.log(`Page ${pIdx}: Found ${questionStarts.length} question starts:`, questionStarts.map(q => q.num));
 
         questionStarts.sort((a, b) => a.y - b.y);
         if (questionStarts.length === 0) return 0;
