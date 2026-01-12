@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause, Play, Highlighter, Trash2 } from 'lucide-react'
+import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause, Play, Highlighter, Trash2, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import MathRender from '@/components/MathRender'
 import {
@@ -47,6 +47,7 @@ export default function ExamPage() {
     const [showClearHighlightDialog, setShowClearHighlightDialog] = useState(false)
     const [showExitDialog, setShowExitDialog] = useState(false)
     const [isPaused, setIsPaused] = useState(false)
+    const [showReferenceSheet, setShowReferenceSheet] = useState(false)
 
     // Highlighting State
     const [highlights, setHighlights] = useState<Record<string, { text: string, index: number }[]>>({}) // questionId -> array of highlight objects
@@ -144,6 +145,11 @@ export default function ExamPage() {
                         setAnswers(parsed.answers || {})
                         setFlagged(parsed.flagged || {})
                         setIsSubmitted(parsed.isSubmitted || false)
+
+                        // Auto-show Reference Sheet for Exam P (Category 1) if not submitted
+                        if (categoryId === 1 && !parsed.isSubmitted) {
+                            setShowReferenceSheet(true);
+                        }
 
                         // Legacy support for highlights
                         if (parsed.highlights) {
@@ -442,6 +448,20 @@ export default function ExamPage() {
                 <div className="flex items-center gap-6 relative">
                     {/* Font Settings Button */}
                     <div className="relative">
+
+                        {categoryId === 1 && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className={cn("text-white hover:bg-white/20 gap-2 px-3 border border-white/20", showReferenceSheet && "bg-white/20")}
+                                onClick={() => setShowReferenceSheet(!showReferenceSheet)}
+                                title="Bảng tra cứu (Reference Sheet)"
+                            >
+                                <FileText className="w-4 h-4" />
+                                <span className="hidden md:inline font-sans text-sm">Bảng tra cứu</span>
+                            </Button>
+                        )}
+
                         <Button
                             variant="ghost"
                             size="sm"
@@ -788,6 +808,27 @@ export default function ExamPage() {
                         <Button variant="outline" onClick={() => setShowClearHighlightDialog(false)}>Hủy</Button>
                         <Button variant="destructive" onClick={confirmClearHighlights}>Xóa</Button>
                     </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={showReferenceSheet} onOpenChange={setShowReferenceSheet}>
+                <DialogContent className="w-[98vw] max-w-[98vw] h-[98vh] flex flex-col p-0 overflow-hidden sm:max-w-[98vw]">
+                    <DialogHeader className="px-6 py-4 flex flex-row items-center justify-between border-b shrink-0">
+                        <div className="flex flex-col">
+                            <DialogTitle>Bảng Tra Cứu (Reference Sheet)</DialogTitle>
+                            <DialogDescription>Tài liệu tham khảo cho kỳ thi</DialogDescription>
+                        </div>
+                    </DialogHeader>
+                    <div className="flex-1 overflow-auto bg-gray-100 p-4 flex items-start justify-center">
+                        <a href="/bang-exam-p.jpg" target="_blank" rel="noopener noreferrer" className="cursor-pointer" title="Click để mở trong tab mới">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                                src="/bang-exam-p.jpg"
+                                alt="Exam P Reference Table"
+                                className="max-w-4xl w-full h-auto shadow-lg border rounded bg-white hover:opacity-95 transition-opacity"
+                            />
+                        </a>
+                    </div>
                 </DialogContent>
             </Dialog>
 
