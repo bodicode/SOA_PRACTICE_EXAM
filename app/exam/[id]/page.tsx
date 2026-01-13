@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import { examService, Question } from '@/services/exam.service'
 import { useUserStore } from '@/stores/userStore'
+import { useProgressStore } from '@/stores/progressStore'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause, Play, Highlighter, Trash2, FileText } from 'lucide-react'
@@ -307,6 +308,7 @@ export default function ExamPage() {
             const payload = {
                 userId: currentUserId,
                 mode: mode,
+                categoryId: isNaN(categoryId) ? null : categoryId,
                 score: score,
                 totalQuestions: questions.length,
                 startTime: new Date(Date.now() - (limitParam || 30) * 60000 + timeLeft * 1000).toISOString(),
@@ -324,6 +326,12 @@ export default function ExamPage() {
                 const errorData = await res.json();
                 throw new Error(errorData.error || `Server error: ${res.status}`);
             }
+
+            // Invalidate/Reset progress store so home page refetches fresh data
+            useProgressStore.getState().reset();
+
+            // Redirect to results page (or home)
+            // ... existing code ...
 
             shouldPersist.current = false // Stop saving
             localStorage.removeItem(STORAGE_KEY)

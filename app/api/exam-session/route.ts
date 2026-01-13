@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { userId, mode, score, totalQuestions, startTime, endTime, details } = body;
+        const { userId, mode, score, totalQuestions, startTime, endTime, details, categoryId } = body;
 
         // 1. Validate User ID
         if (!userId || userId === 0) {
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
             data: {
                 userId: userId, // This will fail if userId doesn't exist in User table
                 mode: mode,
+                categoryId: categoryId ? Number(categoryId) : null,
                 startTime: new Date(startTime),
                 endTime: endTime ? new Date(endTime) : new Date(),
                 totalScore: score,
@@ -70,16 +71,31 @@ export async function POST(req: Request) {
                         } else if (diffDays > 1) {
                             newStreak = 1; // Broken streak
                         }
-                        // If diffDays === 0 (same day), keep streak same
                     } else {
                         newStreak = 1; // First time
                     }
 
+                    // Calculate new stats
+                    const [avgStats, answeredCount] = await Promise.all([
+                        // Average Score: Only from MOCK exams (and 'exam' mode) for accuracy
+                        tx.examSession.aggregate({
+                            where: { userId: userId, mode: { in: ['mock', 'exam'] } },
+                            _avg: { totalScore: true }
+                        }),
+                        // Total Questions: Count actual answers from ExamDetails
+                        tx.examDetail.count({
+                            where: {
+                                session: { userId: userId },
+                                userChoice: { not: null } // Only count answered questions
+                            }
+                        })
+                    ]);
+
                     await tx.user.update({
                         where: { id: userId },
                         data: {
-                            totalExams: { increment: 1 },
-                            totalScore: { increment: score }, // Accumulate score
+                            averageScore: Number(avgStats._avg.totalScore || 0),
+                            questionsAnswered: answeredCount,
                             studyStreak: newStreak,
                             lastStudyDate: new Date()
                         }
