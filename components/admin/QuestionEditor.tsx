@@ -35,6 +35,7 @@ const MATH_TOOLS = [
     { label: "∩", code: "$\\cap$", tooltip: "Intersection" },
     { label: "∈", code: "$\\in$", tooltip: "Element of" },
     { label: "∞", code: "$\\infty$", tooltip: "Infinity" },
+    { label: "%", code: "\\%", tooltip: "Percent Symbol" }, /* Added % support */
     { label: "∅", code: "$\\emptyset$", tooltip: "Empty Set" },
     { label: "$...$", code: "$$", tooltip: "Inline Math", offset: 1 },
     { label: "Block", code: "\n$$\n\n$$\n", tooltip: "Block Math", offset: 4 },

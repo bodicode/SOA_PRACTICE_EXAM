@@ -107,10 +107,11 @@ export default function AdminQuestionsPage() {
 
         const questionStarts: { num: number, y: number, x: number }[] = [];
         items.forEach((item: any) => {
-            const match = item.str.trim().match(/^(\d+)\.?$/);
+            const match = item.str.trim().match(/^(\d+)[\.%]?$/);
             if (match) {
                 const [vx, vy] = viewport.convertToViewportPoint(item.tx, item.ty);
-                if (Math.abs(vx) < 100) {
+                // Use relative margin for robustness (e.g., 15% of page width)
+                if (Math.abs(vx) < viewport.width * 0.15) {
                     questionStarts.push({ num: parseInt(match[1]), y: vy, x: vx });
                 }
             }
