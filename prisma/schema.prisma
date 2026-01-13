@@ -16,8 +16,9 @@ model User {
   createdAt     DateTime  @default(now())
 
   // Progress Tracking
-  totalExams    Int       @default(0)
-  totalScore    Float     @default(0) // Accumulator for calculating average
+  // Progress Tracking
+  averageScore      Float     @default(0)
+  questionsAnswered Int       @default(0)
 
   lastStudyDate DateTime?
   studyStreak   Int       @default(0)
@@ -63,6 +64,7 @@ model Category {
   children    Category[] @relation("CategoryHierarchy")
   questions   Question[]
   pdfQuestions PdfRegionQuestion[]
+  examSessions ExamSession[] @relation("ExamSessionCategory")
 }
 
 model Question {
@@ -101,7 +103,9 @@ model ExamSession {
   endTime    DateTime?
   totalScore Decimal?
   questionCount Int       @default(0)
-
+  categoryId    Int?
+  
+  category   Category?    @relation("ExamSessionCategory", fields: [categoryId], references: [id])
   user       User         @relation(fields: [userId], references: [id])
   details    ExamDetail[]
 }

@@ -18,7 +18,9 @@ export async function GET(req: Request) {
                 fullName: true,
                 role: true,
                 createdAt: true,
-                totalExams: true,
+                _count: {
+                    select: { examSessions: true }
+                },
 
                 studyStreak: true
             }

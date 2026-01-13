@@ -9,6 +9,10 @@ const WINDOW = 60 * 1000; // 1 minute
 export async function middleware(request: NextRequest) {
     const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
 
+    if (request.nextUrl.pathname.startsWith('/api/debug-stats')) {
+        return NextResponse.next();
+    }
+
     const now = Date.now();
     const clientData = rateLimitMap.get(ip) ?? { count: 0, lastReset: now };
 
@@ -40,6 +44,6 @@ export const config = {
          * - favicon.ico (favicon file)
          * Feel free to modify this pattern to include more paths.
          */
-        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/((?!_next/static|_next/image|favicon.ico|api/debug|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
 }
