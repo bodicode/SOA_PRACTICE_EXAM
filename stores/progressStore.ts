@@ -7,41 +7,43 @@ interface ProgressData {
 }
 
 interface ProgressState {
-    data: ProgressData | null
+    cache: Record<string, ProgressData>
+    loadingKeys: Record<string, boolean>
+
     userId: number | null
-    activeCategoryId: number | undefined
-    isLoading: boolean
-    lastFetched: number
 
     fetchProgress: (userId: number, categoryId?: number, force?: boolean) => Promise<void>
+    getData: (categoryId?: number) => ProgressData | null
+    isLoading: (categoryId?: number) => boolean
     reset: () => void
 }
 
 export const useProgressStore = create<ProgressState>((set, get) => ({
-    data: null,
+    cache: {},
+    loadingKeys: {},
     userId: null,
-    activeCategoryId: undefined,
-    isLoading: false,
-    lastFetched: 0,
 
     fetchProgress: async (userId: number, categoryId?: number, force = false) => {
-        const { data, userId: storedUserId, activeCategoryId: storedCategoryId, lastFetched, isLoading } = get();
+        const { userId: storedUserId } = get();
+        const cacheKey = categoryId !== undefined ? categoryId.toString() : 'all';
 
-        // Prevent fetching if already loading
-        if (isLoading) return;
+        // Reset cache if user changes
+        if (storedUserId !== userId) {
+            set({ userId, cache: {}, loadingKeys: {} });
+        }
 
-        // Cache Validation:
-        // 1. Time: < 5 mins
-        // 2. User: Must match
-        // 3. Category: Must match exactly (undefined should match undefined)
-        const isFresh = (Date.now() - lastFetched) < 5 * 60 * 1000;
-        const isSameCategory = storedCategoryId === categoryId;
-
-        if (!force && userId === storedUserId && isSameCategory && data && isFresh) {
+        // Check cache (fresh)
+        if (!force && get().cache[cacheKey]) {
             return;
         }
 
-        set({ isLoading: true, userId, activeCategoryId: categoryId });
+        // Check active loading
+        if (get().loadingKeys[cacheKey]) return;
+
+        set(state => ({
+            loadingKeys: { ...state.loadingKeys, [cacheKey]: true },
+            userId
+        }));
 
         try {
             let url = `/api/progress?userId=${userId}`;
@@ -51,16 +53,28 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
             if (!res.ok) throw new Error('Failed to fetch progress');
 
             const result = await res.json();
-            set({
-                data: result,
-                isLoading: false,
-                lastFetched: Date.now()
-            });
+
+            set(state => ({
+                cache: { ...state.cache, [cacheKey]: result },
+                loadingKeys: { ...state.loadingKeys, [cacheKey]: false }
+            }));
         } catch (error) {
             console.error(error);
-            set({ isLoading: false });
+            set(state => ({
+                loadingKeys: { ...state.loadingKeys, [cacheKey]: false }
+            }));
         }
     },
 
-    reset: () => set({ data: null, userId: null, lastFetched: 0 })
+    getData: (categoryId?: number) => {
+        const key = categoryId !== undefined ? categoryId.toString() : 'all';
+        return get().cache[key] || null;
+    },
+
+    isLoading: (categoryId?: number) => {
+        const key = categoryId !== undefined ? categoryId.toString() : 'all';
+        return !!get().loadingKeys[key];
+    },
+
+    reset: () => set({ cache: {}, userId: null, loadingKeys: {} })
 }))

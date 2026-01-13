@@ -28,17 +28,16 @@ export async function GET(req: Request) {
             select: {
                 studyStreak: true,
                 lastStudyDate: true,
-                questionsAnswered: true, // Fallback for global
-                averageScore: true       // Fallback for global
             }
         });
 
         // 2. Statistics Calculation (Dynamic)
         let totalQuestions = 0;
         let averageScore = 0;
+        let totalExams = 0;
 
         // Helper to calculate 10-point scale average
-        const calculateAverage10Scale = async (filter: any) => {
+        const calculateStats = async (filter: any) => {
             const sessions = await prisma.examSession.findMany({
                 where: {
                     ...filter,
@@ -48,7 +47,7 @@ export async function GET(req: Request) {
                 select: { totalScore: true, questionCount: true }
             });
 
-            if (sessions.length === 0) return 0;
+            if (sessions.length === 0) return { avg: 0, count: 0 };
 
             const sumScale10 = sessions.reduce((acc, s) => {
                 const score = Number(s.totalScore || 0);
@@ -56,55 +55,48 @@ export async function GET(req: Request) {
                 const scale10 = total > 0 ? (score / total) * 10 : 0;
                 return acc + scale10;
             }, 0);
-            return sumScale10 / sessions.length;
+
+            return {
+                avg: sumScale10 / sessions.length,
+                count: sessions.length
+            };
         };
 
-        if (categoryId) {
-            // Recalculate for specific category
-            const [avgScore, countStats] = await Promise.all([
-                calculateAverage10Scale({ userId, categoryId }),
-                prisma.examDetail.count({
-                    where: {
-                        session: { userId, categoryId },
-                        userChoice: { not: null }
-                    }
-                })
-            ]);
-            averageScore = avgScore;
-            totalQuestions = countStats;
-        } else {
-            // Global stats - Recalculate everything on 10-point scale for consistency
-            // Ignoring stored user.averageScore as it might be raw score
-            const [avgScore, countStats] = await Promise.all([
-                calculateAverage10Scale({ userId }),
-                prisma.examDetail.count({ // Accurate global answered count
-                    where: {
-                        session: { userId },
-                        userChoice: { not: null }
-                    }
-                })
-            ]);
+        const filterObj = { userId, ...(categoryId ? { categoryId } : {}) };
 
-            averageScore = avgScore;
-            totalQuestions = countStats; // Use recalculated count for accuracy
-        }
+        // Calculate Stats
+        const [examStats, countStats] = await Promise.all([
+            calculateStats(filterObj),
+            prisma.examDetail.count({
+                where: {
+                    session: filterObj,
+                    userChoice: { not: null }
+                }
+            })
+        ]);
+
+        averageScore = examStats.avg;
+        totalExams = examStats.count;
+        totalQuestions = countStats;
 
         const [performanceSessions, recentSessions] = await Promise.all([
-            // 3. Performance Data (Last 7 days)
+            // 3. Performance Data (Last 7 days - unaffected by global filter usually? 
+            // Actually, keep performance as last 7 days relative to NOW, generic dashboard widget)
             prisma.examSession.findMany({
                 where: {
-                    ...whereSession,
+                    userId,
+                    categoryId: categoryId ? categoryId : undefined, // Still filter by category if selected
                     mode: { in: ['mock', 'exam'] },
                     startTime: { gte: new Date(new Date().setDate(new Date().getDate() - 7)) }
                 },
                 select: { startTime: true, totalScore: true, questionCount: true },
                 orderBy: { startTime: 'asc' }
             }),
-            // 4. Recent Sessions
+            // 4. Recent Sessions (History - Revert to take 10)
             prisma.examSession.findMany({
                 where: whereSession,
                 orderBy: { startTime: 'desc' },
-                take: 10,
+                take: 10, // Reverted to 10
                 select: {
                     id: true,
                     mode: true,
@@ -115,7 +107,7 @@ export async function GET(req: Request) {
             })
         ]);
 
-        // Process Performance Data
+        // Process Performance Data (unchanged logic)
         const performanceMap = new Map<string, { total: number, count: number }>();
         const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
@@ -150,8 +142,9 @@ export async function GET(req: Request) {
         return NextResponse.json({
             stats: {
                 totalQuestions: totalQuestions,
-                averageScore: Math.round(averageScore),
-                studyStreak: user?.studyStreak || 0 // Streak is global
+                averageScore: averageScore.toFixed(1), // Return 1 decimal
+                totalExams: totalExams,
+                studyStreak: user?.studyStreak || 0
             },
             history: recentSessions,
             performance: performanceData

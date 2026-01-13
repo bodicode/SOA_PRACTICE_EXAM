@@ -10,27 +10,33 @@ import { useUserStore } from '@/stores/userStore';
 
 export function HomeProgress() {
     const { user } = useUserStore();
-    const { data, isLoading, fetchProgress } = useProgressStore();
-
-    // Derived state from store data
-    const stats = data?.stats;
-    const performanceData = data?.performance || [];
+    const { getData, isLoading, fetchProgress } = useProgressStore();
 
     // UI State
     const [selectedCategory, setSelectedCategory] = React.useState<number | null>(null);
+
+    // Derived state from store data
+    // Use selectedCategory if present (passed as number), otherwise undefined
+    const activeCategoryId = selectedCategory ?? undefined;
+    const data = getData(activeCategoryId);
+
+    // Check loading using function
+    const isCategoryLoading = isLoading(activeCategoryId);
+
+    const stats = data?.stats;
+    const performanceData = data?.performance || [];
 
     React.useEffect(() => {
         if (user?.id) {
             const numericId = Number(user.id);
             if (!isNaN(numericId)) {
-                // Pass categoryId if selected, otherwise undefined
-                fetchProgress(numericId, selectedCategory ?? undefined);
+                fetchProgress(numericId, activeCategoryId);
             }
         }
-    }, [user?.id, fetchProgress, selectedCategory]);
+    }, [user?.id, fetchProgress, activeCategoryId]);
 
 
-    if (isLoading && !data) return (
+    if (isCategoryLoading && !data) return (
         <section className="py-12 bg-gray-50 flex justify-center">
             <div className="animate-pulse flex flex-col items-center">
                 <div className="h-4 w-32 bg-gray-200 rounded mb-4"></div>
