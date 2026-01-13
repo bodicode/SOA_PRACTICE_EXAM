@@ -1,18 +1,22 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Trophy, Target, Calendar, TrendingUp, Clock, History, ArrowLeft, Filter, Map, Zap } from 'lucide-react'
+import { Trophy, Target, Calendar, TrendingUp, Clock, History, ArrowLeft, Filter, Map, Zap, Star, Flame, Download, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { useUserStore } from '@/stores/userStore'
+import { useProgressStore } from '@/stores/progressStore'
 import ProgressChart from '@/components/ProgressChart'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts'
 
 interface UserStats {
     totalExams: number
     studyStreak: number
     lastStudyDate: string | null
+    averageScore: number
+    totalQuestions: number
 }
 
 interface ExamSession {
@@ -25,218 +29,295 @@ interface ExamSession {
 
 export default function ProgressPage() {
     const { user } = useUserStore()
-    const [stats, setStats] = useState<UserStats | null>(null)
-    const [history, setHistory] = useState<ExamSession[]>([])
-    const [isLoading, setIsLoading] = useState(true)
-    const [activeTab, setActiveTab] = useState("all")
+    const { getData, fetchProgress, isLoading, cache } = useProgressStore()
 
-    const filteredHistory = useMemo(() => {
-        if (activeTab === "all") return history;
-        return history.filter(session => session.mode === activeTab);
-    }, [history, activeTab]);
+    const [activeCategory, setActiveCategory] = useState<number | undefined>(undefined)
+
+    // Derive data from store cache
+    const activeData = useMemo(() => {
+        return getData(activeCategory);
+    }, [getData, activeCategory, cache]);
+
+    const stats = activeData?.stats || null;
+    const history = activeData?.history || [];
+
+    useEffect(() => {
+        if (user && !isNaN(Number(user.id))) {
+            fetchProgress(Number(user.id), activeCategory);
+        }
+    }, [user, activeCategory, fetchProgress]);
+
+    // Show loading only if we have NO data yet for this specific combination
+    const isInitialLoading = isLoading(activeCategory) && !activeData;
+
+    // Use full history directly
+    const filteredHistory = history;
 
     const chartData = useMemo(() => {
-        // Reverse history to show oldest to newest
-        // Only include sessions with valid questionCount > 0 for the chart
-        const sorted = [...filteredHistory].reverse().filter(s => (s.questionCount || 0) > 0);
+        // Filter for exams only
+        const examSessions = filteredHistory.filter((s: ExamSession) => s.mode === 'exam' && (s.questionCount || 0) > 0);
+
+        const sorted = [...examSessions].reverse();
         return sorted.map(session => {
             const total = session.questionCount || 0;
-            const percentage = total > 0 ? (session.totalScore / total) * 100 : 0;
+            const score = Number(session.totalScore || 0);
+            const scale10 = total > 0 ? (score / total) * 10 : 0;
+            const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+
             return {
                 date: new Date(session.startTime).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
                 fullDate: new Date(session.startTime).toLocaleString('vi-VN'),
-                score: session.totalScore,
+                score: score,
                 total: total,
-                percentage: Math.round(percentage)
+                scale10: Number(scale10.toFixed(1)),
+                percentage: percentage,
+                mode: 'Thi thử'
             };
         });
     }, [filteredHistory]);
 
-    useEffect(() => {
-        const fetchProgress = async () => {
-            try {
-                // Fetch dynamic userId
-                if (!user || isNaN(Number(user.id))) return
-                const res = await fetch(`/api/progress?userId=${user.id}`)
-                if (res.ok) {
-                    const data = await res.json()
-                    setStats(data.stats)
-                    setHistory(data.history)
-                }
-            } catch (error) {
-                console.error("Failed to fetch progress", error)
-            } finally {
-                setIsLoading(false)
-            }
-        }
-        if (user) {
-            fetchProgress()
-        } else {
-            setIsLoading(false)
-        }
-    }, [user])
+    // Calculate outcomes
+    const outcomes = useMemo(() => {
+        let pass = 0;
+        let fail = 0;
+        // Also filter outcomes to only Exam mode
+        filteredHistory.filter((s: ExamSession) => s.mode === 'exam').forEach((session: ExamSession) => {
+            const total = session.questionCount || 0;
+            const score = Number(session.totalScore || 0);
+            const percentage = total > 0 ? (score / total) * 100 : 0;
+            if (percentage >= 70) pass++; // Assuming 70% is pass
+            else fail++;
+        });
+        return [
+            { name: 'Pass', value: pass, color: '#2563EB' },
+            { name: 'Fail', value: fail, color: '#EF4444' }
+        ];
+    }, [filteredHistory]);
 
-    if (isLoading) {
-        return <div className="p-8 flex justify-center">Đang tải dữ liệu...</div>
+    const passRate = outcomes[0].value + outcomes[1].value > 0
+        ? Math.round((outcomes[0].value / (outcomes[0].value + outcomes[1].value)) * 100)
+        : 0;
+
+    if (isInitialLoading) {
+        return <div className="p-8 flex justify-center text-gray-500">Loading analytics...</div>
     }
 
-    if (!stats) {
-        return <div className="p-8">Chưa có dữ liệu học tập. Hãy làm một bài thi thử!</div>
-    }
+    const bestScore = history.length > 0
+        ? Math.max(...history.map((s: ExamSession) => s.questionCount ? (s.totalScore / s.questionCount) * 10 : 0))
+        : 0;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6 md:p-10">
-            <div className="max-w-5xl mx-auto">
-                <div className="mb-8 flex items-center justify-between">
+        <div className="min-h-screen bg-[#F8FAFC] p-6 md:p-10 font-sans text-slate-800">
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
                     <div>
-                        <Link href="/" className="text-gray-500 hover:text-gray-900 flex items-center gap-2 mb-2">
-                            <ArrowLeft className="w-4 h-4" /> Trang chủ
-                        </Link>
-                        <h1 className="text-3xl font-bold text-gray-900">Tiến Độ Học Tập</h1>
-                        <p className="text-gray-500">Theo dõi quá trình ôn luyện của bạn</p>
+                        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Thống Kê Hiệu Quả</h1>
+                        <p className="text-slate-500 mt-1">Theo dõi chi tiết tiến độ ôn thi Exam P & FM</p>
                     </div>
                 </div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-                    <Card className="border-green-100 bg-linear-to-br from-white to-green-50 shadow-sm">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-green-700">Chuỗi Ngày Học</CardTitle>
-                            <TrendingUp className="h-4 w-4 text-green-600" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-gray-900">{stats.studyStreak}</div>
-                            <p className="text-xs text-green-600 font-medium flex items-center gap-1">
-                                <Zap className="w-3 h-3" /> Ngày liên tiếp
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-blue-100 bg-linear-to-br from-white to-blue-50 shadow-sm">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-blue-700">Hoạt Động Gần Nhất</CardTitle>
-                            <Calendar className="h-4 w-4 text-blue-600" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-lg font-bold text-gray-900">
-                                {stats.lastStudyDate ? new Date(stats.lastStudyDate).toLocaleDateString('vi-VN') : 'Chưa có'}
+                {/* Category Tabs */}
+                <div className="mb-6">
+                    <Tabs defaultValue="all" className="w-full" onValueChange={(val) => setActiveCategory(val === 'all' ? undefined : parseInt(val))}>
+                        <TabsList className="grid w-full max-w-md grid-cols-3 bg-slate-100 p-1">
+                            <TabsTrigger value="all" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">Tất cả</TabsTrigger>
+                            <TabsTrigger value="1" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">Exam P</TabsTrigger>
+                            <TabsTrigger value="2" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">Exam FM</TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                </div>
+
+
+
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    {/* Average Score */}
+                    <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <p className="text-sm font-medium text-blue-500 mb-1">Điểm Trung Bình</p>
+                                <div className="text-3xl font-bold text-slate-900">
+                                    {stats?.averageScore ? Number(stats.averageScore).toFixed(1) : 0}<span className="text-lg text-gray-400 font-normal">/10</span>
+                                </div>
                             </div>
-                            <p className="text-xs text-blue-600 font-medium flex items-center gap-1">
-                                <Clock className="w-3 h-3" /> Ngày làm bài cuối
-                            </p>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-amber-100 bg-linear-to-br from-white to-amber-50 shadow-sm">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-amber-700">Thành Tích Tốt Nhất</CardTitle>
-                            <Trophy className="h-4 w-4 text-amber-600" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-gray-900">
-                                {history.length > 0 ? Math.max(...history.map(s => s.questionCount ? Math.round((s.totalScore / s.questionCount) * 100) : 0)) : 0}%
+                            <div className="p-2 bg-blue-50 rounded-lg">
+                                <TrendingUp className="w-5 h-5 text-blue-600" />
                             </div>
-                            <p className="text-xs text-amber-600 font-medium flex items-center gap-1">
-                                <Trophy className="w-3 h-3" /> Điểm cao nhất
-                            </p>
-                        </CardContent>
+                        </div>
+                        <p className="text-xs font-semibold text-green-600 flex items-center gap-1">
+                            <TrendingUp className="w-3 h-3" /> Mục tiêu: 7.0/10
+                        </p>
+                    </Card>
+
+                    {/* Total Exams */}
+                    <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <p className="text-sm font-medium text-slate-500 mb-1">Tổng Số Bài Thi</p>
+                                <div className="text-3xl font-bold text-slate-900">{stats?.totalExams || 0}</div>
+                            </div>
+                            <div className="p-2 bg-indigo-50 rounded-lg">
+                                <FileText className="w-5 h-5 text-indigo-600" />
+                            </div>
+                        </div>
+                        <p className="text-xs text-slate-500">
+                            Đã hoàn thành {stats?.totalQuestions || 0} câu hỏi
+                        </p>
+                    </Card>
+
+                    {/* Best Score (Replaces Strongest Topic) */}
+                    <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <p className="text-sm font-medium text-slate-500 mb-1">Điểm Cao Nhất</p>
+                                <div className="text-3xl font-bold text-slate-900 leading-tight">
+                                    {bestScore.toFixed(1)}<span className="text-lg text-gray-400 font-normal">/10</span>
+                                </div>
+                            </div>
+                            <div className="p-2 bg-yellow-50 rounded-lg">
+                                <Star className="w-5 h-5 text-yellow-600 fill-yellow-600" />
+                            </div>
+                        </div>
+                        <p className="text-xs font-semibold text-green-600 flex items-center gap-1">
+                            <VerifiedIcon className="w-3 h-3" /> Kỷ lục cá nhân
+                        </p>
+                    </Card>
+
+                    {/* Study Streak */}
+                    <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <p className="text-sm font-medium text-slate-500 mb-1">Chuỗi Ngày Học</p>
+                                <div className="text-3xl font-bold text-slate-900">{stats?.studyStreak || 0} Ngày</div>
+                            </div>
+                            <div className="p-2 bg-orange-50 rounded-lg">
+                                <Flame className="w-5 h-5 text-orange-500 fill-orange-500" />
+                            </div>
+                        </div>
+                        <p className="text-xs text-slate-500">
+                            Giữ vững phong độ nhé!
+                        </p>
                     </Card>
                 </div>
 
-                {/* Filters and Chart */}
-                <div className="mb-10 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                            <Map className="w-5 h-5 text-blue-600" />
-                            Hành trình của bạn
-                        </h2>
-                        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-[400px]">
-                            <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="all">Tất cả</TabsTrigger>
-                                <TabsTrigger value="exam">Thi Thử</TabsTrigger>
-                                <TabsTrigger value="practice">Luyện Tập</TabsTrigger>
-                            </TabsList>
-                        </Tabs>
+                {/* Main Content Grid */}
+                <div className="mb-8">
+                    {/* Score Evolution Chart */}
+                    <div className="h-[400px]">
+                        <ProgressChart data={chartData} />
                     </div>
-
-                    <ProgressChart data={chartData} />
                 </div>
 
-                {/* Recent History */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <History className="w-5 h-5" /> Lịch Sử Làm Bài {activeTab !== 'all' && <span className="text-sm font-normal text-gray-500 capitalize">({activeTab === 'exam' ? 'Thi Thử' : 'Luyện Tập'})</span>}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {filteredHistory.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">Chưa có lịch sử làm bài cho chế độ này.</div>
-                        ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm text-left">
-                                    <thead className="bg-gray-100 text-gray-700 font-semibold">
-                                        <tr>
-                                            <th className="px-4 py-3 rounded-l-md">Thời gian</th>
-                                            <th className="px-4 py-3">Chế độ</th>
-                                            <th className="px-4 py-3">Trạng thái</th>
-                                            <th className="px-4 py-3 text-right">Điểm số</th>
-                                            <th className="px-4 py-3 rounded-r-md text-right">%</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {filteredHistory.map((session) => {
-                                            const count = session.questionCount || 0;
-                                            const percent = count > 0 ? (session.totalScore / count) * 100 : 0;
-
-                                            // Badge logic
-                                            let badgeColor = "bg-gray-100 text-gray-700";
-                                            let badgeText = "Chưa rõ";
-                                            if (count > 0) {
-                                                if (percent >= 80) {
-                                                    badgeColor = "bg-green-100 text-green-700";
-                                                    badgeText = "Tốt";
-                                                } else if (percent >= 50) {
-                                                    badgeColor = "bg-blue-100 text-blue-700";
-                                                    badgeText = "Khá";
-                                                } else {
-                                                    badgeColor = "bg-yellow-100 text-yellow-800";
-                                                    badgeText = "Cần cố gắng";
-                                                }
-                                            }
-
-                                            return (
-                                                <tr key={session.id} className="hover:bg-gray-50 transition-colors">
-                                                    <td className="px-4 py-3">
-                                                        <div className="font-medium text-gray-900">
-                                                            {new Date(session.startTime).toLocaleString('vi-VN')}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-3 capitalize">
-                                                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${session.mode === 'exam' ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-blue-50 text-blue-700 border border-blue-100'
-                                                            }`}>
-                                                            {session.mode === 'exam' ? 'Thi Thử' : 'Luyện Tập'}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-4 py-3">
-                                                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${badgeColor}`}>
-                                                            {badgeText}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-4 py-3 text-right font-bold text-gray-900">
-                                                        {session.totalScore} / {count > 0 ? count : '?'}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-right font-bold text-blue-600">
-                                                        {count > 0 ? `${Math.round(percent)}%` : '-'}
-                                                    </td>
-                                                </tr>
-                                            )
-                                        })}
-                                    </tbody>
-                                </table>
+                {/* Bottom Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Exam Outcomes */}
+                    <Card className="border-none shadow-md bg-white p-6">
+                        <h3 className="font-bold text-lg text-slate-900 mb-6">Tỉ Lệ Đạt (Pass Rate)</h3>
+                        <div className="h-64 relative flex items-center justify-center">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={outcomes}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                    >
+                                        {outcomes.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
+                                        ))}
+                                    </Pie>
+                                    <RechartsTooltip formatter={(value: any) => [value, 'Số lượng']} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                            {/* Center Text */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span className="text-3xl font-bold text-slate-900">{passRate}%</span>
+                                <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">Tỉ lệ Đậu</span>
                             </div>
-                        )}
-                    </CardContent>
-                </Card>
+                        </div>
+                        <div className="flex justify-center gap-6 mt-4">
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+                                <span className="text-sm text-slate-600">Đậu ({outcomes[0].value})</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                                <span className="text-sm text-slate-600">Trượt ({outcomes[1].value})</span>
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* Recent Attempts */}
+                    <Card className="lg:col-span-2 border-none shadow-md bg-white p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="font-bold text-lg text-slate-900">Lịch Sử Làm Bài Gần Đây</h3>
+                            <Link href="#" className="text-sm font-semibold text-blue-600 hover:text-blue-700">Xem tất cả</Link>
+                        </div>
+                        <div className="space-y-4">
+                            {filteredHistory.slice(0, 4).map((session: ExamSession, i: number) => {
+                                const total = session.questionCount || 0;
+                                const score = Number(session.totalScore || 0);
+                                const scale10 = total > 0 ? (score / total) * 10 : 0;
+                                const percentage = total > 0 ? (score / total) * 100 : 0;
+                                const isPassed = percentage >= 70; // Logic đậu/trượt tạm thời
+
+                                return (
+                                    <div key={session.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-blue-100 hover:bg-blue-50/30 transition-all group">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-lg bg-blue-100/50 flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
+                                                <History className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-semibold text-slate-900">
+                                                    {session.mode === 'exam' ? `Bài Thi Thử #${session.id}` : `Luyện Tập #${session.id}`}
+                                                </h4>
+                                                <p className="text-xs text-slate-500">{new Date(session.startTime).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className={`font-bold ${isPassed ? 'text-green-600' : 'text-red-500'}`}>
+                                                {scale10.toFixed(1)}/10
+                                            </div>
+                                            <div className={`text-[10px] uppercase font-bold tracking-wider ${isPassed ? 'text-green-600' : 'text-red-500'}`}>
+                                                {isPassed ? 'ĐẠT' : 'CHƯA ĐẠT'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                            {filteredHistory.length === 0 && (
+                                <div className="text-center py-8 text-slate-400">Chưa có dữ liệu trong khoảng thời gian này.</div>
+                            )}
+                        </div>
+                    </Card>
+                </div>
             </div>
         </div>
     )
 }
+
+function VerifiedIcon(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M12.01 2.011a3.2 3.2 0 0 1 2.113 .797l.154 .145l.698 .698a1.2 1.2 0 0 0 .71 .341l.135 .008h1a3.2 3.2 0 0 1 3.195 3.018l.005 .182v1c0 .27 .092 .533 .258 .743l.09 .1l.697 .698a3.2 3.2 0 0 1 .147 4.382l-.145 .154l-.698 .698a1.2 1.2 0 0 0 -.341 .71l-.008 .135v1a3.2 3.2 0 0 1 -3.018 3.195l-.182 .005h-1a1.2 1.2 0 0 0 -.743 .258l-.1 .09l-.698 .697a3.2 3.2 0 0 1 -4.382 .147l-.154 -.145l-.698 -.698a1.2 1.2 0 0 0 -.71 -.341l-.135 -.008h-1a3.2 3.2 0 0 1 -3.195 -3.018l-.005 -.182v-1a1.2 1.2 0 0 0 -.258 -.743l-.09 -.1l-.697 -.698a3.2 3.2 0 0 1 -.147 -4.382l.145 -.154l.698 -.698a1.2 1.2 0 0 0 .341 -.71l.008 -.135v-1a3.2 3.2 0 0 1 3.018 -3.195l.182 -.005h1a1.2 1.2 0 0 0 .743 -.258l.1 -.09l.698 -.697a3.2 3.2 0 0 1 2.269 -.944z" strokeWidth="0" fill="currentColor" />
+            <path d="M9 12l2 2l4 -4" stroke="white" strokeWidth="2" fill="none" />
+        </svg>
+    )
+}
+
