@@ -30,10 +30,14 @@ export function HomeProgress() {
         if (user?.id) {
             const numericId = Number(user.id);
             if (!isNaN(numericId)) {
-                fetchProgress(numericId, activeCategoryId);
+                // Prefetch all categories to ensure smooth tab switching
+                // The store handles caching, so subsequent calls are cheap
+                fetchProgress(numericId, undefined);
+                fetchProgress(numericId, 1);
+                fetchProgress(numericId, 2);
             }
         }
-    }, [user?.id, fetchProgress, activeCategoryId]);
+    }, [user?.id, fetchProgress]); // removed activeCategoryId dependency to avoid refetching on tab change if already cached
 
 
     if (isCategoryLoading && !data) return (

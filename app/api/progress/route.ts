@@ -107,22 +107,37 @@ export async function GET(req: Request) {
             })
         ]);
 
-        // Process Performance Data (unchanged logic)
-        const performanceMap = new Map<string, { total: number, count: number }>();
+        // Process Performance Data
+        const performanceMap = new Map<string, { total: number, count: number, label: string }>();
         const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
+        // Helper to get local YYYY-MM-DD key
+        const getDateKey = (date: Date) => {
+            return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+        };
 
         // Initialize last 7 days
         for (let i = 6; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
-            const key = days[d.getDay()];
-            performanceMap.set(key, { total: 0, count: 0 });
+
+            const key = getDateKey(d);
+            const dayName = days[d.getDay()];
+            const dateStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+
+            performanceMap.set(key, {
+                total: 0,
+                count: 0,
+                label: `${dayName} ${dateStr}`
+            });
         }
 
         performanceSessions.forEach(session => {
             if (session.totalScore !== null) {
-                const day = days[new Date(session.startTime).getDay()];
-                const entry = performanceMap.get(day);
+                const d = new Date(session.startTime);
+                const key = getDateKey(d);
+                const entry = performanceMap.get(key);
+
                 if (entry) {
                     const score = Number(session.totalScore || 0);
                     const total = session.questionCount || 1;
@@ -134,8 +149,8 @@ export async function GET(req: Request) {
             }
         });
 
-        const performanceData = Array.from(performanceMap.entries()).map(([day, stats]) => ({
-            day,
+        const performanceData = Array.from(performanceMap.values()).map(stats => ({
+            day: stats.label,
             value: stats.count > 0 ? Math.round(stats.total / stats.count) : 0
         }));
 
