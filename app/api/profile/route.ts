@@ -22,7 +22,8 @@ export async function GET(req: Request) {
                     select: { examSessions: true }
                 },
 
-                studyStreak: true
+                studyStreak: true,
+                avatarUrl: true,
             }
         });
 
@@ -40,20 +41,25 @@ export async function GET(req: Request) {
 export async function PUT(req: Request) {
     try {
         const body = await req.json();
-        const { userId, fullName } = body;
+        const { userId, fullName, avatarUrl } = body;
 
-        if (!userId || !fullName) {
+        if (!userId) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
+        const dataToUpdate: any = {};
+        if (fullName) dataToUpdate.fullName = fullName;
+        if (avatarUrl) dataToUpdate.avatarUrl = avatarUrl;
+
         const updatedUser = await prisma.user.update({
             where: { id: parseInt(userId) },
-            data: { fullName },
+            data: dataToUpdate,
             select: {
                 id: true,
                 email: true,
                 fullName: true,
                 role: true,
+                avatarUrl: true,
             }
         });
 

@@ -24,7 +24,8 @@ export async function POST() {
             const updatedUser = await prisma.user.update({
                 where: { email: user.email! },
                 data: {
-                    fullName: user.user_metadata?.full_name || existingUser.fullName,
+                    fullName: existingUser.fullName || user.user_metadata?.full_name,
+                    avatarUrl: existingUser.avatarUrl || user.user_metadata?.avatar_url,
                 }
             })
             return NextResponse.json({ user: updatedUser, action: 'updated' })

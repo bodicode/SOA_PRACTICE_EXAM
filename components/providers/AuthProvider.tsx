@@ -39,11 +39,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (user) {
                 // Set initial Supabase user
+                const currentUser = useUserStore.getState().user
                 const initialUser = {
                     id: user.id,
                     email: user.email || '',
-                    fullName: user.user_metadata?.full_name,
-                    avatarUrl: user.user_metadata?.avatar_url,
+                    fullName: (currentUser?.id === user.id && currentUser?.fullName) || user.user_metadata?.full_name,
+                    avatarUrl: (currentUser?.id === user.id && currentUser?.avatarUrl) || user.user_metadata?.avatar_url,
                     role: user.user_metadata?.role || 'student',
                 }
                 setUser(initialUser)
@@ -54,7 +55,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setUser({
                         ...initialUser,
                         id: dbUser.id.toString(), // Update to DB ID
-                        role: dbUser.role.toLowerCase()
+                        role: dbUser.role.toLowerCase(),
+                        avatarUrl: dbUser.avatarUrl || initialUser.avatarUrl,
+                        fullName: dbUser.fullName || initialUser.fullName
                     })
                 }
             } else {
@@ -85,7 +88,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                             setUser({
                                 ...initialUser,
                                 id: dbUser.id.toString(),
-                                role: dbUser.role.toLowerCase()
+                                role: dbUser.role.toLowerCase(),
+                                avatarUrl: dbUser.avatarUrl || initialUser.avatarUrl,
+                                fullName: dbUser.fullName || initialUser.fullName
                             })
                         }
                     }
