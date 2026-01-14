@@ -16,6 +16,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export function Navbar() {
     const { user, isLoading, logout } = useUserStore()
@@ -93,12 +94,16 @@ export function Navbar() {
                                 >
                                     <DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="relative h-auto w-auto p-0 hover:bg-transparent">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-medium text-gray-700 hidden sm:block whitespace-nowrap hover:text-blue-600 transition-colors">
-                                                        {user.fullName || user.email?.split('@')[0]}
-                                                    </span>
+                                            <Button variant="ghost" className="relative h-10 w-auto p-0 hover:bg-transparent px-2 gap-2 rounded-full">
+                                                <div className="text-sm font-medium text-gray-700 hidden sm:block">
+                                                    {user.fullName || user.email?.split('@')[0]}
                                                 </div>
+                                                <Avatar className="h-9 w-9 border border-gray-200 shadow-sm transition-transform hover:scale-105">
+                                                    <AvatarImage src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} className="object-cover" />
+                                                    <AvatarFallback className="bg-blue-100 text-blue-600 font-medium">
+                                                        {user.email?.[0]?.toUpperCase()}
+                                                    </AvatarFallback>
+                                                </Avatar>
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent className="w-56" align="end" forceMount>
