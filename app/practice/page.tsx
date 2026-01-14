@@ -129,7 +129,7 @@ export default function PracticePage() {
                         Nếu bạn tìm thấy lỗi có thể xảy ra trong câu hỏi hoặc đáp án, vui lòng chụp màn hình
                         câu hỏi cùng với lời giải của bạn và gửi cho chúng tôi qua{' '}
                         <a href="mailto:errors@soapractice.vn" className="text-[#0066cc] hover:underline">
-                            errors@soapractice.vn
+                            29.hoang.10@gmail.com
                         </a>. Chúng tôi sẽ xem xét và phản hồi trong thời gian sớm nhất.
                     </p>
                 </div>

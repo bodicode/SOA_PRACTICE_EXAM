@@ -32,6 +32,45 @@ const components = {
 };
 
 export default function MathRender({ text }: { text: string }) {
+    // Preprocess text to match Admin Preview behavior (respect newlines)
+    // Preprocess text to match Admin Preview behavior (respect newlines)
+    const processedText = React.useMemo(() => {
+        if (!text) return "";
+
+        let isPreviousLineTable = false;
+
+        return text.split("\n").map(line => {
+            // Preserve indentation with non-breaking spaces
+            const preservedLine = line.replace(/^ +/g, (match) => "\u00A0".repeat(match.length));
+            const trimmed = preservedLine.trim();
+
+            // Handle empty lines using stateful logic
+            if (trimmed === "") {
+                if (isPreviousLineTable) {
+                    isPreviousLineTable = false;
+                    return ""; // Clean break after table
+                }
+                return "\u00A0  "; // Force visible line break for normal text
+            }
+
+            // Check if current line is a table row or math block delimiter
+            const isTable = trimmed.startsWith("|");
+            // Also consider $$ blocks as "special" where we might not want to force breaks?
+            // Actually, for $$ blocks, standard markdown rendering handles them.
+            // If we append "  " to $$...$$, it might be fine, but let's be safe.
+            const isMathBlock = trimmed.startsWith("$$");
+
+            isPreviousLineTable = isTable;
+
+            if (isTable || isMathBlock) {
+                return preservedLine;
+            }
+
+            // Otherwise add two spaces to force <br/>
+            return preservedLine + "  ";
+        }).join("\n");
+    }, [text]);
+
     return (
         <div className="prose prose-sm max-w-none text-gray-800">
             <ReactMarkdown
@@ -39,7 +78,7 @@ export default function MathRender({ text }: { text: string }) {
                 rehypePlugins={[rehypeKatex, rehypeRaw]}
                 components={components}
             >
-                {text}
+                {processedText}
             </ReactMarkdown>
         </div>
     );

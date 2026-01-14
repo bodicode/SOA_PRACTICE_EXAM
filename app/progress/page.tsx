@@ -43,9 +43,13 @@ export default function ProgressPage() {
 
     useEffect(() => {
         if (user && !isNaN(Number(user.id))) {
-            fetchProgress(Number(user.id), activeCategory);
+            const uid = Number(user.id);
+            // Prefetch all categories to ensure smooth tab switching
+            fetchProgress(uid, undefined); // All
+            fetchProgress(uid, 1);       // Exam P
+            fetchProgress(uid, 2);       // Exam FM
         }
-    }, [user, activeCategory, fetchProgress]);
+    }, [user, fetchProgress]);
 
     // Show loading only if we have NO data yet for this specific combination
     const isInitialLoading = isLoading(activeCategory) && !activeData;
@@ -64,8 +68,13 @@ export default function ProgressPage() {
             const scale10 = total > 0 ? (score / total) * 10 : 0;
             const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
+            const dateObj = new Date(session.startTime);
+            const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+            const dayPrefix = days[dateObj.getDay()];
+            const dateStr = dateObj.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+
             return {
-                date: new Date(session.startTime).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
+                date: `${dayPrefix} ${dateStr}`,
                 fullDate: new Date(session.startTime).toLocaleString('vi-VN'),
                 score: score,
                 total: total,
