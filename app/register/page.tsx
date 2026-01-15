@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label'
 import { motion } from 'framer-motion'
 import { Loader2, ArrowRight, UserPlus, Mail, Lock, User, ChevronLeft, Rocket, GraduationCap, Stars, Eye, EyeOff } from 'lucide-react'
 
+import { translateAuthError } from '@/lib/utils'
+
 export default function RegisterPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -53,7 +55,7 @@ export default function RegisterPage() {
             })
 
             if (error) {
-                setError(error.message)
+                setError(translateAuthError(error.message))
                 setLoading(false)
             } else {
                 setSuccess(true)

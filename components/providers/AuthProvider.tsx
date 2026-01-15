@@ -5,25 +5,50 @@ import { createClient } from '@/lib/supabase/client'
 import { useUserStore } from '@/stores/userStore'
 
 // Function to sync user to database
-let lastSyncTime = 0;
-const SYNC_COOLDOWN = 5000; // 5 seconds
+const SYNC_COOLDOWN = 60 * 1000; // 1 minute is enough if persisted
 
 async function syncUserToDatabase() {
+    if (typeof window === 'undefined') return null;
+
     const now = Date.now();
+    const lastSyncTime = parseInt(localStorage.getItem('lastSyncTime') || '0', 10);
+    const cachedUserStr = localStorage.getItem('cachedUser');
+
     if (now - lastSyncTime < SYNC_COOLDOWN) {
-        return null; // Skip if synced recently
+        // Return cached user if exists and we are skipping sync
+        if (cachedUserStr) {
+            try {
+                return JSON.parse(cachedUserStr);
+            } catch (e) {
+                console.error('Failed to parse cached user', e);
+            }
+        }
+        return null;
     }
 
     try {
         const res = await fetch('/api/auth/sync-user', { method: 'POST' })
         if (res.ok) {
-            lastSyncTime = now;
+            localStorage.setItem('lastSyncTime', now.toString());
             const data = await res.json()
+            if (data.user) {
+                localStorage.setItem('cachedUser', JSON.stringify(data.user));
+            }
             return data.user
         }
     } catch (error) {
         console.error('Failed to sync user:', error)
     }
+
+    // Fallback to cache if sync fails
+    if (cachedUserStr) {
+        try {
+            return JSON.parse(cachedUserStr);
+        } catch (e) {
+            console.error('Failed to parse cached user', e);
+        }
+    }
+
     return null
 }
 
@@ -96,6 +121,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     }
                 } else {
                     setUser(null)
+                    // Clear cache on logout
+                    localStorage.removeItem('cachedUser')
+                    localStorage.removeItem('lastSyncTime')
                 }
             }
         )
