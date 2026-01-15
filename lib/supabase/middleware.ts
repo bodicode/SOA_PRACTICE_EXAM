@@ -37,8 +37,12 @@ export async function updateSession(request: NextRequest) {
         request.nextUrl.pathname.startsWith('/login') ||
         request.nextUrl.pathname.startsWith('/register') ||
         request.nextUrl.pathname.startsWith('/auth') ||
+        request.nextUrl.pathname.startsWith('/api/auth') || // Allow auth callbacks
         request.nextUrl.pathname.startsWith('/practice') ||
-        request.nextUrl.pathname.startsWith('/api/categories')
+        request.nextUrl.pathname.startsWith('/api/categories') ||
+        // Forgot Password Routes
+        request.nextUrl.pathname.startsWith('/forgot-password') ||
+        request.nextUrl.pathname.startsWith('/reset-password')
 
     if (!user && !isPublicPath) {
         const url = request.nextUrl.clone()

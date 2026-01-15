@@ -4,20 +4,26 @@ import { createClient } from '@/lib/supabase/server'
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url)
     const code = searchParams.get('code')
-    // if "next" is in param, use it as the redirect URL
     const next = searchParams.get('next') ?? '/'
+    const error = searchParams.get('error')
+    const error_description = searchParams.get('error_description')
 
-    // Allow configuring the site URL via environment variable to support non-localhost redirects
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || origin
+
+    if (error) {
+        return NextResponse.redirect(`${siteUrl}/login?error=${encodeURIComponent(error_description || 'Authentication failed')}`)
+    }
 
     if (code) {
         const supabase = await createClient()
-        const { error } = await supabase.auth.exchangeCodeForSession(code)
-        if (!error) {
+        const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
+        if (!sessionError) {
             return NextResponse.redirect(`${siteUrl}${next}`)
+        } else {
+            return NextResponse.redirect(`${siteUrl}/login?error=${encodeURIComponent(sessionError.message)}`)
         }
     }
 
-    // return the user to an error page with instructions
-    return NextResponse.redirect(`${siteUrl}/auth/auth-code-error`)
+    // Return to login with generic error if no code
+    return NextResponse.redirect(`${siteUrl}/login?error=invalid_request`)
 }
