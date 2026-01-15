@@ -68,16 +68,45 @@ export async function GET(request: Request) {
 
         const allQuestions = [...questions, ...mappedPdfQuestions]
 
-        const random = searchParams.get('random') === 'true'
-        if (random) {
-            // Fisher-Yates shuffle
-            for (let i = allQuestions.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [allQuestions[i], allQuestions[j]] = [allQuestions[j], allQuestions[i]];
+        // Sort questions by the number prefix in content (e.g. "1. Question..." -> 1)
+        // This ensures the slice matches the user's mental model of "Question 1 to 10"
+        allQuestions.sort((a, b) => {
+            const getNum = (str: string) => {
+                const match = str.match(/^(\d+)\./);
+                return match ? parseInt(match[1]) : 999999;
+            }
+            return getNum(a.content) - getNum(b.content);
+        })
+
+        // Handle Range Selection (start/end)
+        const startParam = searchParams.get('start')
+        const endParam = searchParams.get('end')
+
+        let processedQuestions = allQuestions;
+
+        if (startParam || endParam) {
+            const start = parseInt(startParam || '1')
+            const end = parseInt(endParam || allQuestions.length.toString())
+
+            // Adjust to 0-based index
+            const startIndex = Math.max(0, start - 1)
+            const endIndex = Math.min(allQuestions.length, end)
+
+            if (startIndex < endIndex) {
+                processedQuestions = allQuestions.slice(startIndex, endIndex)
             }
         }
 
-        return NextResponse.json(allQuestions)
+        const random = searchParams.get('random') === 'true'
+        if (random) {
+            // Fisher-Yates shuffle
+            for (let i = processedQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [processedQuestions[i], processedQuestions[j]] = [processedQuestions[j], processedQuestions[i]];
+            }
+        }
+
+        return NextResponse.json(processedQuestions)
     } catch (error) {
         console.error('Fetch questions error:', error)
         return NextResponse.json(

@@ -34,6 +34,8 @@ export default function ExamPage() {
     const mode = searchParams.get('mode') || 'practice'
     const limitParam = parseInt(searchParams.get('limit') || '0')
     const countParam = parseInt(searchParams.get('count') || '10')
+    const startParam = searchParams.get('start') ? parseInt(searchParams.get('start')!) : undefined
+    const endParam = searchParams.get('end') ? parseInt(searchParams.get('end')!) : undefined
 
     // State
     const [questions, setQuestions] = useState<Question[]>([])
@@ -190,7 +192,9 @@ export default function ExamPage() {
                 // Fetch questions
                 const data = await examService.getQuestions({
                     categoryId: categoryId,
-                    limit: qCount
+                    limit: qCount,
+                    start: startParam,
+                    end: endParam
                 })
                 setQuestions(data)
             } catch (error) {
@@ -200,7 +204,7 @@ export default function ExamPage() {
             }
         }
         initExam()
-    }, [categoryId, mode, limitParam, countParam])
+    }, [categoryId, mode, limitParam, countParam, startParam, endParam])
 
     // Save State
     useEffect(() => {

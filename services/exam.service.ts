@@ -22,9 +22,11 @@ class ExamService {
         return res.json()
     }
 
-    async getQuestions(params: { categoryId?: number; limit?: number }): Promise<Question[]> {
+    async getQuestions(params: { categoryId?: number; limit?: number; start?: number; end?: number }): Promise<Question[]> {
         const queryParams = new URLSearchParams()
         if (params.categoryId) queryParams.append('categoryId', params.categoryId.toString())
+        if (params.start) queryParams.append('start', params.start.toString())
+        if (params.end) queryParams.append('end', params.end.toString())
 
         // Note: The /api/questions endpoint currently fetches all matching questions.
         // We might need to handle 'limit' either in the API or client-side for now,
