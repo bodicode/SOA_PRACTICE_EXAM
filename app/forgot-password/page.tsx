@@ -22,8 +22,10 @@ export default function ForgotPasswordPage() {
         setMsg(null)
 
         try {
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/api/auth/callback?next=/reset-password`,
+                redirectTo: `${siteUrl}/api/auth/callback?next=/reset-password`,
             })
 
             if (error) {
@@ -106,8 +108,8 @@ export default function ForgotPasswordPage() {
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 className={`p-4 rounded-xl text-sm flex items-start gap-3 ${msg.type === 'success'
-                                        ? 'bg-green-50 border border-green-200 text-green-700'
-                                        : 'bg-red-50 border border-red-200 text-red-600'
+                                    ? 'bg-green-50 border border-green-200 text-green-700'
+                                    : 'bg-red-50 border border-red-200 text-red-600'
                                     }`}
                             >
                                 <div className={`w-2 h-2 mt-1.5 rounded-full shrink-0 ${msg.type === 'success' ? 'bg-green-500' : 'bg-red-500'
