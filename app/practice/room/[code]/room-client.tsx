@@ -59,6 +59,7 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
     const [isCameraOn, setIsCameraOn] = useState(true);
     const myStreamRef = useRef<MediaStream | null>(null); // Ref for stale closures
     const [peers, setPeers] = useState<{ peerId: string; peer: any; stream?: MediaStream }[]>([]);
+    const [peerStatuses, setPeerStatuses] = useState<Record<string, { mic: boolean; camera: boolean }>>({});
     const peersRef = useRef<{ peerId: string; peer: any; stream?: MediaStream }[]>([]);
     const myVideoRef = useRef<HTMLVideoElement>(null);
     const [members, setMembers] = useState<Member[]>([]);
@@ -97,7 +98,9 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
 
     // Mobile Responsive State
     const [showLeftSidebar, setShowLeftSidebar] = useState(false);
+
     const [showRightSidebar, setShowRightSidebar] = useState(false);
+    const [activeTab, setActiveTab] = useState("chat");
 
     const isHost = currentUser?.id === hostUserId;
     const channelRef = useRef<any>(null);
@@ -203,11 +206,42 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                 localStorage.removeItem(`room_state_${roomCode}`);
                 router.push("/practice/group");
             })
+            // Reset local status state for this user potentially?
+            // Actually we just wait for their status update or assume default
+
+            .on("broadcast", { event: "status_update" }, ({ payload }) => {
+                setPeerStatuses(prev => ({
+                    ...prev,
+                    [payload.userId]: { mic: payload.mic, camera: payload.camera }
+                }));
+            })
             .on("broadcast", { event: "join_video" }, async ({ payload }) => {
                 if (!isVideoJoinedRef.current || payload.userId === currentUser.id) return;
-                const SimplePeer = (await import("simple-peer")).default;
-                const peer = new SimplePeer({ initiator: true, trickle: false, stream: myStreamRef.current || undefined });
 
+                // Broadcast my status to the new user (and everyone else, to be safe)
+                if (channelRef.current) {
+                    channelRef.current.send({
+                        type: "broadcast",
+                        event: "status_update",
+                        payload: { userId: currentUser.id, mic: isMicOn, camera: isCameraOn }
+                    });
+                }
+
+                const SimplePeer = (await import("simple-peer")).default;
+
+                const rtcConfig = {
+                    iceServers: [
+                        { urls: "stun:stun.l.google.com:19302" },
+                        { urls: "stun:global.stun.twilio.com:3478" }
+                    ]
+                };
+
+                const peer = new SimplePeer({
+                    initiator: true,
+                    trickle: false,
+                    stream: myStreamRef.current || undefined,
+                    config: rtcConfig
+                });
 
                 peer.on("signal", (signal: any) => {
                     channel.send({ type: "broadcast", event: "signal", payload: { signal, to: payload.userId, from: currentUser.id } });
@@ -215,7 +249,7 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
 
                 peer.on("error", (err: any) => {
                     console.error("Peer connection error:", err);
-                    toast.error("Kết nối video bị lỗi");
+                    toast.error(`Lỗi kết nối video: ${err.code || err.message || "Không xác định"}`);
                 });
 
                 peer.on("close", () => {
@@ -241,9 +275,20 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                         item.peer.signal(payload.signal);
                     } else {
                         const SimplePeer = (await import("simple-peer")).default;
-                        const peer = new SimplePeer({ initiator: false, trickle: false, stream: myStreamRef.current || undefined });
 
+                        const rtcConfig = {
+                            iceServers: [
+                                { urls: "stun:stun.l.google.com:19302" },
+                                { urls: "stun:global.stun.twilio.com:3478" }
+                            ]
+                        };
 
+                        const peer = new SimplePeer({
+                            initiator: false,
+                            trickle: false,
+                            stream: myStreamRef.current || undefined,
+                            config: rtcConfig
+                        });
                         peer.on("signal", (signal: any) => {
                             channel.send({ type: "broadcast", event: "signal", payload: { signal, to: payload.from, from: currentUser.id } });
                         });
@@ -288,6 +333,13 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
         };
     }, [roomCode, currentUser, supabase]);
 
+    useEffect(() => {
+        const wasJoined = localStorage.getItem(`video_joined_${roomCode}`);
+        if (wasJoined === "true" && !isVideoJoinedRef.current) {
+            joinVideo();
+        }
+    }, [roomCode]);
+
     const joinVideo = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -297,14 +349,17 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
             setIsMicOn(true); // Reset mic state
             setIsCameraOn(true); // Reset camera state
             isVideoJoinedRef.current = true; // Update Ref
-            // Removed direct ref assignment here to avoid race condition
-            // It is handled by the useEffect below
+
+            // Save intent
+            localStorage.setItem(`video_joined_${roomCode}`, "true");
+
             if (channelRef.current) {
                 channelRef.current.send({ type: "broadcast", event: "join_video", payload: { userId: currentUser.id } });
             }
         } catch (err) {
             console.error(err);
             toast.error("Không thể truy cập Camera/Micro");
+            localStorage.removeItem(`video_joined_${roomCode}`); // Clear intent on failure
         }
     };
 
@@ -316,6 +371,10 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
         myStreamRef.current = null; // Update Ref
         setIsMicOn(true);
         setIsCameraOn(true);
+
+        // Clear intent
+        localStorage.removeItem(`video_joined_${roomCode}`);
+
         if (channelRef.current) {
             channelRef.current.send({ type: "broadcast", event: "leave_video", payload: { userId: currentUser.id } });
         }
@@ -328,9 +387,19 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
         if (myStream) {
             const audioTrack = myStream.getAudioTracks()[0];
             if (audioTrack) {
-                audioTrack.enabled = !audioTrack.enabled;
-                setIsMicOn(audioTrack.enabled);
-                toast.success(audioTrack.enabled ? "Đã bật Mic" : "Đã tắt Mic");
+                const newState = !audioTrack.enabled;
+                audioTrack.enabled = newState;
+                setIsMicOn(newState);
+                toast.success(newState ? "Đã bật Mic" : "Đã tắt Mic");
+
+                // Broadcast Status
+                if (channelRef.current) {
+                    channelRef.current.send({
+                        type: "broadcast",
+                        event: "status_update",
+                        payload: { userId: currentUser.id, mic: newState, camera: isCameraOn }
+                    });
+                }
             }
         }
     };
@@ -339,9 +408,19 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
         if (myStream) {
             const videoTrack = myStream.getVideoTracks()[0];
             if (videoTrack) {
-                videoTrack.enabled = !videoTrack.enabled;
-                setIsCameraOn(videoTrack.enabled);
-                toast.success(videoTrack.enabled ? "Đã bật Camera" : "Đã tắt Camera");
+                const newState = !videoTrack.enabled;
+                videoTrack.enabled = newState;
+                setIsCameraOn(newState);
+                toast.success(newState ? "Đã bật Camera" : "Đã tắt Camera");
+
+                // Broadcast Status
+                if (channelRef.current) {
+                    channelRef.current.send({
+                        type: "broadcast",
+                        event: "status_update",
+                        payload: { userId: currentUser.id, mic: isMicOn, camera: newState }
+                    });
+                }
             }
         }
     };
@@ -987,7 +1066,7 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                     "fixed right-0 top-16 xl:static",
                     showRightSidebar ? "translate-x-0" : "translate-x-full xl:translate-x-0"
                 )}>
-                    <Tabs defaultValue="chat" className="flex-1 flex flex-col h-full">
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col h-full">
                         <div className="p-2 border-b border-gray-100 bg-gray-50 shrink-0">
                             <TabsList className="w-full grid grid-cols-2">
                                 <TabsTrigger value="chat" className="gap-2"><MessageSquare className="w-4 h-4" /> Chat</TabsTrigger>
@@ -995,7 +1074,8 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                             </TabsList>
                         </div>
 
-                        <TabsContent value="chat" className="flex-1 flex flex-col p-0 m-0 overflow-hidden">
+                        {/* Chat Content - Manual Visibility */}
+                        <div className={cn("flex-1 flex flex-col p-0 m-0 overflow-hidden", activeTab !== "chat" && "hidden")}>
                             {/* Chat Messages */}
                             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50/50">
                                 {messages.length === 0 && (
@@ -1027,9 +1107,10 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                                     <Send className="w-4 h-4" />
                                 </Button>
                             </div>
-                        </TabsContent>
+                        </div>
 
-                        <TabsContent value="video" className="flex-1 flex flex-col p-4 m-0 overflow-hidden bg-gray-900">
+                        {/* Video Content - Manual Visibility */}
+                        <div className={cn("flex-1 flex flex-col p-4 m-0 overflow-hidden bg-gray-900", activeTab !== "video" && "hidden")}>
                             {!isVideoJoined ? (
                                 <div className="flex-1 flex flex-col items-center justify-center text-white space-y-4">
                                     <Video className="w-16 h-16 opacity-20" />
@@ -1042,20 +1123,48 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                                 <div className="flex-1 flex flex-col space-y-4 overflow-y-auto min-h-0">
                                     <div className="flex flex-col gap-2">
                                         {/* My Video */}
-                                        <div className="relative aspect-video bg-gray-800 rounded-lg overflow-hidden ring-2 ring-green-500 shadow-md">
-                                            <video ref={myVideoRef} autoPlay muted playsInline className="w-full h-full object-cover transform scale-x-[-1]" />
-                                            <div className="absolute bottom-1 left-2 text-[10px] text-white bg-black/50 px-1 rounded">Bạn</div>
+
+                                        <div className="relative aspect-video bg-gray-800 rounded-lg overflow-hidden ring-2 ring-green-500 shadow-md group">
+                                            <video ref={myVideoRef} autoPlay muted playsInline className={cn("w-full h-full object-cover transform scale-x-[-1]", !isCameraOn && "opacity-0")} />
+                                            {!isCameraOn && (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-gray-500">
+                                                    <VideoOff className="w-12 h-12 opacity-50" />
+                                                </div>
+                                            )}
+                                            <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-between">
+                                                <span className="text-xs font-bold text-white truncate max-w-[70%]">Bạn (Me)</span>
+                                                <div className="flex items-center gap-1">
+                                                    {isMicOn ? <Mic className="w-3 h-3 text-green-400" /> : <MicOff className="w-3 h-3 text-red-500" />}
+                                                    {isCameraOn ? <Video className="w-3 h-3 text-green-400" /> : <VideoOff className="w-3 h-3 text-red-500" />}
+                                                </div>
+                                            </div>
                                         </div>
 
                                         {/* Peers */}
-                                        {peers.map((p) => (
-                                            <div key={p.peerId} className="relative aspect-video bg-gray-800 rounded-lg overflow-hidden shadow-md">
-                                                <VideoComponent peer={p.peer} stream={p.stream} />
-                                                <div className="absolute bottom-1 left-2 text-[10px] text-white bg-black/50 px-1 rounded">
-                                                    {members.find(m => m.userId === p.peerId)?.email.split("@")[0] || "User"}
+                                        {peers.map((p) => {
+                                            const status = peerStatuses[p.peerId] || { mic: true, camera: true };
+                                            return (
+                                                <div key={p.peerId} className="relative aspect-video bg-gray-800 rounded-lg overflow-hidden shadow-md group">
+                                                    <div className={cn("absolute inset-0", !status.camera && "opacity-0 transition-opacity")}>
+                                                        <VideoComponent peer={p.peer} stream={p.stream} />
+                                                    </div>
+                                                    {!status.camera && (
+                                                        <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-gray-500 z-10">
+                                                            <VideoOff className="w-12 h-12 opacity-50" />
+                                                        </div>
+                                                    )}
+                                                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-between z-20">
+                                                        <span className="text-xs font-bold text-white truncate max-w-[70%]">
+                                                            {members.find(m => m.userId === p.peerId)?.email.split("@")[0] || "User"}
+                                                        </span>
+                                                        <div className="flex items-center gap-1">
+                                                            {status.mic ? <Mic className="w-3 h-3 text-green-400" /> : <MicOff className="w-3 h-3 text-red-500" />}
+                                                            {status.camera ? <Video className="w-3 h-3 text-green-400" /> : <VideoOff className="w-3 h-3 text-red-500" />}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
 
                                     <div className="mt-auto pt-4 flex gap-4 justify-center">
@@ -1086,7 +1195,7 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                                     </div>
                                 </div>
                             )}
-                        </TabsContent>
+                        </div>
                     </Tabs>
                 </aside>
             </div >
