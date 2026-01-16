@@ -516,12 +516,13 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
     };
 
     // Disband Room
-    const handleDisband = () => {
+    const handleDisband = async () => {
         if (!isHost) return;
         if (channelRef.current) {
-            channelRef.current.send({
+            await channelRef.current.send({
                 type: "broadcast",
-                event: "destroy_room"
+                event: "destroy_room",
+                payload: {}
             });
         }
         // Host also leaves
@@ -605,12 +606,18 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                         <Menu className="w-6 h-6" />
                     </Button>
 
-                    <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 gap-2 px-2" onClick={() => {
-                        localStorage.removeItem(`room_state_${roomCode}`);
-                        router.push("/practice/group");
-                    }}>
-                        <ChevronLeft className="w-4 h-4" /> Thoát
-                    </Button>
+                    {isHost ? (
+                        <Button variant="ghost" size="sm" className="text-red-300 hover:text-white hover:bg-red-600/50 gap-2 px-2" onClick={() => setConfirmDisbandOpen(true)}>
+                            <X className="w-4 h-4" /> Giải Tán
+                        </Button>
+                    ) : (
+                        <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 gap-2 px-2" onClick={() => {
+                            localStorage.removeItem(`room_state_${roomCode}`);
+                            router.push("/practice/group");
+                        }}>
+                            <ChevronLeft className="w-4 h-4" /> Thoát
+                        </Button>
+                    )}
                     <span className="hidden md:inline">Phòng ôn tập: {roomCode}</span>
                 </div>
 
