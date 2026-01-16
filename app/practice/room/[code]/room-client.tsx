@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "react-hot-toast";
 import {
-    Users, LogOut, CheckCircle, MessageSquare, Send, Video, VideoOff,
+    Users, LogOut, CheckCircle, MessageSquare, Send, Video, VideoOff, Mic, MicOff,
     ChevronLeft, ChevronRight, Settings, ChevronDown, Clock, Flag,
     BookOpen, PlayCircle, Grid, AlertCircle
 } from "lucide-react";
@@ -54,6 +54,8 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
     const [isVideoJoined, setIsVideoJoined] = useState(false);
     const isVideoJoinedRef = useRef(false); // Ref for stale closures
     const [myStream, setMyStream] = useState<MediaStream | null>(null);
+    const [isMicOn, setIsMicOn] = useState(true);
+    const [isCameraOn, setIsCameraOn] = useState(true);
     const myStreamRef = useRef<MediaStream | null>(null); // Ref for stale closures
     const [peers, setPeers] = useState<{ peerId: string; peer: any; stream?: MediaStream }[]>([]);
     const peersRef = useRef<{ peerId: string; peer: any; stream?: MediaStream }[]>([]);
@@ -206,6 +208,16 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                     channel.send({ type: "broadcast", event: "signal", payload: { signal, to: payload.userId, from: currentUser.id } });
                 });
 
+                peer.on("error", (err: any) => {
+                    console.error("Peer connection error:", err);
+                    toast.error("Kết nối video bị lỗi");
+                });
+
+                peer.on("close", () => {
+                    console.log("Peer connection closed");
+                    // Optional: remove peer from state if needed, though leave_video should handle it
+                });
+
                 peer.on("stream", (stream: any) => {
                     const found = peersRef.current.find(p => p.peer === peer);
                     if (found) {
@@ -229,6 +241,10 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
 
                         peer.on("signal", (signal: any) => {
                             channel.send({ type: "broadcast", event: "signal", payload: { signal, to: payload.from, from: currentUser.id } });
+                        });
+
+                        peer.on("error", (err: any) => {
+                            console.error("Peer connection error:", err);
                         });
 
                         peer.on("stream", (stream: any) => {
@@ -273,6 +289,8 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
             setMyStream(stream);
             myStreamRef.current = stream; // Update Ref
             setIsVideoJoined(true);
+            setIsMicOn(true); // Reset mic state
+            setIsCameraOn(true); // Reset camera state
             isVideoJoinedRef.current = true; // Update Ref
             // Removed direct ref assignment here to avoid race condition
             // It is handled by the useEffect below
@@ -291,12 +309,36 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
         myStream?.getTracks().forEach(track => track.stop());
         setMyStream(null);
         myStreamRef.current = null; // Update Ref
+        setIsMicOn(true);
+        setIsCameraOn(true);
         if (channelRef.current) {
             channelRef.current.send({ type: "broadcast", event: "leave_video", payload: { userId: currentUser.id } });
         }
         peersRef.current.forEach(p => p.peer.destroy());
         peersRef.current = [];
         setPeers([]);
+    };
+
+    const toggleMic = () => {
+        if (myStream) {
+            const audioTrack = myStream.getAudioTracks()[0];
+            if (audioTrack) {
+                audioTrack.enabled = !audioTrack.enabled;
+                setIsMicOn(audioTrack.enabled);
+                toast.success(audioTrack.enabled ? "Đã bật Mic" : "Đã tắt Mic");
+            }
+        }
+    };
+
+    const toggleCamera = () => {
+        if (myStream) {
+            const videoTrack = myStream.getVideoTracks()[0];
+            if (videoTrack) {
+                videoTrack.enabled = !videoTrack.enabled;
+                setIsCameraOn(videoTrack.enabled);
+                toast.success(videoTrack.enabled ? "Đã bật Camera" : "Đã tắt Camera");
+            }
+        }
     };
 
     // Fix Local Video Attachment
@@ -312,15 +354,9 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
         useEffect(() => {
             if (stream && ref.current) {
                 ref.current.srcObject = stream;
+                ref.current.play().catch(e => console.error("Video play failed:", e));
             }
         }, [stream]);
-
-        // Fallback listener in case stream comes later (though we try to capture it in parent)
-        useEffect(() => {
-            peer.on("stream", (s: any) => {
-                if (ref.current && !ref.current.srcObject) ref.current.srcObject = s;
-            });
-        }, [peer]);
 
         return <video playsInline autoPlay ref={ref} className="w-full h-full object-cover rounded-lg bg-gray-900" />;
     };
@@ -988,9 +1024,31 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="mt-auto pt-4">
-                                        <Button onClick={leaveVideo} variant="destructive" className="w-full">
-                                            <VideoOff className="w-4 h-4 mr-2" /> Rời Video
+
+                                    <div className="mt-auto pt-4 flex gap-4 justify-center">
+                                        <Button
+                                            onClick={toggleMic}
+                                            variant={isMicOn ? "secondary" : "destructive"}
+                                            className="h-12 w-12 rounded-full p-0"
+                                            title={isMicOn ? "Tắt Micro" : "Bật Micro"}
+                                        >
+                                            {isMicOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+                                        </Button>
+                                        <Button
+                                            onClick={toggleCamera}
+                                            variant={isCameraOn ? "secondary" : "destructive"}
+                                            className="h-12 w-12 rounded-full p-0"
+                                            title={isCameraOn ? "Tắt Camera" : "Bật Camera"}
+                                        >
+                                            {isCameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
+                                        </Button>
+                                        <Button
+                                            onClick={leaveVideo}
+                                            variant="destructive"
+                                            className="h-12 w-12 rounded-full p-0 bg-red-600 hover:bg-red-700"
+                                            title="Rời Video"
+                                        >
+                                            <LogOut className="w-5 h-5" />
                                         </Button>
                                     </div>
                                 </div>
@@ -1000,7 +1058,6 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                 </aside>
             </div >
 
-            {/* Submit Confirmation Dialog */}
             {/* Submit Confirmation Dialog */}
             <Dialog open={confirmSubmitOpen} onOpenChange={setConfirmSubmitOpen}>
                 <DialogContent>
@@ -1018,7 +1075,6 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                 </DialogContent>
             </Dialog >
 
-            {/* Disband Confirmation Dialog */}
             {/* Disband Confirmation Dialog */}
             <Dialog open={confirmDisbandOpen} onOpenChange={setConfirmDisbandOpen}>
                 <DialogContent>
