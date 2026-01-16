@@ -21,8 +21,9 @@ import { toast } from "react-hot-toast";
 import {
     Users, LogOut, CheckCircle, MessageSquare, Send, Video, VideoOff, Mic, MicOff,
     ChevronLeft, ChevronRight, Settings, ChevronDown, Clock, Flag,
-    BookOpen, PlayCircle, Grid, AlertCircle
+    BookOpen, PlayCircle, Grid, AlertCircle, Menu, X
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { useUserStore } from "@/stores/userStore";
 import { Label } from "@/components/ui/label";
@@ -93,6 +94,10 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
     const [rangeEnd, setRangeEnd] = useState<string | number>("");
     const [questionLimit, setQuestionLimit] = useState<string | number>(10);
     const [timeLimit, setTimeLimit] = useState<number>(15);
+
+    // Mobile Responsive State
+    const [showLeftSidebar, setShowLeftSidebar] = useState(false);
+    const [showRightSidebar, setShowRightSidebar] = useState(false);
 
     const isHost = currentUser?.id === hostUserId;
     const channelRef = useRef<any>(null);
@@ -514,9 +519,14 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
     return (
         <div className="flex flex-col min-h-screen bg-white">
             {/* Header */}
-            <header className="sticky top-0 h-16 bg-[#003366] text-white flex items-center justify-between px-6 shadow-md z-50 font-sans">
-                <div className="font-bold text-lg flex items-center gap-4">
-                    <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 gap-2" onClick={() => {
+            <header className="sticky top-0 h-16 bg-[#003366] text-white flex items-center justify-between px-4 shadow-md z-50 font-sans">
+                <div className="font-bold text-lg flex items-center gap-2">
+                    {/* Mobile Menu Toggle */}
+                    <Button variant="ghost" size="icon" className="lg:hidden text-white hover:bg-white/20 mr-2" onClick={() => setShowLeftSidebar(!showLeftSidebar)}>
+                        <Menu className="w-6 h-6" />
+                    </Button>
+
+                    <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 gap-2 px-2" onClick={() => {
                         localStorage.removeItem(`room_state_${roomCode}`);
                         router.push("/practice/group");
                     }}>
@@ -568,12 +578,26 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                         <Users className="w-5 h-5" />
                         {members.length}
                     </div>
+
+                    {/* Mobile Right Sidebar Toggle */}
+                    <Button variant="ghost" size="icon" className="xl:hidden text-white hover:bg-white/20 ml-2" onClick={() => setShowRightSidebar(!showRightSidebar)}>
+                        <MessageSquare className="w-6 h-6" />
+                    </Button>
                 </div>
             </header>
 
             <div className="flex flex-1 items-start relative box-border overflow-hidden">
+                {/* Mobile Backdrop (Left) */}
+                {showLeftSidebar && (
+                    <div className="fixed inset-0 bg-black/50 z-[60] lg:hidden" onClick={() => setShowLeftSidebar(false)} />
+                )}
+
                 {/* Sidebar: Question List or Members */}
-                <aside className="w-80 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 flex-col shadow-lg z-40 hidden lg:flex">
+                <aside className={cn(
+                    "w-80 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 flex-col shadow-lg z-[70] lg:z-40 lg:flex transition-transform duration-300 ease-in-out",
+                    "fixed left-0 top-16 lg:static",
+                    showLeftSidebar ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+                )}>
                     {questions.length > 0 ? (
                         /* Question List Grid */
                         <>
@@ -952,8 +976,17 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                     )}
                 </main>
 
+                {/* Mobile Backdrop (Right) */}
+                {showRightSidebar && (
+                    <div className="fixed inset-0 bg-black/50 z-[60] xl:hidden" onClick={() => setShowRightSidebar(false)} />
+                )}
+
                 {/* Right Sidebar: Chat & Video */}
-                <aside className="w-80 h-[calc(100vh-4rem)] bg-white border-l border-gray-200 flex flex-col shadow-lg z-40 hidden xl:flex">
+                <aside className={cn(
+                    "w-80 h-[calc(100vh-4rem)] bg-white border-l border-gray-200 flex flex-col shadow-lg z-[70] xl:z-40 xl:flex transition-transform duration-300 ease-in-out",
+                    "fixed right-0 top-16 xl:static",
+                    showRightSidebar ? "translate-x-0" : "translate-x-full xl:translate-x-0"
+                )}>
                     <Tabs defaultValue="chat" className="flex-1 flex flex-col h-full">
                         <div className="p-2 border-b border-gray-100 bg-gray-50 shrink-0">
                             <TabsList className="w-full grid grid-cols-2">
