@@ -132,6 +132,12 @@ model BattleRoom {
   roomCode   String   @unique
   hostUserId Int
   status     String   @default("waiting")
+  mode       String   @default("battle") // 'battle', 'study'
+  
+  // Real-time Sync State
+  currentCategoryId Int?
+  currentQuestionId Int?
+  
   createdAt  DateTime @default(now())
 
   host       User              @relation(fields: [hostUserId], references: [id])

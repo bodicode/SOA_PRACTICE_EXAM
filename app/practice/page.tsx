@@ -62,6 +62,26 @@ export default function PracticePage() {
                     </p>
                 </div>
 
+                {/* Group Study Banner */}
+                <div className="bg-linear-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 mb-12 text-white shadow-xl relative overflow-hidden">
+                    <div className="relative z-10">
+                        <h2 className="text-3xl font-bold mb-4 flex items-center gap-3">
+                            👥 Ôn Tập Nhóm (Group Study)
+                        </h2>
+                        <p className="text-blue-100 text-lg mb-6 max-w-2xl">
+                            Mời bạn bè cùng tham gia giải đề. Chế độ đồng bộ thời gian thực giúp nhóm của bạn thảo luận và học tập hiệu quả hơn bao giờ hết.
+                        </p>
+                        <Link href="/practice/group">
+                            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 font-bold border-0">
+                                Tham Gia Ngay
+                            </Button>
+                        </Link>
+                    </div>
+                    {/* Decorative background circle */}
+                    <div className="absolute -right-10 -bottom-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                    <div className="absolute top-10 right-20 w-32 h-32 bg-indigo-500/30 rounded-full blur-xl"></div>
+                </div>
+
                 {/* Description */}
                 <div className="prose prose-lg max-w-none mb-12">
                     <p className="text-gray-700 leading-relaxed mb-4">

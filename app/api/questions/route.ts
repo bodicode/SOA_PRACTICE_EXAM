@@ -106,6 +106,14 @@ export async function GET(request: Request) {
             }
         }
 
+        const takeParam = searchParams.get('take');
+        if (takeParam) {
+            const take = parseInt(takeParam);
+            if (!isNaN(take) && take > 0) {
+                processedQuestions = processedQuestions.slice(0, take);
+            }
+        }
+
         return NextResponse.json(processedQuestions)
     } catch (error) {
         console.error('Fetch questions error:', error)

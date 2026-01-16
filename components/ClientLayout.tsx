@@ -9,7 +9,7 @@ import { Toaster } from 'react-hot-toast';
 export function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
     // Hide header/footer on /exam, /login, /register routes, and /admin routes
-    const shouldHideLayout = pathname?.startsWith('/exam') || pathname?.startsWith('/admin') || pathname === '/login' || pathname === '/register' || pathname === '/forgot-password' || pathname === '/reset-password'
+    const shouldHideLayout = pathname?.startsWith('/exam') || pathname?.startsWith('/practice/room') || pathname?.startsWith('/admin') || pathname === '/login' || pathname === '/register' || pathname === '/forgot-password' || pathname === '/reset-password'
 
     return (
         <>
@@ -19,7 +19,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             ) : (
                 <>
                     <Navbar />
-                    {/* Main content wrapper with top padding to account for fixed navbar */}
                     <main className="min-h-screen">
                         {children}
                     </main>
