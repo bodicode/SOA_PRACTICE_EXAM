@@ -22,21 +22,23 @@ export async function GET(req: Request) {
             whereSession.categoryId = categoryId;
         }
 
-        // 1. Fetch User (for global streak/lastStudyDate which are strictly user-level)
+        // 1. Fetch User (for global streak/lastStudyDate/stats)
         const user = await prisma.user.findUnique({
             where: { id: userId },
             select: {
                 studyStreak: true,
                 lastStudyDate: true,
+                averageScore: true,
+                questionsAnswered: true
             }
         });
 
-        // 2. Statistics Calculation (Dynamic)
+        // 2. Statistics Calculation (Dynamic or Pre-calculated)
         let totalQuestions = 0;
         let averageScore = 0;
         let totalExams = 0;
 
-        // Helper to calculate 10-point scale average
+        // Helper to calculate 10-point scale average (for filtered category)
         const calculateStats = async (filter: any) => {
             const sessions = await prisma.examSession.findMany({
                 where: {
@@ -64,20 +66,35 @@ export async function GET(req: Request) {
 
         const filterObj = { userId, ...(categoryId ? { categoryId } : {}) };
 
-        // Calculate Stats
-        const [examStats, countStats] = await Promise.all([
-            calculateStats(filterObj),
-            prisma.examDetail.count({
-                where: {
-                    session: filterObj,
-                    userChoice: { not: null }
-                }
-            })
-        ]);
+        // Calculate Total Exams (always needed dynamically as we don't store it)
+        // And if filtering by category, we must recalculate Avg Score & Question count.
+        if (categoryId) {
+            const [examStats, countStats] = await Promise.all([
+                calculateStats(filterObj),
+                prisma.examDetail.count({
+                    where: {
+                        session: filterObj,
+                        userChoice: { not: null }
+                    }
+                })
+            ]);
+            averageScore = examStats.avg;
+            totalExams = examStats.count;
+            totalQuestions = countStats;
+        } else {
+            // Global View: Use pre-calculated User stats where possible
+            totalQuestions = user?.questionsAnswered || 0;
+            averageScore = user?.averageScore || 0;
 
-        averageScore = examStats.avg;
-        totalExams = examStats.count;
-        totalQuestions = countStats;
+            // Still need to count total exams dynamically
+            totalExams = await prisma.examSession.count({
+                where: {
+                    userId,
+                    mode: { in: ['mock', 'exam'] },
+                    questionCount: { gt: 0 }
+                }
+            });
+        }
 
         const [performanceSessions, recentSessions] = await Promise.all([
             // 3. Performance Data (Last 7 days - unaffected by global filter usually? 

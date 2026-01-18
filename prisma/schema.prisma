@@ -15,8 +15,9 @@ model User {
   role          String    @default("student") // 'admin', 'student'
   createdAt     DateTime  @default(now())
   avatarUrl     String?
+  country       String?   @default("VN") // e.g. "VN", "US"
+  level         String?   @default("Beginner") // "Beginner", "Intermediate", "Advanced"
 
-  // Progress Tracking
   // Progress Tracking
   averageScore      Float     @default(0)
   questionsAnswered Int       @default(0)
@@ -31,6 +32,29 @@ model User {
   hostedRooms   BattleRoom[]
   roomParticipations RoomParticipant[]
   pdfAssetsUploaded  PdfAsset[]        @relation("PdfAssetUploader")
+  badges             UserBadge[]
+}
+
+model Badge {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique // e.g. "first_exam", "score_10"
+  name        String
+  description String
+  imageUrl    String?
+  
+  users       UserBadge[]
+}
+
+model UserBadge {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  badgeId   Int
+  earnedAt  DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  
+  @@unique([userId, badgeId])
 }
 
 // 2. Subscriptions
