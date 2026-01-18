@@ -11,7 +11,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause, Play, Highlighter, Trash2, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import MathRender from '@/components/MathRender'
+import Image from 'next/image'
+import dynamic from 'next/dynamic'
+
+const MathRender = dynamic(() => import('@/components/MathRender'), { ssr: false })
 import {
     Dialog,
     DialogContent,
@@ -55,6 +58,11 @@ export default function ExamPage() {
     // Highlighting State
     const [highlights, setHighlights] = useState<Record<string, { text: string, index: number }[]>>({}) // questionId -> array of highlight objects
     const [isHighlightMode, setIsHighlightMode] = useState(false)
+
+    // Pagination State
+    const [seed] = useState<number>(Date.now());
+    const [totalQuestions, setTotalQuestions] = useState(0); // Target total for this session
+    const [loadingMore, setLoadingMore] = useState(false);
 
     // ... (keep existing persistence code, assume it handles the new shape naturally) ...
 
@@ -187,15 +195,22 @@ export default function ExamPage() {
                     tLimit = 180 * 60
                 }
 
+                setTotalQuestions(qCount) // Set target total
                 setTimeLeft(tLimit)
 
-                // Fetch questions
-                const data = await examService.getQuestions({
+                // Fetch questions (First Batch)
+                const BATCH_SIZE = 20;
+                const { questions: data, total: apiTotal } = await examService.getQuestions({
                     categoryId: categoryId,
-                    limit: qCount,
+                    limit: Math.min(qCount, BATCH_SIZE), // Don't fetch more than needed
                     start: startParam,
-                    end: endParam
+                    end: endParam,
+                    seed: seed,
+                    page: 1
                 })
+
+                // If API returns fewer than requested (end of list), adjust total?
+                // No, keep it robust.
                 setQuestions(data)
             } catch (error) {
                 console.error('Failed to load exam', error)
@@ -204,7 +219,7 @@ export default function ExamPage() {
             }
         }
         initExam()
-    }, [categoryId, mode, limitParam, countParam, startParam, endParam])
+    }, [categoryId, mode, limitParam, countParam, startParam, endParam, seed])
 
     // Save State
     useEffect(() => {
@@ -440,10 +455,66 @@ export default function ExamPage() {
     if (isLoading) return <div className="h-screen flex items-center justify-center">Đang tải đề thi...</div>
     if (questions.length === 0) return <div className="h-screen flex items-center justify-center">Không tìm thấy câu hỏi nào.</div>
 
+    const fetchPageForIndex = async (index: number) => {
+        if (questions[index]) return true; // Already loaded
+
+        setLoadingMore(true);
+        try {
+            const BATCH_SIZE = 20;
+            const page = Math.floor(index / BATCH_SIZE) + 1;
+
+            // Calculate limit for this fetch? No, standard batch size.
+            // But we need to make sure we don't fetch beyond total?
+            // API handles slicing, but we requested specific page/limit.
+
+            const { questions: newQuestions } = await examService.getQuestions({
+                categoryId: categoryId,
+                limit: BATCH_SIZE,
+                start: startParam,
+                end: endParam,
+                seed: seed,
+                page: page
+            });
+
+            if (newQuestions && newQuestions.length > 0) {
+                setQuestions(prev => {
+                    const updated = [...prev];
+                    // Sparse fill
+                    const startIdx = (page - 1) * BATCH_SIZE;
+                    newQuestions.forEach((q, i) => {
+                        updated[startIdx + i] = q;
+                    });
+                    return updated;
+                });
+                return true;
+            }
+            return false;
+        } catch (e) {
+            console.error("Failed to fetch more questions", e);
+            return false;
+        } finally {
+            setLoadingMore(false);
+        }
+    }
+
+    const handleJumpToQuestion = async (index: number) => {
+        if (index < 0 || index >= totalQuestions) return;
+
+        const success = await fetchPageForIndex(index);
+        if (success || questions[index]) { // Ensure it exists after fetch
+            setCurrentQuestionIndex(index);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    };
+
+    // Check next/prev handlers to use this too
+    const handleNext = () => handleJumpToQuestion(currentQuestionIndex + 1);
+    const handlePrev = () => handleJumpToQuestion(currentQuestionIndex - 1);
+
     const currentQuestion = questions[currentQuestionIndex]
 
     const formatQuestionContent = (index: number, content: string) => {
-        const trimmed = content.trim();
+        const trimmed = content?.trim() || "";
         return trimmed.replace(/^(\d+)\./, "$1\\.");
     };
 
@@ -592,25 +663,28 @@ export default function ExamPage() {
                     </div>
                     <div className="flex-1 overflow-y-auto p-4 font-sans">
                         <div className="grid grid-cols-5 gap-2">
-                            {questions.map((q, idx) => (
-                                <button
-                                    key={q.id}
-                                    onClick={() => {
-                                        setCurrentQuestionIndex(idx);
-                                        window.scrollTo({ top: 0, behavior: "smooth" });
-                                    }}
-                                    className={cn(
-                                        "w-8 h-8 font-medium flex items-center justify-center transition-all relative border",
-                                        currentQuestionIndex === idx
-                                            ? "ring-1 ring-offset-1 ring-[#003366] border-[#003366] bg-blue-50 text-[#003366]"
-                                            : "border-gray-200 hover:bg-gray-50 text-gray-600",
-                                        answers[q.id] !== undefined && currentQuestionIndex !== idx && !flagged[q.id] && "bg-blue-600 text-white border-blue-600",
-                                        flagged[q.id] && "bg-yellow-400 border-yellow-500 text-yellow-900 font-bold"
-                                    )}
-                                >
-                                    {idx + 1}
-                                </button>
-                            ))}
+                            {Array.from({ length: totalQuestions }).map((_, idx) => {
+                                const q = questions[idx];
+                                const isLoaded = !!q;
+                                return (
+                                    <button
+                                        key={idx}
+                                        onClick={() => handleJumpToQuestion(idx)}
+                                        disabled={loadingMore && !isLoaded}
+                                        className={cn(
+                                            "w-8 h-8 font-medium flex items-center justify-center transition-all relative border",
+                                            currentQuestionIndex === idx
+                                                ? "ring-1 ring-offset-1 ring-[#003366] border-[#003366] bg-blue-50 text-[#003366]"
+                                                : "border-gray-200 hover:bg-gray-50 text-gray-600",
+                                            isLoaded && answers[q.id] !== undefined && currentQuestionIndex !== idx && !flagged[q.id] && "bg-blue-600 text-white border-blue-600",
+                                            isLoaded && flagged[q.id] && "bg-yellow-400 border-yellow-500 text-yellow-900 font-bold",
+                                            !isLoaded && "opacity-50 border-dashed bg-gray-50"
+                                        )}
+                                    >
+                                        {isLoaded ? idx + 1 : (loadingMore && idx === currentQuestionIndex ? "..." : idx + 1)}
+                                    </button>
+                                )
+                            })}
                         </div>
                     </div>
                     <div className="p-4 border-t border-gray-100 bg-gray-50 text-sm text-gray-700 space-y-3 shrink-0 font-sans">
@@ -723,6 +797,18 @@ export default function ExamPage() {
                         <div className="mb-1 leading-normal text-black">
                             {/* Question Text */}
                             <div onMouseUp={handleHighlight}>
+                                {(currentQuestion as any).imageUrl && (
+                                    <div className="mb-4 flex justify-center">
+                                        <Image
+                                            src={(currentQuestion as any).imageUrl}
+                                            alt={`Question ${currentQuestionIndex + 1} Image`}
+                                            width={600}
+                                            height={400}
+                                            className="rounded-lg border border-gray-200 object-contain max-h-[400px]"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                )}
                                 <MathRender text={formatQuestionContent(currentQuestionIndex, applyHighlights(currentQuestion.content ?? ""))} />
                             </div>
                         </div>
@@ -763,29 +849,26 @@ export default function ExamPage() {
                     <div className="flex justify-start mt-auto pt-4 pb-10 gap-2 font-sans border-t border-gray-200">
                         <Button
                             variant="outline"
-                            onClick={() => {
-                                setCurrentQuestionIndex(prev => Math.max(0, prev - 1));
-                                window.scrollTo({ top: 0, behavior: "smooth" });
-                            }}
-                            disabled={currentQuestionIndex === 0}
+                            onClick={handlePrev}
+                            disabled={currentQuestionIndex === 0 || loadingMore}
                             className="w-10 h-10 p-0 rounded-full border-gray-300"
                             title="Previous Question"
                         >
                             <ChevronLeft className="w-5 h-5 text-gray-600" />
                         </Button>
                         <Button
-                            className={cn("bg-[#003366] hover:bg-[#002244] w-10 h-10 p-0 rounded-full", currentQuestionIndex === questions.length - 1 && "bg-green-600 hover:bg-green-700")}
+                            className={cn("bg-[#003366] hover:bg-[#002244] w-10 h-10 p-0 rounded-full", currentQuestionIndex === totalQuestions - 1 && "bg-green-600 hover:bg-green-700")}
                             onClick={() => {
-                                if (currentQuestionIndex === questions.length - 1) {
+                                if (currentQuestionIndex === totalQuestions - 1) {
                                     setShowSubmitDialog(true);
                                 } else {
-                                    setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1));
-                                    window.scrollTo({ top: 0, behavior: "smooth" });
+                                    handleNext();
                                 }
                             }}
-                            title={currentQuestionIndex === questions.length - 1 ? "Nộp bài" : "Câu tiếp theo"}
+                            disabled={loadingMore}
+                            title={currentQuestionIndex === totalQuestions - 1 ? "Nộp bài" : "Câu tiếp theo"}
                         >
-                            {currentQuestionIndex === questions.length - 1 ? <Check className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                            {currentQuestionIndex === totalQuestions - 1 ? <Check className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                         </Button>
                     </div>
                 </main>

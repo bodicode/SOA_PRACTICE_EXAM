@@ -29,7 +29,11 @@ import { useUserStore } from "@/stores/userStore";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import MathRender from "@/components/MathRender";
+import Link from "next/link";
+import Image from "next/image";
+import dynamic from "next/dynamic";
+
+const MathRender = dynamic(() => import("@/components/MathRender"), { ssr: false });
 
 interface RoomClientProps {
     roomCode: string;
@@ -464,8 +468,11 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
             const res = await fetch(url);
             const data = await res.json();
 
-            if (Array.isArray(data) && data.length > 0) {
-                const newQuestions = data.map(q => ({
+            // Handle new API response format { questions: [], total: ... }
+            const questionsList = Array.isArray(data) ? data : (data.questions || []);
+
+            if (Array.isArray(questionsList) && questionsList.length > 0) {
+                const newQuestions = questionsList.map((q: any) => ({
                     ...q,
                     content: formatQuestionContent(q.content),
                     options: typeof q.options === "string" ? JSON.parse(q.options) : q.options,
@@ -965,6 +972,18 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
 
                             <Card className="p-0 border-0 shadow-none flex flex-col mb-8 bg-transparent">
                                 <div className="mb-4 leading-relaxed text-gray-900 text-lg">
+                                    {(question as any).imageUrl && (
+                                        <div className="mb-4 flex justify-center">
+                                            <Image
+                                                src={(question as any).imageUrl}
+                                                alt={`Question Image`}
+                                                width={600}
+                                                height={400}
+                                                className="rounded-lg border border-gray-200 object-contain max-h-[400px]"
+                                                loading="lazy"
+                                            />
+                                        </div>
+                                    )}
                                     <MathRender text={question.content || ""} />
                                 </div>
 

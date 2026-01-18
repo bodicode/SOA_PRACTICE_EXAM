@@ -13,9 +13,7 @@ const PdfCanvas = dynamic(() => import("@/components/pdf/PdfCanvas").then(m => m
     loading: () => <div className="h-96 flex items-center justify-center bg-gray-100 text-gray-400">Loading PDF Viewer...</div>
 });
 const BboxSelector = dynamic(() => import("@/components/pdf/BboxSelector").then(m => m.BboxSelector), { ssr: false });
-
-
-import { QuestionEditor } from "@/components/admin/QuestionEditor";
+const QuestionEditor = dynamic(() => import("@/components/admin/QuestionEditor").then(m => m.QuestionEditor), { ssr: false });
 
 type PdfAsset = { id: string; title: string; storagePath: string };
 
