@@ -24,6 +24,8 @@ export async function GET(req: Request) {
 
                 studyStreak: true,
                 avatarUrl: true,
+                country: true,
+                level: true,
             }
         });
 
@@ -41,7 +43,7 @@ export async function GET(req: Request) {
 export async function PUT(req: Request) {
     try {
         const body = await req.json();
-        const { userId, fullName, avatarUrl } = body;
+        const { userId, fullName, avatarUrl, country } = body;
 
         if (!userId) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -50,6 +52,8 @@ export async function PUT(req: Request) {
         const dataToUpdate: any = {};
         if (fullName) dataToUpdate.fullName = fullName;
         if (avatarUrl) dataToUpdate.avatarUrl = avatarUrl;
+        if (country) dataToUpdate.country = country;
+        // Level is updated automatically by system stats
 
         const updatedUser = await prisma.user.update({
             where: { id: parseInt(userId) },
@@ -60,6 +64,8 @@ export async function PUT(req: Request) {
                 fullName: true,
                 role: true,
                 avatarUrl: true,
+                country: true,
+                level: true,
             }
         });
 

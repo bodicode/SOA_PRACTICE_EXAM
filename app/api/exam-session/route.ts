@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { updateUserStats } from '@/lib/leaderboard';
 
 export async function POST(req: Request) {
     try {
@@ -75,33 +76,20 @@ export async function POST(req: Request) {
                         newStreak = 1; // First time
                     }
 
-                    // Calculate new stats
-                    const [avgStats, answeredCount] = await Promise.all([
-                        // Average Score: Only from MOCK exams (and 'exam' mode) for accuracy
-                        tx.examSession.aggregate({
-                            where: { userId: userId, mode: { in: ['mock', 'exam'] } },
-                            _avg: { totalScore: true }
-                        }),
-                        // Total Questions: Count actual answers from ExamDetails
-                        tx.examDetail.count({
-                            where: {
-                                session: { userId: userId },
-                                userChoice: { not: null } // Only count answered questions
-                            }
-                        })
-                    ]);
-
                     await tx.user.update({
                         where: { id: userId },
                         data: {
-                            averageScore: Number(avgStats._avg.totalScore || 0),
-                            questionsAnswered: answeredCount,
                             studyStreak: newStreak,
                             lastStudyDate: new Date()
                         }
                     });
                 }
             });
+
+            // 4. Update Leaderboard Stats (Score, Questions, Level)
+            // We do this outside the transaction to use the shared logic in lib/leaderboard.ts
+            // which correctly handles normalization (0-10 scale) and unique question counting.
+            await updateUserStats(userId);
         }
 
         return NextResponse.json({ success: true, sessionId: session.id });
