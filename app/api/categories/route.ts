@@ -1,30 +1,11 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getCachedCategories } from '@/lib/categories'
 
 export async function GET() {
     try {
-        const categories = await prisma.category.findMany({
-            include: {
-                parent: true,
-                _count: {
-                    select: {
-                        questions: true,
-                        pdfQuestions: true
-                    }
-                }
-            },
-            orderBy: { id: 'asc' }
-        })
-
-        const formattedCategories = categories.map((cat: any) => ({
-            id: cat.id,
-            name: cat.name,
-            parentId: cat.parentId,
-            parentName: cat.parent?.name,
-            questionsCount: cat._count.questions + cat._count.pdfQuestions
-        }))
-
-        return NextResponse.json(formattedCategories)
+        const categories = await getCachedCategories();
+        return NextResponse.json(categories)
     } catch (error) {
         return NextResponse.json(
             { error: 'Failed to fetch categories' },
@@ -32,6 +13,7 @@ export async function GET() {
         )
     }
 }
+
 
 export async function POST(request: Request) {
     try {

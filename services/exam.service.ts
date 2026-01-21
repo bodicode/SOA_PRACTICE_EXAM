@@ -22,28 +22,34 @@ class ExamService {
         return res.json()
     }
 
-    async getQuestions(params: { categoryId?: number; limit?: number }): Promise<Question[]> {
+    async getQuestions(params: { categoryId?: number; limit?: number; start?: number; end?: number; page?: number; seed?: number }): Promise<{ questions: Question[]; total: number }> {
         const queryParams = new URLSearchParams()
         if (params.categoryId) queryParams.append('categoryId', params.categoryId.toString())
-
-        // Note: The /api/questions endpoint currently fetches all matching questions.
-        // We might need to handle 'limit' either in the API or client-side for now,
-        // or update the API to support it. 
-        // For now, we'll fetch and slice client-side if the API doesn't support limit.
+        if (params.start) queryParams.append('start', params.start.toString())
+        if (params.end) queryParams.append('end', params.end.toString())
+        if (params.page) queryParams.append('page', params.page.toString())
+        if (params.limit) queryParams.append('limit', params.limit.toString())
+        if (params.seed) queryParams.append('seed', params.seed.toString())
 
         // Append random=true to get shuffled results from API
+        // If paging, random order must be consistent? The API handles simple shuffle.
         queryParams.append('random', 'true')
 
         const res = await fetch(`/api/questions?${queryParams.toString()}`)
         if (!res.ok) throw new Error('Failed to fetch questions')
 
-        const questions = await res.json()
+        const data = await res.json()
 
-        if (params.limit && questions.length > params.limit) {
-            return questions.slice(0, params.limit);
+        // Handle both new (object) and legacy (array) formats gracefully if needed context switching
+        if (Array.isArray(data)) {
+            let questions = data;
+            if (params.limit && questions.length > params.limit) {
+                questions = questions.slice(0, params.limit);
+            }
+            return { questions, total: questions.length }
         }
 
-        return questions
+        return { questions: data.questions, total: data.total }
     }
 }
 

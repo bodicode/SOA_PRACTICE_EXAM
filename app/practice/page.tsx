@@ -1,50 +1,18 @@
-'use client'
-
+import { Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useEffect, useState } from 'react'
-import { Category, examService } from '@/services/exam.service'
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
+import { getCachedCategories } from '@/lib/categories'
+import ExamCategoryList from './exam-category-list'
+
+export const revalidate = 3600 // Revalidate every hour
+export const dynamic = 'force-static'
+
+async function CategoryListLoader() {
+    const categories = await getCachedCategories()
+    return <ExamCategoryList categories={categories} />
+}
 
 export default function PracticePage() {
-    const { user } = useUserStore()
-    const router = useRouter()
-    const [examCategories, setExamCategories] = useState<Category[]>([])
-    const [isLoading, setIsLoading] = useState(true)
-    const [showLoginDialog, setShowLoginDialog] = useState(false)
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const data = await examService.getCategories()
-                setExamCategories(data)
-            } catch (error) {
-                console.error('Failed to fetch categories:', error)
-            } finally {
-                setIsLoading(false)
-            }
-        }
-        fetchCategories()
-    }, [])
-
-    const handleStart = (examId: number) => {
-        if (!user) {
-            setShowLoginDialog(true)
-        } else {
-            router.push(`/practice/${examId}`)
-        }
-    }
-
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Main Content */}
@@ -60,6 +28,26 @@ export default function PracticePage() {
                         cập nhật ngân hàng câu hỏi để phù hợp với format thi mới nhất. Nếu bạn gặp bất kỳ vấn đề
                         kỹ thuật nào, vui lòng liên hệ với chúng tôi qua email hỗ trợ.
                     </p>
+                </div>
+
+                {/* Group Study Banner */}
+                <div className="bg-linear-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 mb-12 text-white shadow-xl relative overflow-hidden">
+                    <div className="relative z-10">
+                        <h2 className="text-3xl font-bold mb-4 flex items-center gap-3">
+                            👥 Ôn Tập Nhóm (Group Study)
+                        </h2>
+                        <p className="text-blue-100 text-lg mb-6 max-w-2xl">
+                            Mời bạn bè cùng tham gia giải đề. Chế độ đồng bộ thời gian thực giúp nhóm của bạn thảo luận và học tập hiệu quả hơn bao giờ hết.
+                        </p>
+                        <Link href="/practice/group">
+                            <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 font-bold border-0">
+                                Tham Gia Ngay
+                            </Button>
+                        </Link>
+                    </div>
+                    {/* Decorative background circle */}
+                    <div className="absolute -right-10 -bottom-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                    <div className="absolute top-10 right-20 w-32 h-32 bg-indigo-500/30 rounded-full blur-xl"></div>
                 </div>
 
                 {/* Description */}
@@ -95,32 +83,9 @@ export default function PracticePage() {
                     Chọn Kỳ Thi Để Bắt Đầu
                 </h2>
 
-                {isLoading ? (
-                    <div className="text-center py-12">Đang tải dữ liệu...</div>
-                ) : (
-                    <div className="grid md:grid-cols-2 gap-4">
-                        {examCategories.map((exam) => (
-                            <Card key={exam.id} className="hover:shadow-lg transition-shadow border-l-4 border-[#0066cc]">
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-[#003366] text-lg">{exam.name}</CardTitle>
-                                    <CardDescription>
-                                        {exam.parentName ? `Thuộc: ${exam.parentName}` : 'Kỳ thi chính thức'}
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="flex justify-between items-center">
-                                    <span className="text-sm text-gray-500">{exam.questionsCount} câu hỏi</span>
-                                    <Button
-                                        size="sm"
-                                        className="bg-[#003366] hover:bg-[#002244]"
-                                        onClick={() => handleStart(exam.id)}
-                                    >
-                                        Bắt đầu
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                )}
+                <Suspense fallback={<div className="text-center py-12">Đang tải dữ liệu...</div>}>
+                    <CategoryListLoader />
+                </Suspense>
 
                 {/* Reporting Errors Box */}
                 <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -134,27 +99,6 @@ export default function PracticePage() {
                     </p>
                 </div>
             </main>
-
-            <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Yêu cầu đăng nhập</DialogTitle>
-                        <DialogDescription>
-                            Bạn cần đăng nhập để bắt đầu làm bài thi thử. Tài khoản của bạn sẽ được lưu quá trình học tập.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowLoginDialog(false)}>
-                            Hủy
-                        </Button>
-                        <Link href="/login">
-                            <Button onClick={() => setShowLoginDialog(false)}>
-                                Đăng nhập ngay
-                            </Button>
-                        </Link>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </div>
     )
 }

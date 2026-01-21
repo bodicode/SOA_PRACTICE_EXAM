@@ -17,6 +17,8 @@ export default function ProfilePage() {
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
     const [fullName, setFullName] = useState('')
+    const [country, setCountry] = useState('VN')
+    const [level, setLevel] = useState('Beginner')
     const [stats, setStats] = useState<any>(null)
 
     // Password Change State
@@ -37,6 +39,8 @@ export default function ProfilePage() {
                 if (res.ok) {
                     const data = await res.json()
                     setFullName(data.fullName || '')
+                    setCountry(data.country || 'VN')
+                    setLevel(data.level || 'Beginner')
                     setStats(data)
                 }
             } catch (error) {
@@ -56,7 +60,7 @@ export default function ProfilePage() {
             const res = await fetch('/api/profile', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user.id, fullName })
+                body: JSON.stringify({ userId: user.id, fullName, country, level })
             })
 
             if (res.ok) {
@@ -300,6 +304,39 @@ export default function ProfilePage() {
                                             />
                                         </div>
                                     </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-gray-700">Quốc gia</label>
+                                            <select
+                                                value={country}
+                                                onChange={(e) => setCountry(e.target.value)}
+                                                className="flex h-11 w-full rounded-md border border-gray-200 bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                <option value="VN">Vietnam 🇻🇳</option>
+                                                <option value="US">USA 🇺🇸</option>
+                                                <option value="UK">UK 🇬🇧</option>
+                                                <option value="CA">Canada 🇨🇦</option>
+                                                <option value="AU">Australia 🇦🇺</option>
+                                                <option value="SG">Singapore 🇸🇬</option>
+                                                <option value="KR">Korea 🇰🇷</option>
+                                                <option value="JP">Japan 🇯🇵</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-gray-700">Trình độ <span className="text-xs text-blue-500 font-normal ml-1">(Tự động xếp hạng)</span></label>
+                                            <div className="flex h-11 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-500 cursor-not-allowed">
+                                                {level === 'Expert' && 'Expert (Chuyên gia) 🏆'}
+                                                {level === 'Advanced' && 'Advanced (Nâng cao) 🥇'}
+                                                {level === 'Intermediate' && 'Intermediate (Trung bình) 🥈'}
+                                                {level === 'Beginner' && 'Beginner (Mới bắt đầu) 🥉'}
+                                            </div>
+                                            <p className="text-[10px] text-gray-400">
+                                                *Luyện tập nhiều hơn để thăng hạng tự động.
+                                            </p>
+                                        </div>
+                                    </div>
+
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-gray-700">Email</label>
                                         <Input value={user.email || ''} disabled className="bg-gray-50 h-11" />
