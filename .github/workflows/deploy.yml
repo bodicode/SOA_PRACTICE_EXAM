@@ -16,8 +16,7 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           port: 22
           script: |
-            export PATH=$PATH:/www/server/nodejs/v20.18.0/bin
-            source /root/.bashrc
+            export PATH=$PATH:/www/server/nvm/versions/node/v24.13.0/bin
 
             cd /www/wwwroot/3hours.io.vn
 
