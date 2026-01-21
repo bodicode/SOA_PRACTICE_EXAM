@@ -16,8 +16,14 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           port: 22
           script: |
+            export PATH=$PATH:/www/server/nodejs/v20.18.0/bin
+            source /root/.bashrc
+
             cd /www/wwwroot/3hours.io.vn
+
             git pull origin main
+
             npm install
             npm run build
+
             pm2 restart nextjs-app
