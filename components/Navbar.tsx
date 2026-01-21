@@ -63,7 +63,7 @@ export function Navbar() {
                         <Link href="/" className="flex items-center gap-2 group">
                             <div className="relative w-40 h-16 flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden">
                                 <Image
-                                    src="/logo.png"
+                                    src="/logo-remove-bg.png"
                                     alt="SOA Prep Logo"
                                     fill
                                     className="object-contain object-center scale-[2.5]"
@@ -91,7 +91,7 @@ export function Navbar() {
                         ) : user ? (
                             <div className="flex items-center gap-4">
                                 <div
-                                    className="relative py-2" // Add padding to bridge gap for hover
+                                    className="relative py-2"
                                     onMouseEnter={() => setIsOpen(true)}
                                     onMouseLeave={() => setIsOpen(false)}
                                 >
