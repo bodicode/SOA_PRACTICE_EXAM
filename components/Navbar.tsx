@@ -77,7 +77,7 @@ export function Navbar() {
                                     Ôn tập
                                 </Link>
                                 <Link href="/leaderboard" className="hover:text-blue-600 transition-colors">
-                                    Bảng Xếp Hạnggggg
+                                    Bảng Xếp Hạng
                                 </Link>
                                 <Link href="/progress" className="hover:text-blue-600 transition-colors">
                                     Tiến độ học tập
