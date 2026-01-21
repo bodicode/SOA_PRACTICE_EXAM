@@ -1,0 +1,23 @@
+name: Deploy Next.js to VPS
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /www/wwwroot/3hours.io.vn
+            git pull origin main
+            npm install
+            npm run build
+            pm2 restart nextjs-app

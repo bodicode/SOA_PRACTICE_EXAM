@@ -65,7 +65,7 @@ export function AdminSidebar() {
                 <Link href="/admin" className="flex items-center gap-3 w-full">
                     <div className="relative w-full h-24 flex items-center justify-center overflow-hidden">
                         <Image
-                            src="/logo-admin.png"
+                            src="/logo-admin-new.png"
                             alt="SOA Prep Logo"
                             fill
                             className="object-contain object-center scale-[2.5]"
