@@ -5,7 +5,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useUserStore } from '@/stores/userStore'
 
 // Function to sync user to database
-const SYNC_COOLDOWN = 60 * 1000; // 1 minute is enough if persisted
+const SYNC_COOLDOWN = 3 * 60 * 1000; // 3 minutes
+let lastSyncAttempt = 0; // In-memory fallback
 
 async function syncUserToDatabase() {
     if (typeof window === 'undefined') return null;
@@ -14,8 +15,9 @@ async function syncUserToDatabase() {
     const lastSyncTime = parseInt(localStorage.getItem('lastSyncTime') || '0', 10);
     const cachedUserStr = localStorage.getItem('cachedUser');
 
-    if (now - lastSyncTime < SYNC_COOLDOWN) {
-        // Return cached user if exists and we are skipping sync
+    // Check both memory and storage cooldowns
+    if (now - lastSyncAttempt < SYNC_COOLDOWN || now - lastSyncTime < SYNC_COOLDOWN) {
+        // Return cached user if exists
         if (cachedUserStr) {
             try {
                 return JSON.parse(cachedUserStr);
@@ -26,10 +28,16 @@ async function syncUserToDatabase() {
         return null;
     }
 
+    // Update locally BEFORE the call to prevent race conditions or retries during travel
+    lastSyncAttempt = now;
+    // We don't update localStorage yet to allow retry on hard refresh if logic fails, 
+    // but we might want to prevent loop. Let's update it in finally block? 
+    // Actually, to stop the loop, we MUST update it regardless of success/failure.
+    localStorage.setItem('lastSyncTime', now.toString());
+
     try {
         const res = await fetch('/api/auth/sync-user', { method: 'POST' })
         if (res.ok) {
-            localStorage.setItem('lastSyncTime', now.toString());
             const data = await res.json()
             if (data.user) {
                 localStorage.setItem('cachedUser', JSON.stringify(data.user));
