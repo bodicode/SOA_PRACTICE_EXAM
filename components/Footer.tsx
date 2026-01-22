@@ -8,11 +8,10 @@ export function Footer() {
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-2">
                         <div className="relative w-40 h-16 flex items-center justify-center overflow-hidden">
-                            <Image
+                            <img
                                 src="/logo-remove-bg.png"
                                 alt="SOA Prep Logo"
-                                fill
-                                className="object-contain object-center scale-[2.5]"
+                                className="w-full h-full object-contain object-center scale-[2.5]"
                             />
                         </div>
                     </div>
