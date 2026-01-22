@@ -62,12 +62,10 @@ export function Navbar() {
                     <div className="flex items-center gap-8">
                         <Link href="/" className="flex items-center gap-2 group">
                             <div className="relative w-40 h-16 flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden">
-                                <Image
+                                <img
                                     src="/logo-remove-bg.png"
                                     alt="SOA Prep Logo"
-                                    fill
-                                    className="object-contain object-center scale-[2.5]"
-                                    priority
+                                    className="w-full h-full object-contain object-center scale-[2.5]"
                                 />
                             </div>
                         </Link>
