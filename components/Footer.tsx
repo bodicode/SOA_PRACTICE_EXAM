@@ -9,7 +9,7 @@ export function Footer() {
                     <div className="flex items-center gap-2">
                         <div className="relative w-40 h-16 flex items-center justify-center overflow-hidden">
                             <img
-                                src="/logo-remove-bg.png"
+                                src="/logo.png"
                                 alt="SOA Prep Logo"
                                 className="w-full h-full object-contain object-center scale-[2.5]"
                             />
