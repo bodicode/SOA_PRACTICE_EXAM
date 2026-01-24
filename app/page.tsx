@@ -68,8 +68,8 @@ export default function Home() {
               </div>
 
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight font-display">
-                Chinh Phục <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Kỳ Thi SOA Của Bạn</span>
+                Luyện Thi SOA <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Chinh Phục Chứng Chỉ Actuary</span>
               </h1>
 
               <p className="text-lg md:text-xl text-blue-100/80 mb-10 leading-relaxed max-w-2xl">
@@ -199,6 +199,71 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Exam Programs Section - Deep SEO for Exam P & FM */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="text-blue-600 font-semibold tracking-wider uppercase text-sm">Chương Trình Luyện Thi</span>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mt-2 mb-4">Các Kỳ Thi SOA Trọng Tâm</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Tập trung ôn luyện vào các chủ đề cốt lõi. Ngân hàng câu hỏi của chúng tôi bao phủ 100% syllabus mới nhất.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+            {/* Exam P Card */}
+            <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100 hover:border-blue-200 transition-colors relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600 font-bold text-xl">P</div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Exam P - Probability</h3>
+                <p className="text-gray-600 mb-6 line-clamp-2">
+                  Chinh phục môn Xác Suất. Bao gồm các chủ đề: Biến ngẫu nhiên, Phân phối xác suất (Univariate & Multivariate), Risk Management.
+                </p>
+                <div className="space-y-3 mb-8">
+                  {['General Probability', 'Univariate Random Variables', 'Multivariate Random Variables'].map((topic) => (
+                    <div key={topic} className="flex items-center text-sm text-gray-500">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
+                      {topic}
+                    </div>
+                  ))}
+                </div>
+                <Link href="/practice?exam=P">
+                  <Button className="w-full bg-slate-900 hover:bg-blue-600 text-white transition-colors">
+                    Luyện Đề Exam P
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Exam FM Card */}
+            <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100 hover:border-indigo-200 transition-colors relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
+              <div className="relative z-10">
+                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 text-indigo-600 font-bold text-xl">FM</div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Exam FM - Financial Math</h3>
+                <p className="text-gray-600 mb-6 line-clamp-2">
+                  Làm chủ Toán Tài Chính. Các chủ đề cốt lõi: Time Value of Money, Niên kim (Annuities), Trái phiếu (Bonds), Quản lý rủi ro lãi suất.
+                </p>
+                <div className="space-y-3 mb-8">
+                  {['Time Value of Money', 'Annuities & Cash Flows', 'Loans & Bonds', 'Immunization'].map((topic) => (
+                    <div key={topic} className="flex items-center text-sm text-gray-500">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
+                      {topic}
+                    </div>
+                  ))}
+                </div>
+                <Link href="/practice?exam=FM">
+                  <Button className="w-full bg-slate-900 hover:bg-indigo-600 text-white transition-colors">
+                    Luyện Đề Exam FM
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonial Section */}
       < section className="py-24 overflow-hidden" >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -246,6 +311,46 @@ export default function Home() {
           </div>
         </div>
       </section >
+
+      {/* FAQ Section - SEO Optimization */}
+      <section className="py-20 bg-gray-50 border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Câu Hỏi Thường Gặp Về Luyện Thi SOA</h2>
+            <p className="text-lg text-gray-600">Giải đáp thắc mắc cho người mới bắt đầu hành trình Actuary</p>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+              <h3 className="text-xl font-bold text-gray-900 mb-3">SOA là gì và chứng chỉ này dành cho ai?</h3>
+              <p className="text-gray-600 leading-relaxed">
+                SOA (Society of Actuaries) là Hiệp hội Định phí Hoa Kỳ. Các kỳ thi SOA (như Exam P, FM) là bước khởi đầu bắt buộc để trở thành chuyên gia định phí (Actuary) - một trong những nghề nghiệp có thu nhập cao nhất thế giới, dành cho nhân sự ngành Toán, Thống kê, Tài chính và Bảo hiểm.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Tôi nên bắt đầu luyện thi SOA từ Exam nào?</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Hầu hết ứng viên bắt đầu với <strong>Exam P (Probability)</strong> hoặc <strong>Exam FM (Financial Mathematics)</strong>. Tại SOA Exam Practice, chúng tôi cung cấp ngân hàng câu hỏi thích ứng (Adaptive Learning) cho cả hai kỳ thi này để giúp bạn tối ưu hóa thời gian ôn luyện.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Học phí và lệ phí thi SOA là bao nhiêu?</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Lệ phí thi chính thức của SOA thường dao động từ $250 - $350/exam (có giảm cho sinh viên). Về chi phí ôn luyện, SOA Prep cung cấp các gói luyện đề với chi phí tiết kiệm hơn 80% so với sách giáo khoa truyền thống, đồng thời cập nhật liên tục theo syllabus 2026.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Quy trình đăng ký thi SOA tại Việt Nam?</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Bạn có thể đăng ký trực tuyến trên website soa.org và chọn địa điểm thi (Prometric Center) tại Hà Nội hoặc TP.HCM. Kỳ thi diễn ra trên máy tính (CBT) và bạn sẽ biết kết quả (Pass/Fail) ngay lập tức sau khi nộp bài.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
 
 

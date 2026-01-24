@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | SOA Exam Practice"
   },
   description: "Nền tảng luyện thi SOA Actuarial #1 Việt Nam với hàng ngàn câu hỏi, theo dõi tiến độ chi tiết và chế độ thi đấu. Chuẩn bị tốt nhất cho kỳ thi SOA với chúng tôi.",
-  keywords: ["SOA", "Actuary", "Actuarial", "luyện thi", "practice exam", "SOA exam", "actuarial science", "Việt Nam"],
+  keywords: ["SOA", "Actuary", "Actuarial", "luyện thi", "practice exam", "Exam P", "Exam FM", "toán tài chính", "xác suất thống kê", "SOA exam", "actuarial science", "Việt Nam"],
   authors: [{ name: "SOA Exam Practice" }],
   creator: "SOA Exam Practice",
   publisher: "SOA Exam Practice",
