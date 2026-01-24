@@ -62,9 +62,12 @@ export function Navbar() {
                     <div className="flex items-center gap-8">
                         <Link href="/" className="flex items-center gap-2 group">
                             <div className="relative w-40 h-16 flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden">
-                                <img
+                                <Image
                                     src="/logo.png"
                                     alt="SOA Prep Logo"
+                                    width={160}
+                                    height={64}
+                                    priority
                                     className="w-full h-full object-contain object-center scale-[2.5]"
                                 />
                             </div>
@@ -99,11 +102,21 @@ export function Navbar() {
                                                 <div className="text-sm font-medium text-gray-700 hidden sm:block">
                                                     {user.fullName || user.email?.split('@')[0]}
                                                 </div>
-                                                <Avatar className="h-9 w-9 border border-gray-200 shadow-sm transition-transform hover:scale-105">
-                                                    <AvatarImage src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} className="object-cover" />
-                                                    <AvatarFallback className="bg-blue-100 text-blue-600 font-medium">
-                                                        {user.email?.[0]?.toUpperCase()}
+                                                <Avatar className="h-9 w-9 border border-gray-200 shadow-sm transition-transform hover:scale-105 relative bg-blue-100">
+                                                    <AvatarFallback className="bg-blue-100 text-blue-600 font-bold flex items-center justify-center w-full h-full">
+                                                        {user.fullName ? user.fullName[0].toUpperCase() : user.email?.[0]?.toUpperCase()}
                                                     </AvatarFallback>
+                                                    {user.avatarUrl && (
+                                                        <Image
+                                                            src={user.avatarUrl}
+                                                            alt="User Avatar"
+                                                            fill
+                                                            sizes="36px"
+                                                            className="object-cover transition-opacity duration-300"
+                                                            priority
+                                                            unoptimized
+                                                        />
+                                                    )}
                                                 </Avatar>
                                             </Button>
                                         </DropdownMenuTrigger>

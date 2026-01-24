@@ -36,7 +36,7 @@ export default function GroupStudyLobby() {
 
     const handleJoinRoom = async () => {
         if (!roomCode || roomCode.length < 6) {
-            toast.error("Please enter a valid 6-digit code");
+            toast.error("Vui lòng nhập mã phòng hợp lệ!");
             return;
         }
         setIsJoining(true);
