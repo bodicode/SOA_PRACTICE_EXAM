@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
-import { ArrowRight, CheckCircle2, BarChart2, BookOpen, Target, LogOut, LayoutDashboard, ChevronRight, Star, Sparkles, Zap } from 'lucide-react'
+import { ArrowRight, CheckCircle2, BarChart2, BookOpen, Target, LogOut, LayoutDashboard, ChevronRight, Star, Sparkles, Zap, Users } from 'lucide-react'
 import { HeroSection } from '@/components/HeroSection'
 import { HomeProgress } from '@/components/HomeProgress'
 
@@ -62,11 +62,6 @@ export default function Home() {
             </div>
 
             <div className="relative z-10 max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-blue-100 text-xs font-medium uppercase tracking-wider mb-8 backdrop-blur-sm">
-                <span className="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded-sm font-bold">MỚI</span>
-                Cập nhật cho Giáo trình 2026
-              </div>
-
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight font-display">
                 Luyện Thi SOA <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Chinh Phục Chứng Chỉ Actuary</span>
@@ -142,28 +137,35 @@ export default function Home() {
             </motion.p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 relative z-10">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
             {[
               {
-                icon: <Target className="w-8 h-8 text-white" />,
+                icon: <BookOpen className="w-8 h-8 text-white" />,
                 bg: "bg-blue-600",
                 shadow: "shadow-blue-600/30",
-                title: "Độ Khó Thích Ứng",
-                desc: "Hệ thống AI tự động phân tích và điều chỉnh độ khó câu hỏi dựa trên năng lực thực tế của bạn, giúp tối ưu hóa thời gian học."
+                title: "Kho Bài Luyện Thi",
+                desc: "Hàng ngàn câu hỏi được phân loại theo chủ đề, độ khó, giúp bạn tập trung vào từng mảng kiến thức cụ thể."
               },
               {
-                icon: <BookOpen className="w-8 h-8 text-white" />,
+                icon: <Target className="w-8 h-8 text-white" />,
                 bg: "bg-indigo-600",
                 shadow: "shadow-indigo-600/30",
-                title: "Lời Giải Chi Tiết",
-                desc: "Giải thích cặn kẽ từng bước cho mọi câu hỏi. Chúng tôi giúp bạn hiểu sâu bản chất vấn đề thay vì chỉ học vẹt."
+                title: "Thi Thử Thực Tế",
+                desc: "Mô phỏng kỳ thi CBT thật với áp lực thời gian, giúp bạn làm quen và tự tin trước khi bước vào phòng thi."
               },
               {
                 icon: <BarChart2 className="w-8 h-8 text-white" />,
                 bg: "bg-violet-600",
                 shadow: "shadow-violet-600/30",
-                title: "Phân Tích Chuyên Sâu",
-                desc: "Dashboard trực quan giúp nhận diện điểm mạnh, điểm yếu để xây dựng chiến lược ôn thi phù hợp nhất với bạn."
+                title: "Theo Dõi Tiến Độ",
+                desc: "Biểu đồ trực quan thống kê lịch sử làm bài, phân tích điểm mạnh yếu để tối ưu lộ trình ôn luyện."
+              },
+              {
+                icon: <Users className="w-8 h-8 text-white" />,
+                bg: "bg-pink-600",
+                shadow: "shadow-pink-600/30",
+                title: "Phòng Ôn Thi Chung",
+                desc: "Tạo hoặc tham gia phòng học nhóm, cùng nhau rèn luyện, chia sẻ kiến thức và tạo động lực học tập."
               }
             ].map((feature, i) => (
               <motion.div
@@ -173,7 +175,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 + 0.3 }}
                 whileHover={{ y: -8 }}
-                className="group relative bg-white p-8 lg:p-10 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300"
+                className="group relative bg-white p-8 lg:p-10 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 h-full flex flex-col"
               >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-gray-50 to-transparent rounded-bl-[10rem] opacity-50 group-hover:scale-110 transition-transform duration-500" />
 
@@ -188,11 +190,6 @@ export default function Home() {
                 <p className="text-gray-600 leading-relaxed mb-6">
                   {feature.desc}
                 </p>
-
-                <div className="flex items-center text-blue-600 font-semibold group-hover:translate-x-2 transition-transform cursor-pointer">
-                  <span>Tìm hiểu thêm</span>
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </div>
               </motion.div>
             ))}
           </div>
@@ -212,9 +209,9 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             {/* Exam P Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100 hover:border-blue-200 transition-colors relative overflow-hidden group">
+            <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100 hover:border-blue-200 transition-colors relative overflow-hidden group h-full flex flex-col">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
-              <div className="relative z-10">
+              <div className="relative z-10 flex flex-col flex-1">
                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600 font-bold text-xl">P</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Exam P - Probability</h3>
                 <p className="text-gray-600 mb-6 line-clamp-2">
@@ -228,7 +225,7 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <Link href="/practice?exam=P">
+                <Link href="/practice?exam=P" className="mt-auto">
                   <Button className="w-full bg-slate-900 hover:bg-blue-600 text-white transition-colors">
                     Luyện Đề Exam P
                   </Button>
@@ -237,9 +234,9 @@ export default function Home() {
             </div>
 
             {/* Exam FM Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100 hover:border-indigo-200 transition-colors relative overflow-hidden group">
+            <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100 hover:border-indigo-200 transition-colors relative overflow-hidden group h-full flex flex-col">
               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
-              <div className="relative z-10">
+              <div className="relative z-10 flex flex-col flex-1">
                 <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 text-indigo-600 font-bold text-xl">FM</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Exam FM - Financial Math</h3>
                 <p className="text-gray-600 mb-6 line-clamp-2">
@@ -253,7 +250,7 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <Link href="/practice?exam=FM">
+                <Link href="/practice?exam=FM" className="mt-auto">
                   <Button className="w-full bg-slate-900 hover:bg-indigo-600 text-white transition-colors">
                     Luyện Đề Exam FM
                   </Button>
@@ -341,21 +338,9 @@ export default function Home() {
                 Lệ phí thi chính thức của SOA thường dao động từ $250 - $350/exam (có giảm cho sinh viên). Về chi phí ôn luyện, SOA Prep cung cấp các gói luyện đề với chi phí tiết kiệm hơn 80% so với sách giáo khoa truyền thống, đồng thời cập nhật liên tục theo syllabus 2026.
               </p>
             </div>
-
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Quy trình đăng ký thi SOA tại Việt Nam?</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Bạn có thể đăng ký trực tuyến trên website soa.org và chọn địa điểm thi (Prometric Center) tại Hà Nội hoặc TP.HCM. Kỳ thi diễn ra trên máy tính (CBT) và bạn sẽ biết kết quả (Pass/Fail) ngay lập tức sau khi nộp bài.
-              </p>
-            </div>
           </div>
         </div>
       </section>
-
-
-
-      {/* Footer */}
-
     </div >
   )
 }

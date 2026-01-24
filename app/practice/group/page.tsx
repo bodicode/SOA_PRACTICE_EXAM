@@ -23,9 +23,9 @@ export default function GroupStudyLobby() {
                 body: JSON.stringify({ mode: "study" }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Failed to create room");
+            if (!res.ok) throw new Error(data.error || "Tạo phòng thất bại");
 
-            toast.success("Room created!");
+            toast.success("Phòng đã được tạo!");
             router.push(`/practice/room/${data.roomCode}`);
         } catch (error: any) {
             toast.error(error.message);
@@ -47,9 +47,9 @@ export default function GroupStudyLobby() {
                 body: JSON.stringify({ roomCode }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Failed to join room");
+            if (!res.ok) throw new Error(data.error || "Thất bại");
 
-            toast.success("Joined room!");
+            toast.success("Tham gia phòng thành công!");
             router.push(`/practice/room/${roomCode}`);
         } catch (error: any) {
             toast.error(error.message);

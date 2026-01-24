@@ -346,6 +346,10 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
 
     const joinVideo = async () => {
         try {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error("Trình duyệt không hỗ trợ hoặc kết nối chưa được bảo mật (HTTPS)");
+            }
+
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             setMyStream(stream);
             myStreamRef.current = stream; // Update Ref
@@ -360,9 +364,10 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
             if (channelRef.current) {
                 channelRef.current.send({ type: "broadcast", event: "join_video", payload: { userId: currentUser.id } });
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            toast.error("Không thể truy cập Camera/Micro");
+            const msg = err.message || err.name || "Lỗi không xác định";
+            toast.error(`Lỗi Camera/Mic: ${msg}`);
             localStorage.removeItem(`video_joined_${roomCode}`); // Clear intent on failure
         }
     };
@@ -1158,7 +1163,7 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
                                                 </div>
                                             )}
                                             <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-between">
-                                                <span className="text-xs font-bold text-white truncate max-w-[70%]">Bạn (Me)</span>
+                                                <span className="text-xs font-bold text-white truncate max-w-[70%]">Bạn</span>
                                                 <div className="flex items-center gap-1">
                                                     {isMicOn ? <Mic className="w-3 h-3 text-green-400" /> : <MicOff className="w-3 h-3 text-red-500" />}
                                                     {isCameraOn ? <Video className="w-3 h-3 text-green-400" /> : <VideoOff className="w-3 h-3 text-red-500" />}

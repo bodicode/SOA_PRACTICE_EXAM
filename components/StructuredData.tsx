@@ -88,14 +88,6 @@ export default function StructuredData() {
                     "text": "Lệ phí thi chính thức của SOA thường dao động từ $250 - $350/exam. Tại SOA Exam Practice, chúng tôi cung cấp giải pháp luyện thi với chi phí tối ưu."
                 }
             },
-            {
-                "@type": "Question",
-                "name": "Quy trình đăng ký thi SOA tại Việt Nam?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Bạn có thể đăng ký trực tuyến trên website soa.org và thi tại các trung tâm Prometric ở Hà Nội hoặc TP.HCM theo hình thức CBT (Computer Based Testing)."
-                }
-            }
         ]
     }
 
