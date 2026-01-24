@@ -2,12 +2,14 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+// import { useRouter, usePathname } from 'next/navigation' // Removed standard hooks
+import { useRouter, usePathname } from '@/navigation' // Use next-intl hooks
 import { createClient } from '@/lib/supabase/client'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, LogOut } from 'lucide-react'
+import { LayoutDashboard, LogOut, Languages } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,6 +23,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 export function Navbar() {
     const { user, isLoading, logout } = useUserStore()
     const router = useRouter()
+    const pathname = usePathname()
+    const locale = useLocale()
+    const t = useTranslations('nav')
     const [supabase] = useState(() => createClient())
     const [isOpen, setIsOpen] = useState(false)
     const [isVisible, setIsVisible] = useState(true)
@@ -52,6 +57,11 @@ export function Navbar() {
         router.refresh()
     }
 
+    const switchLocale = (newLocale: string) => {
+        // next-intl router handles the path and prefix automatically
+        router.replace(pathname, { locale: newLocale })
+    }
+
     return (
         <header
             className={`sticky top-0 z-50 w-full border-b border-gray-100 bg-white transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
@@ -75,18 +85,34 @@ export function Navbar() {
                         {user && (
                             <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
                                 <Link href="/practice" className="hover:text-blue-600 transition-colors">
-                                    Ôn tập
+                                    {t('practice')}
                                 </Link>
                                 <Link href="/leaderboard" className="hover:text-blue-600 transition-colors">
-                                    Bảng Xếp Hạng
+                                    {t('leaderboard')}
                                 </Link>
                                 <Link href="/progress" className="hover:text-blue-600 transition-colors">
-                                    Tiến độ học tập
+                                    {t('progress')}
                                 </Link>
                             </nav>
                         )}
                     </div>
                     <div className="flex items-center gap-3">
+                        {/* Language Switcher */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                                    <Languages className="h-5 w-5" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => switchLocale('vi')} className="cursor-pointer">
+                                    🇻🇳 Tiếng Việt
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => switchLocale('en')} className="cursor-pointer">
+                                    🇬🇧 English
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                         {isLoading ? (
                             <div className="w-24 h-9 bg-gray-100 animate-pulse rounded-full" />
                         ) : user ? (
@@ -132,18 +158,18 @@ export function Navbar() {
                                             <DropdownMenuSeparator />
                                             <Link href="/profile" className="w-full cursor-pointer">
                                                 <DropdownMenuItem className="cursor-pointer">
-                                                    Hồ sơ cá nhân
+                                                    {t('profile')}
                                                 </DropdownMenuItem>
                                             </Link>
                                             <Link href="/progress" className="w-full cursor-pointer">
                                                 <DropdownMenuItem className="cursor-pointer">
-                                                    Tiến độ học tập
+                                                    {t('progress')}
                                                 </DropdownMenuItem>
                                             </Link>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
                                                 <LogOut className="mr-2 h-4 w-4" />
-                                                <span>Đăng xuất</span>
+                                                <span>{t('logout')}</span>
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -153,12 +179,12 @@ export function Navbar() {
                             <>
                                 <Link href="/login">
                                     <Button variant="ghost" className="text-gray-600 hover:text-gray-900 font-medium">
-                                        Đăng Nhập
+                                        {t('login')}
                                     </Button>
                                 </Link>
                                 <Link href="/register">
                                     <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 rounded-full px-6 transition-transform hover:scale-105">
-                                        Đăng Ký
+                                        {t('register')}
                                     </Button>
                                 </Link>
                             </>

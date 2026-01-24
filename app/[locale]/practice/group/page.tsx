@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "react-hot-toast";
 import { Users, Plus, LogIn, ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function GroupStudyLobby() {
+    const t = useTranslations("groupLobby");
     const router = useRouter();
     const [roomCode, setRoomCode] = useState("");
     const [isCreating, setIsCreating] = useState(false);
@@ -23,9 +25,9 @@ export default function GroupStudyLobby() {
                 body: JSON.stringify({ mode: "study" }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Tạo phòng thất bại");
+            if (!res.ok) throw new Error(data.error || t('create.error'));
 
-            toast.success("Phòng đã được tạo!");
+            toast.success(t('create.success'));
             router.push(`/practice/room/${data.roomCode}`);
         } catch (error: any) {
             toast.error(error.message);
@@ -36,7 +38,7 @@ export default function GroupStudyLobby() {
 
     const handleJoinRoom = async () => {
         if (!roomCode || roomCode.length < 6) {
-            toast.error("Vui lòng nhập mã phòng hợp lệ!");
+            toast.error(t('join.invalidCode'));
             return;
         }
         setIsJoining(true);
@@ -47,9 +49,9 @@ export default function GroupStudyLobby() {
                 body: JSON.stringify({ roomCode }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Thất bại");
+            if (!res.ok) throw new Error(data.error || t('join.error'));
 
-            toast.success("Tham gia phòng thành công!");
+            toast.success(t('join.success'));
             router.push(`/practice/room/${roomCode}`);
         } catch (error: any) {
             toast.error(error.message);
@@ -67,10 +69,10 @@ export default function GroupStudyLobby() {
                     <div className="space-y-2">
                         <h1 className="text-4xl font-extrabold text-[#003366] flex items-center gap-3">
                             <Users className="w-10 h-10" />
-                            Group Study
+                            {t('title')}
                         </h1>
                         <p className="text-lg text-gray-600">
-                            Ôn tập cùng bạn bè. Cùng nhau giải đề, thảo luận đáp án, và chinh phục kỳ thi SOA.
+                            {t('subtitle')}
                         </p>
                     </div>
 
@@ -80,8 +82,8 @@ export default function GroupStudyLobby() {
                                 <Users className="w-6 h-6 text-blue-600" />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-gray-900">Học Nhóm Real-time</h3>
-                                <p className="text-sm text-gray-500">Đồng bộ câu hỏi với mọi người trong phòng.</p>
+                                <h3 className="font-semibold text-gray-900">{t('features.realtimeTitle')}</h3>
+                                <p className="text-sm text-gray-500">{t('features.realtimeDesc')}</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-4">
@@ -89,8 +91,8 @@ export default function GroupStudyLobby() {
                                 <ArrowRight className="w-6 h-6 text-green-600" />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-gray-900">Tiến Độ Chung</h3>
-                                <p className="text-sm text-gray-500">Chủ phòng điều khiển tốc độ làm bài.</p>
+                                <h3 className="font-semibold text-gray-900">{t('features.progressTitle')}</h3>
+                                <p className="text-sm text-gray-500">{t('features.progressDesc')}</p>
                             </div>
                         </div>
                     </div>
@@ -102,16 +104,16 @@ export default function GroupStudyLobby() {
                     <Card className="border-l-4 border-blue-600 shadow-md hover:shadow-xl transition-all cursor-pointer" onClick={handleCreateRoom}>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-blue-800">
-                                <Plus className="w-5 h-5" /> Tạo Phòng Mới
+                                <Plus className="w-5 h-5" /> {t('create.title')}
                             </CardTitle>
-                            <CardDescription>Bạn sẽ là chủ phòng và chọn đề thi.</CardDescription>
+                            <CardDescription>{t('create.desc')}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Button
                                 className="w-full bg-blue-600 hover:bg-blue-700"
                                 disabled={isCreating}
                             >
-                                {isCreating ? "Đang tạo..." : "Tạo Phòng Ngay"}
+                                {isCreating ? t('create.loading') : t('create.button')}
                             </Button>
                         </CardContent>
                     </Card>
@@ -120,14 +122,14 @@ export default function GroupStudyLobby() {
                     <Card className="border-l-4 border-green-600 shadow-md hover:shadow-xl transition-all">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-green-800">
-                                <LogIn className="w-5 h-5" /> Tham Gia Phòng
+                                <LogIn className="w-5 h-5" /> {t('join.title')}
                             </CardTitle>
-                            <CardDescription>Nhập mã số phòng từ bạn bè của bạn.</CardDescription>
+                            <CardDescription>{t('join.desc')}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
                                 <Input
-                                    placeholder="Nhập mã phòng (VD: 123456)"
+                                    placeholder={t('join.placeholder')}
                                     className="text-center text-lg tracking-widest uppercase font-bold text-gray-700"
                                     maxLength={6}
                                     value={roomCode}
@@ -140,7 +142,7 @@ export default function GroupStudyLobby() {
                                 onClick={handleJoinRoom}
                                 disabled={isJoining}
                             >
-                                {isJoining ? "Đang vào..." : "Vào Phòng"}
+                                {isJoining ? t('join.loading') : t('join.button')}
                             </Button>
                         </CardContent>
                     </Card>

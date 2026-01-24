@@ -10,6 +10,7 @@ import { useUserStore } from '@/stores/userStore'
 import { useProgressStore } from '@/stores/progressStore'
 import ProgressChart from '@/components/ProgressChart'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts'
+import { useTranslations, useFormatter } from 'next-intl'
 
 interface UserStats {
     totalExams: number
@@ -30,6 +31,8 @@ interface ExamSession {
 export default function ProgressPage() {
     const { user } = useUserStore()
     const { getData, fetchProgress, isLoading, cache } = useProgressStore()
+    const t = useTranslations('progress')
+    const format = useFormatter()
 
     const [activeCategory, setActiveCategory] = useState<number | undefined>(undefined)
 
@@ -69,21 +72,24 @@ export default function ProgressPage() {
             const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
             const dateObj = new Date(session.startTime);
-            const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-            const dayPrefix = days[dateObj.getDay()];
-            const dateStr = dateObj.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+            // const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+            // const dayPrefix = days[dateObj.getDay()];
+            // Use format.dateTime for day/date
+            const dayPrefix = format.dateTime(dateObj, { weekday: 'short' });
+            const dateStr = format.dateTime(dateObj, { day: '2-digit', month: '2-digit' });
 
             return {
                 date: `${dayPrefix} ${dateStr}`,
-                fullDate: new Date(session.startTime).toLocaleString('vi-VN'),
+                fullDate: format.dateTime(dateObj, { dateStyle: 'medium', timeStyle: 'short' }),
                 score: score,
                 total: total,
                 scale10: Number(scale10.toFixed(1)),
                 percentage: percentage,
-                mode: 'Thi thử'
+                mode: 'Thi thử' // Chart tooltip might need translation if logic is inside component, but "Thi thử" here is hardcoded. It's passed to chart.
+                // Assuming ProgressChart can handle labels or we pass generic key. For now assuming chart handles this or we leave it.
             };
         });
-    }, [filteredHistory]);
+    }, [filteredHistory, format]);
 
     // Calculate outcomes
     const outcomes = useMemo(() => {
@@ -108,7 +114,7 @@ export default function ProgressPage() {
         : 0;
 
     if (isInitialLoading) {
-        return <div className="p-8 flex justify-center text-gray-500">Loading analytics...</div>
+        return <div className="p-8 flex justify-center text-gray-500">{t('loading')}</div>
     }
 
     const bestScore = history.length > 0
@@ -121,8 +127,8 @@ export default function ProgressPage() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
                     <div>
-                        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Thống Kê Hiệu Quả</h1>
-                        <p className="text-slate-500 mt-1">Theo dõi chi tiết tiến độ ôn thi Exam P & FM</p>
+                        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t('title')}</h1>
+                        <p className="text-slate-500 mt-1">{t('subtitle')}</p>
                     </div>
                 </div>
 
@@ -130,13 +136,12 @@ export default function ProgressPage() {
                 <div className="mb-6">
                     <Tabs defaultValue="all" className="w-full" onValueChange={(val) => setActiveCategory(val === 'all' ? undefined : parseInt(val))}>
                         <TabsList className="grid w-full max-w-md grid-cols-3 bg-slate-100 p-1">
-                            <TabsTrigger value="all" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">Tất cả</TabsTrigger>
-                            <TabsTrigger value="1" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">Exam P</TabsTrigger>
-                            <TabsTrigger value="2" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">Exam FM</TabsTrigger>
+                            <TabsTrigger value="all" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">{t('tabs.all')}</TabsTrigger>
+                            <TabsTrigger value="1" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">{t('tabs.examP')}</TabsTrigger>
+                            <TabsTrigger value="2" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">{t('tabs.examFM')}</TabsTrigger>
                         </TabsList>
                     </Tabs>
                 </div>
-
 
 
                 {/* Summary Cards */}
@@ -145,7 +150,7 @@ export default function ProgressPage() {
                     <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <p className="text-sm font-medium text-blue-500 mb-1">Điểm Trung Bình</p>
+                                <p className="text-sm font-medium text-blue-500 mb-1">{t('stats.avgScore')}</p>
                                 <div className="text-3xl font-bold text-slate-900">
                                     {stats?.averageScore ? Number(stats.averageScore).toFixed(1) : 0}<span className="text-lg text-gray-400 font-normal">/10</span>
                                 </div>
@@ -155,7 +160,7 @@ export default function ProgressPage() {
                             </div>
                         </div>
                         <p className="text-xs font-semibold text-green-600 flex items-center gap-1">
-                            <TrendingUp className="w-3 h-3" /> Mục tiêu: 7.0/10
+                            <TrendingUp className="w-3 h-3" /> {t('stats.goal')}
                         </p>
                     </Card>
 
@@ -163,7 +168,7 @@ export default function ProgressPage() {
                     <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <p className="text-sm font-medium text-slate-500 mb-1">Tổng Số Bài Thi</p>
+                                <p className="text-sm font-medium text-slate-500 mb-1">{t('stats.totalExams')}</p>
                                 <div className="text-3xl font-bold text-slate-900">{stats?.totalExams || 0}</div>
                             </div>
                             <div className="p-2 bg-indigo-50 rounded-lg">
@@ -171,7 +176,7 @@ export default function ProgressPage() {
                             </div>
                         </div>
                         <p className="text-xs text-slate-500">
-                            Đã hoàn thành {stats?.totalQuestions || 0} câu hỏi
+                            {t('stats.completed', { count: stats?.totalQuestions || 0 })}
                         </p>
                     </Card>
 
@@ -179,7 +184,7 @@ export default function ProgressPage() {
                     <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <p className="text-sm font-medium text-slate-500 mb-1">Điểm Cao Nhất</p>
+                                <p className="text-sm font-medium text-slate-500 mb-1">{t('stats.bestScore')}</p>
                                 <div className="text-3xl font-bold text-slate-900 leading-tight">
                                     {bestScore.toFixed(1)}<span className="text-lg text-gray-400 font-normal">/10</span>
                                 </div>
@@ -189,7 +194,7 @@ export default function ProgressPage() {
                             </div>
                         </div>
                         <p className="text-xs font-semibold text-green-600 flex items-center gap-1">
-                            <VerifiedIcon className="w-3 h-3" /> Kỷ lục cá nhân
+                            <VerifiedIcon className="w-3 h-3" /> {t('stats.record')}
                         </p>
                     </Card>
 
@@ -197,15 +202,15 @@ export default function ProgressPage() {
                     <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <p className="text-sm font-medium text-slate-500 mb-1">Chuỗi Ngày Học</p>
-                                <div className="text-3xl font-bold text-slate-900">{stats?.studyStreak || 0} Ngày</div>
+                                <p className="text-sm font-medium text-slate-500 mb-1">{t('stats.streak')}</p>
+                                <div className="text-3xl font-bold text-slate-900">{stats?.studyStreak || 0} {t('stats.days')}</div>
                             </div>
                             <div className="p-2 bg-orange-50 rounded-lg">
                                 <Flame className="w-5 h-5 text-orange-500 fill-orange-500" />
                             </div>
                         </div>
                         <p className="text-xs text-slate-500">
-                            Giữ vững phong độ nhé!
+                            {t('stats.keepUp')}
                         </p>
                     </Card>
                 </div>
@@ -222,7 +227,7 @@ export default function ProgressPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Exam Outcomes */}
                     <Card className="border-none shadow-md bg-white p-6">
-                        <h3 className="font-bold text-lg text-slate-900 mb-6">Tỉ Lệ Đạt (Pass Rate)</h3>
+                        <h3 className="font-bold text-lg text-slate-900 mb-6">{t('charts.passRateTitle')}</h3>
                         <div className="h-64 relative flex items-center justify-center">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
@@ -239,23 +244,23 @@ export default function ProgressPage() {
                                             <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
                                         ))}
                                     </Pie>
-                                    <RechartsTooltip formatter={(value: any) => [value, 'Số lượng']} />
+                                    <RechartsTooltip formatter={(value: any) => [value, t('charts.count')]} />
                                 </PieChart>
                             </ResponsiveContainer>
                             {/* Center Text */}
                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                                 <span className="text-3xl font-bold text-slate-900">{passRate}%</span>
-                                <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">Tỉ lệ Đậu</span>
+                                <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">{t('charts.passRatio')}</span>
                             </div>
                         </div>
                         <div className="flex justify-center gap-6 mt-4">
                             <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-                                <span className="text-sm text-slate-600">Đậu ({outcomes[0].value})</span>
+                                <span className="text-sm text-slate-600">{t('charts.pass')} ({outcomes[0].value})</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                                <span className="text-sm text-slate-600">Trượt ({outcomes[1].value})</span>
+                                <span className="text-sm text-slate-600">{t('charts.fail')} ({outcomes[1].value})</span>
                             </div>
                         </div>
                     </Card>
@@ -263,8 +268,8 @@ export default function ProgressPage() {
                     {/* Recent Attempts */}
                     <Card className="lg:col-span-2 border-none shadow-md bg-white p-6">
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="font-bold text-lg text-slate-900">Lịch Sử Làm Bài Gần Đây</h3>
-                            <Link href="#" className="text-sm font-semibold text-blue-600 hover:text-blue-700">Xem tất cả</Link>
+                            <h3 className="font-bold text-lg text-slate-900">{t('history.title')}</h3>
+                            <Link href="#" className="text-sm font-semibold text-blue-600 hover:text-blue-700">{t('history.viewAll')}</Link>
                         </div>
                         <div className="space-y-4">
                             {filteredHistory.slice(0, 4).map((session: ExamSession, i: number) => {
@@ -282,9 +287,9 @@ export default function ProgressPage() {
                                             </div>
                                             <div>
                                                 <h4 className="font-semibold text-slate-900">
-                                                    {session.mode === 'exam' ? `Bài Thi Thử #${session.id}` : `Luyện Tập #${session.id}`}
+                                                    {session.mode === 'exam' ? `${t('history.examPrefix')} #${session.id}` : `${t('history.practicePrefix')} #${session.id}`}
                                                 </h4>
-                                                <p className="text-xs text-slate-500">{new Date(session.startTime).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+                                                <p className="text-xs text-slate-500">{format.dateTime(new Date(session.startTime), { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
@@ -292,14 +297,14 @@ export default function ProgressPage() {
                                                 {scale10.toFixed(1)}/10
                                             </div>
                                             <div className={`text-[10px] uppercase font-bold tracking-wider ${isPassed ? 'text-green-600' : 'text-red-500'}`}>
-                                                {isPassed ? 'ĐẠT' : 'CHƯA ĐẠT'}
+                                                {isPassed ? t('history.passStatus') : t('history.failStatus')}
                                             </div>
                                         </div>
                                     </div>
                                 )
                             })}
                             {filteredHistory.length === 0 && (
-                                <div className="text-center py-8 text-slate-400">Chưa có dữ liệu trong khoảng thời gian này.</div>
+                                <div className="text-center py-8 text-slate-400">{t('history.empty')}</div>
                             )}
                         </div>
                     </Card>
@@ -329,4 +334,3 @@ function VerifiedIcon(props: any) {
         </svg>
     )
 }
-

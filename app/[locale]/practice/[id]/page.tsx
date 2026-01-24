@@ -10,8 +10,10 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Clock, BookOpen, AlertCircle, PlayCircle, Settings } from 'lucide-react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 export default function ExamModeSelectionPage() {
+    const t = useTranslations('examSelection')
     const params = useParams()
     const router = useRouter()
     const categoryId = parseInt(params.id as string)
@@ -65,19 +67,19 @@ export default function ExamModeSelectionPage() {
         router.push(`/exam/${category.id}?mode=exam`)
     }
 
-    if (isLoading) return <div className="min-h-screen flex items-center justify-center">Đang tải...</div>
-    if (!category) return <div className="min-h-screen flex items-center justify-center">Không tìm thấy kỳ thi</div>
+    if (isLoading) return <div className="min-h-screen flex items-center justify-center">{t('loading')}</div>
+    if (!category) return <div className="min-h-screen flex items-center justify-center">{t('notFound')}</div>
 
     return (
         <div className="min-h-screen bg-gray-50 p-6 md:p-12">
             <div className="max-w-4xl mx-auto">
                 <Link href="/practice" className="text-gray-500 hover:text-[#003366] mb-6 inline-flex items-center gap-2">
-                    ← Quay lại danh sách
+                    {t('back')}
                 </Link>
 
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-[#003366] mb-2">{category.name}</h1>
-                    <p className="text-gray-600">Chọn chế độ thi để bắt đầu làm bài</p>
+                    <p className="text-gray-600">{t('subtitle')}</p>
                 </div>
 
                 <Tabs defaultValue="practice" className="w-full">
@@ -87,16 +89,16 @@ export default function ExamModeSelectionPage() {
                             className="flex flex-col gap-2 py-4 data-[state=active]:bg-blue-50 data-[state=active]:text-[#003366] data-[state=active]:border-blue-200 border border-transparent rounded-lg transition-all"
                         >
                             <Settings className="w-6 h-6" />
-                            <div className="font-bold">Luyện Tập Linh Hoạt (Practice Mode)</div>
-                            <span className="text-xs font-normal text-gray-500">Tùy chỉnh số câu & thời gian</span>
+                            <div className="font-bold">{t('modes.practice.title')}</div>
+                            <span className="text-xs font-normal text-gray-500">{t('modes.practice.desc')}</span>
                         </TabsTrigger>
                         <TabsTrigger
                             value="exam"
                             className="flex flex-col gap-2 py-4 data-[state=active]:bg-blue-50 data-[state=active]:text-[#003366] data-[state=active]:border-blue-200 border border-transparent rounded-lg transition-all"
                         >
                             <AlertCircle className="w-6 h-6" />
-                            <div className="font-bold">Thi Thử (Exam Mode)</div>
-                            <span className="text-xs font-normal text-gray-500">Giả lập thi thật (CBT)</span>
+                            <div className="font-bold">{t('modes.exam.title')}</div>
+                            <span className="text-xs font-normal text-gray-500">{t('modes.exam.desc')}</span>
                         </TabsTrigger>
                     </TabsList>
 
@@ -105,15 +107,15 @@ export default function ExamModeSelectionPage() {
                             <CardHeader>
                                 <CardTitle className="text-green-700 flex items-center gap-2">
                                     <Settings className="w-5 h-5" />
-                                    Cấu Hình Bài Luyện Tập
+                                    {t('practice.title')}
                                 </CardTitle>
                                 <CardDescription>
-                                    Chọn số lượng câu hỏi và thời gian bạn muốn dành cho bài luyện tập này.
+                                    {t('practice.desc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="space-y-4">
-                                    <h3 className="font-semibold text-gray-700">Chế độ chọn câu hỏi</h3>
+                                    <h3 className="font-semibold text-gray-700">{t('practice.modeLabel')}</h3>
                                     <Tabs defaultValue="random" onValueChange={(v) => {
                                         if (v === 'random') {
                                             setRangeMode(false)
@@ -122,8 +124,8 @@ export default function ExamModeSelectionPage() {
                                         }
                                     }}>
                                         <TabsList className="w-full grid grid-cols-2">
-                                            <TabsTrigger value="random">Ngẫu nhiên toàn bộ</TabsTrigger>
-                                            <TabsTrigger value="range">Tùy chỉnh phạm vi</TabsTrigger>
+                                            <TabsTrigger value="random">{t('practice.random')}</TabsTrigger>
+                                            <TabsTrigger value="range">{t('practice.range')}</TabsTrigger>
                                         </TabsList>
                                     </Tabs>
                                 </div>
@@ -131,7 +133,7 @@ export default function ExamModeSelectionPage() {
                                 {rangeMode && (
                                     <div className="grid grid-cols-2 gap-4 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                                         <div className="space-y-2">
-                                            <Label>Từ câu</Label>
+                                            <Label>{t('practice.from')}</Label>
                                             <Input
                                                 type="number"
                                                 min={1}
@@ -151,7 +153,7 @@ export default function ExamModeSelectionPage() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label>Đến câu</Label>
+                                            <Label>{t('practice.to')}</Label>
                                             <Input
                                                 type="number"
                                                 min={1}
@@ -172,7 +174,7 @@ export default function ExamModeSelectionPage() {
                                         </div>
                                         <div className="col-span-2">
                                             <p className="text-xs text-yellow-800">
-                                                Hệ thống sẽ chọn ngẫu nhiên {questionCount} câu hỏi trong phạm vi từ câu {rangeStart || 1} đến câu {rangeEnd || category.questionsCount}.
+                                                {t('practice.rangeDesc', { count: questionCount, start: rangeStart || 1, end: rangeEnd || category.questionsCount })}
                                             </p>
                                         </div>
                                     </div>
@@ -180,7 +182,7 @@ export default function ExamModeSelectionPage() {
 
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <Label>Số lượng câu muốn làm</Label>
+                                        <Label>{t('practice.countLabel')}</Label>
                                         <div className="relative">
                                             <BookOpen className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                                             <Input
@@ -193,11 +195,11 @@ export default function ExamModeSelectionPage() {
                                             />
                                         </div>
                                         <p className="text-xs text-gray-500">
-                                            Tối đa: {rangeMode ? ((typeof rangeEnd === 'number' ? rangeEnd : category.questionsCount) - (typeof rangeStart === 'number' ? rangeStart : 1) + 1) : category.questionsCount} câu
+                                            Tối đa: {rangeMode ? ((typeof rangeEnd === 'number' ? rangeEnd : category.questionsCount) - (typeof rangeStart === 'number' ? rangeStart : 1) + 1) : category.questionsCount} {t('practice.maxSuffix')}
                                         </p>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>Thời gian (phút)</Label>
+                                        <Label>{t('practice.timeLabel')}</Label>
                                         <div className="relative">
                                             <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                                             <Input
@@ -209,17 +211,17 @@ export default function ExamModeSelectionPage() {
                                                 className="pl-10"
                                             />
                                         </div>
-                                        <p className="text-xs text-gray-500">Đề xuất: 2-3 phút/câu</p>
+                                        <p className="text-xs text-gray-500">{t('practice.timeHint')}</p>
                                     </div>
                                 </div>
 
                                 <div className="bg-green-50 p-4 rounded-lg text-sm text-green-800 border border-green-200">
-                                    💡 <strong>Mẹo:</strong> Chế độ này phù hợp để ôn tập theo chủ đề hoặc tranh thủ luyện tập trong thời gian ngắn.
+                                    💡 <strong>{t('practice.tipTitle')}</strong> {t('practice.tipDesc')}
                                 </div>
 
                                 <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-lg h-12" onClick={startPractice}>
                                     <PlayCircle className="w-5 h-5 mr-2" />
-                                    Bắt Đầu Luyện Tập
+                                    {t('practice.startBtn')}
                                 </Button>
                             </CardContent>
                         </Card>
@@ -230,50 +232,50 @@ export default function ExamModeSelectionPage() {
                             <CardHeader>
                                 <CardTitle className="text-red-700 flex items-center gap-2">
                                     <AlertCircle className="w-5 h-5" />
-                                    Thông Tin Bài Thi Chuẩn
+                                    {t('exam.title')}
                                 </CardTitle>
                                 <CardDescription>
-                                    Chế độ này mô phỏng chính xác áp lực và quy định của kỳ thi thật.
+                                    {t('exam.desc')}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <div className="bg-gray-100 p-4 rounded-lg text-center">
                                         <div className="text-2xl font-bold text-gray-900">30</div>
-                                        <div className="text-xs text-gray-500 uppercase font-semibold">Câu hỏi</div>
+                                        <div className="text-xs text-gray-500 uppercase font-semibold">{t('exam.stats.questions')}</div>
                                     </div>
                                     <div className="bg-gray-100 p-4 rounded-lg text-center">
                                         <div className="text-2xl font-bold text-gray-900">180</div>
-                                        <div className="text-xs text-gray-500 uppercase font-semibold">Phút</div>
+                                        <div className="text-xs text-gray-500 uppercase font-semibold">{t('exam.stats.minutes')}</div>
                                     </div>
                                     <div className="bg-gray-100 p-4 rounded-lg text-center">
                                         <div className="text-2xl font-bold text-gray-900">70%</div>
-                                        <div className="text-xs text-gray-500 uppercase font-semibold">Điểm đỗ</div>
+                                        <div className="text-xs text-gray-500 uppercase font-semibold">{t('exam.stats.passingScore')}</div>
                                     </div>
                                     <div className="bg-gray-100 p-4 rounded-lg text-center">
                                         <div className="text-2xl font-bold text-gray-900">CBT</div>
-                                        <div className="text-xs text-gray-500 uppercase font-semibold">Giao diện</div>
+                                        <div className="text-xs text-gray-500 uppercase font-semibold">{t('exam.stats.interface')}</div>
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
                                     <div className="flex items-start gap-3">
                                         <div className="w-5 h-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">1</div>
-                                        <p className="text-sm text-gray-700">Thời gian sẽ <strong>không thể tạm dừng</strong> một khi đã bắt đầu.</p>
+                                        <p className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: t.raw('exam.rules.1') }} />
                                     </div>
                                     <div className="flex items-start gap-3">
                                         <div className="w-5 h-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">2</div>
-                                        <p className="text-sm text-gray-700">Bạn có thể đánh dấu (flag) các câu hỏi để xem lại sau.</p>
+                                        <p className="text-sm text-gray-700">{t('exam.rules.2')}</p>
                                     </div>
                                     <div className="flex items-start gap-3">
                                         <div className="w-5 h-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">3</div>
-                                        <p className="text-sm text-gray-700">Kết quả sẽ được tính vào <strong>Ranking System</strong> của hệ thống.</p>
+                                        <p className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: t.raw('exam.rules.3') }} />
                                     </div>
                                 </div>
 
                                 <Button size="lg" className="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-lg h-12" onClick={startMockExam}>
                                     <PlayCircle className="w-5 h-5 mr-2" />
-                                    Bắt Đầu Thi Thử
+                                    {t('exam.startBtn')}
                                 </Button>
                             </CardContent>
                         </Card>

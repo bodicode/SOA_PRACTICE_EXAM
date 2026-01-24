@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,13 @@ import { HomeProgress } from '@/components/HomeProgress'
 export default function Home() {
   const { user, isLoading } = useUserStore()
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
+  const tHero = useTranslations('hero')
+  const tFeatures = useTranslations('features')
+  const tExams = useTranslations('exams')
+  const tPrograms = useTranslations('programs')
+  const tTestimonials = useTranslations('testimonials')
+  const tFaq = useTranslations('faq')
+  const tCta = useTranslations('cta')
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -63,25 +70,25 @@ export default function Home() {
 
             <div className="relative z-10 max-w-3xl">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight font-display">
-                Luyện Thi SOA <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Chinh Phục Chứng Chỉ Actuary</span>
+                {tHero('title')} <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">{tHero('subtitle')}</span>
               </h1>
 
               <p className="text-lg md:text-xl text-blue-100/80 mb-10 leading-relaxed max-w-2xl">
-                Mô phỏng điều kiện thi thực tế với các bài luyện tập toàn diện cho Exam P, FM. Theo dõi tiến độ và tối ưu điểm số hiệu quả.
+                {tHero('description')}
               </p>
 
               <div className="flex flex-wrap gap-4">
                 <Link href="/practice">
                   <Button size="lg" className="h-14 px-8 text-base bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20 rounded-xl transition-all hover:scale-105 active:scale-95 font-semibold">
                     <Zap className="w-5 h-5 mr-2 fill-current" />
-                    Bắt Đầu Luyện Thi
+                    {tHero('startButton')}
                   </Button>
                 </Link>
                 <Link href="/progress">
                   <Button size="lg" variant="outline" className="h-14 px-8 text-base bg-white/5 hover:bg-white/10 text-white border-white/10 rounded-xl backdrop-blur-sm transition-all hover:scale-105 active:scale-95 font-semibold">
                     <LayoutDashboard className="w-5 h-5 mr-2" />
-                    Xem Tiến Độ
+                    {tHero('progressButton')}
                   </Button>
                 </Link>
               </div>
@@ -112,7 +119,7 @@ export default function Home() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-sm font-semibold mb-8"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Tính năng vượt trội</span>
+              <span>{tFeatures('subtitle')}</span>
             </motion.div>
 
             <motion.h2
@@ -122,8 +129,7 @@ export default function Home() {
               transition={{ delay: 0.1 }}
               className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight leading-tight"
             >
-              Tại Sao Bạn Nên Chọn <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">SOA Prep</span>?
+              {tFeatures('title')}
             </motion.h2>
 
             <motion.p
@@ -133,7 +139,7 @@ export default function Home() {
               transition={{ delay: 0.2 }}
               className="text-xl text-gray-600 mx-auto leading-relaxed"
             >
-              Chúng tôi kết hợp công nghệ AI tiên tiến với kiến thức chuyên sâu từ các Actuary hàng đầu<br className="hidden md:block" /> để mang đến trải nghiệm ôn thi hiệu quả nhất.
+              {tFeatures('subtitle')}
             </motion.p>
           </div>
 
@@ -143,29 +149,29 @@ export default function Home() {
                 icon: <BookOpen className="w-8 h-8 text-white" />,
                 bg: "bg-blue-600",
                 shadow: "shadow-blue-600/30",
-                title: "Kho Bài Luyện Thi",
-                desc: "Hàng ngàn câu hỏi được phân loại theo chủ đề, độ khó, giúp bạn tập trung vào từng mảng kiến thức cụ thể."
+                title: tFeatures('questionBank.title'),
+                desc: tFeatures('questionBank.description')
               },
               {
                 icon: <Target className="w-8 h-8 text-white" />,
                 bg: "bg-indigo-600",
                 shadow: "shadow-indigo-600/30",
-                title: "Thi Thử Thực Tế",
-                desc: "Mô phỏng kỳ thi CBT thật với áp lực thời gian, giúp bạn làm quen và tự tin trước khi bước vào phòng thi."
+                title: tFeatures('realExam.title'),
+                desc: tFeatures('realExam.description')
               },
               {
                 icon: <BarChart2 className="w-8 h-8 text-white" />,
                 bg: "bg-violet-600",
                 shadow: "shadow-violet-600/30",
-                title: "Theo Dõi Tiến Độ",
-                desc: "Biểu đồ trực quan thống kê lịch sử làm bài, phân tích điểm mạnh yếu để tối ưu lộ trình ôn luyện."
+                title: tFeatures('analytics.title'),
+                desc: tFeatures('analytics.description')
               },
               {
                 icon: <Users className="w-8 h-8 text-white" />,
                 bg: "bg-pink-600",
                 shadow: "shadow-pink-600/30",
-                title: "Phòng Ôn Thi Chung",
-                desc: "Tạo hoặc tham gia phòng học nhóm, cùng nhau rèn luyện, chia sẻ kiến thức và tạo động lực học tập."
+                title: tFeatures('videoCall.title'),
+                desc: tFeatures('videoCall.description')
               }
             ].map((feature, i) => (
               <motion.div
@@ -200,10 +206,10 @@ export default function Home() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-blue-600 font-semibold tracking-wider uppercase text-sm">Chương Trình Luyện Thi</span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mt-2 mb-4">Các Kỳ Thi SOA Trọng Tâm</h2>
+            <span className="text-blue-600 font-semibold tracking-wider uppercase text-sm">{tPrograms('badge')}</span>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mt-2 mb-4">{tPrograms('title')}</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Tập trung ôn luyện vào các chủ đề cốt lõi. Ngân hàng câu hỏi của chúng tôi bao phủ 100% syllabus mới nhất.
+              {tPrograms('description')}
             </p>
           </div>
 
@@ -213,12 +219,12 @@ export default function Home() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
               <div className="relative z-10 flex flex-col flex-1">
                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600 font-bold text-xl">P</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Exam P - Probability</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">{tExams('p.title')}</h3>
                 <p className="text-gray-600 mb-6 line-clamp-2">
-                  Chinh phục môn Xác Suất. Bao gồm các chủ đề: Biến ngẫu nhiên, Phân phối xác suất (Univariate & Multivariate), Risk Management.
+                  {tExams('p.description')}
                 </p>
                 <div className="space-y-3 mb-8">
-                  {['General Probability', 'Univariate Random Variables', 'Multivariate Random Variables'].map((topic) => (
+                  {(tExams.raw('p.topics') as string[]).map((topic) => (
                     <div key={topic} className="flex items-center text-sm text-gray-500">
                       <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
                       {topic}
@@ -227,7 +233,7 @@ export default function Home() {
                 </div>
                 <Link href="/practice?exam=P" className="mt-auto">
                   <Button className="w-full bg-slate-900 hover:bg-blue-600 text-white transition-colors">
-                    Luyện Đề Exam P
+                    {tExams('p.button')}
                   </Button>
                 </Link>
               </div>
@@ -238,12 +244,12 @@ export default function Home() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
               <div className="relative z-10 flex flex-col flex-1">
                 <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 text-indigo-600 font-bold text-xl">FM</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Exam FM - Financial Math</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">{tExams('fm.title')}</h3>
                 <p className="text-gray-600 mb-6 line-clamp-2">
-                  Làm chủ Toán Tài Chính. Các chủ đề cốt lõi: Time Value of Money, Niên kim (Annuities), Trái phiếu (Bonds), Quản lý rủi ro lãi suất.
+                  {tExams('fm.description')}
                 </p>
                 <div className="space-y-3 mb-8">
-                  {['Time Value of Money', 'Annuities & Cash Flows', 'Loans & Bonds', 'Immunization'].map((topic) => (
+                  {(tExams.raw('fm.topics') as string[]).map((topic) => (
                     <div key={topic} className="flex items-center text-sm text-gray-500">
                       <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
                       {topic}
@@ -252,7 +258,7 @@ export default function Home() {
                 </div>
                 <Link href="/practice?exam=FM" className="mt-auto">
                   <Button className="w-full bg-slate-900 hover:bg-indigo-600 text-white transition-colors">
-                    Luyện Đề Exam FM
+                    {tExams('fm.button')}
                   </Button>
                 </Link>
               </div>
@@ -274,7 +280,7 @@ export default function Home() {
                   <span className="text-4xl">❝</span>
                 </div>
                 <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6 leading-tight">
-                  "Tôi đã trượt Exam P hai lần trước khi biết đến SOA Prep. Phương pháp học thích ứng đã giúp tôi lấy lại căn bản và đỗ với điểm 9!"
+                  "{tTestimonials('an.quote')}"
                 </h2>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-lg border border-white/30">
@@ -282,7 +288,7 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="font-bold text-white text-lg">Nguyễn Phước Thịnh</div>
-                    <div className="text-blue-200">Associate of the Society of Actuaries (ASA)</div>
+                    <div className="text-blue-200">{tTestimonials('an.role')}</div>
                   </div>
                 </div>
               </div>
@@ -297,10 +303,10 @@ export default function Home() {
                     ))}
                   </div>
                   <p className="text-white/90 mb-4">
-                    Được tin dùng bởi hơn 5,000 học viên Actuary trên toàn thế giới.
+                    {tTestimonials('trust')}
                   </p>
                   <Button className="w-full bg-white text-blue-600 hover:bg-blue-50 border-0 font-bold">
-                    Tham Gia Cộng Đồng Ngay
+                    {tTestimonials('button')}
                   </Button>
                 </div>
               </div>
@@ -313,29 +319,29 @@ export default function Home() {
       <section className="py-20 bg-gray-50 border-t border-gray-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Câu Hỏi Thường Gặp Về Luyện Thi SOA</h2>
-            <p className="text-lg text-gray-600">Giải đáp thắc mắc cho người mới bắt đầu hành trình Actuary</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{tFaq('title')}</h2>
+            <p className="text-lg text-gray-600">{tFaq('subtitle')}</p>
           </div>
 
           <div className="space-y-6">
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">SOA là gì và chứng chỉ này dành cho ai?</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{tFaq('q1.q')}</h3>
               <p className="text-gray-600 leading-relaxed">
-                SOA (Society of Actuaries) là Hiệp hội Định phí Hoa Kỳ. Các kỳ thi SOA (như Exam P, FM) là bước khởi đầu bắt buộc để trở thành chuyên gia định phí (Actuary) - một trong những nghề nghiệp có thu nhập cao nhất thế giới, dành cho nhân sự ngành Toán, Thống kê, Tài chính và Bảo hiểm.
+                {tFaq('q1.a')}
               </p>
             </div>
 
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Tôi nên bắt đầu luyện thi SOA từ Exam nào?</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{tFaq('q2.q')}</h3>
               <p className="text-gray-600 leading-relaxed">
-                Hầu hết ứng viên bắt đầu với <strong>Exam P (Probability)</strong> hoặc <strong>Exam FM (Financial Mathematics)</strong>. Tại SOA Exam Practice, chúng tôi cung cấp ngân hàng câu hỏi thích ứng (Adaptive Learning) cho cả hai kỳ thi này để giúp bạn tối ưu hóa thời gian ôn luyện.
+                {tFaq('q2.a')}
               </p>
             </div>
 
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Học phí và lệ phí thi SOA là bao nhiêu?</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">{tFaq('q3.q')}</h3>
               <p className="text-gray-600 leading-relaxed">
-                Lệ phí thi chính thức của SOA thường dao động từ $250 - $350/exam (có giảm cho sinh viên). Về chi phí ôn luyện, SOA Prep cung cấp các gói luyện đề với chi phí tiết kiệm hơn 80% so với sách giáo khoa truyền thống, đồng thời cập nhật liên tục theo syllabus 2026.
+                {tFaq('q3.a')}
               </p>
             </div>
           </div>

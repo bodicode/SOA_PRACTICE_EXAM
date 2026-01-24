@@ -11,8 +11,10 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Loader2, Save, User, Mail, Calendar, Trophy, Lock, Shield, Camera, Flame } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { useTranslations } from 'next-intl'
 
 export default function ProfilePage() {
+    const t = useTranslations('profile')
     const { user, setUser } = useUserStore()
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
@@ -66,13 +68,13 @@ export default function ProfilePage() {
             if (res.ok) {
                 const data = await res.json()
                 setUser({ ...user, fullName: data.user.fullName })
-                toast.success("Cập nhật thông tin thành công!")
+                toast.success(t('messages.updateSuccess'))
             } else {
-                toast.error("Có lỗi xảy ra khi cập nhật.")
+                toast.error(t('messages.updateError'))
             }
         } catch (error) {
             console.error("Failed to update", error)
-            toast.error("Lỗi kết nối!")
+            toast.error(t('messages.error'))
         } finally {
             setIsSaving(false)
         }
@@ -80,17 +82,17 @@ export default function ProfilePage() {
 
     const handleChangePassword = async () => {
         if (!newPassword || !oldPassword || !confirmPassword) {
-            toast.error("Vui lòng nhập đầy đủ thông tin.")
+            toast.error(t('messages.fillAll'))
             return
         }
 
         if (newPassword !== confirmPassword) {
-            toast.error("Mật khẩu xác nhận không khớp.")
+            toast.error(t('messages.passwordMismatch'))
             return
         }
 
         if (newPassword.length < 6) {
-            toast.error("Mật khẩu mới phải có ít nhất 6 ký tự.")
+            toast.error(t('messages.passwordLength'))
             return
         }
 
@@ -104,7 +106,7 @@ export default function ProfilePage() {
             })
 
             if (signInError) {
-                toast.error("Mật khẩu hiện tại không đúng.")
+                toast.error(t('messages.wrongPassword'))
                 setIsChangingPassword(false)
                 return
             }
@@ -114,16 +116,16 @@ export default function ProfilePage() {
             })
 
             if (updateError) {
-                toast.error("Lỗi khi cập nhật mật khẩu: " + updateError.message)
+                toast.error(t('messages.updateError') + ": " + updateError.message)
             } else {
-                toast.success("Đổi mật khẩu thành công!")
+                toast.success(t('messages.passwordSuccess'))
                 setOldPassword("")
                 setNewPassword("")
                 setConfirmPassword("")
             }
         } catch (err) {
             console.error(err)
-            toast.error("Đã xảy ra lỗi không mong muốn.")
+            toast.error(t('messages.error'))
         } finally {
             setIsChangingPassword(false)
         }
@@ -134,11 +136,11 @@ export default function ProfilePage() {
         if (!file) return
 
         if (file.size > 2 * 1024 * 1024) {
-            toast.error("Ảnh không được quá 2MB")
+            toast.error(t('messages.sizeError'))
             return
         }
 
-        const toastId = toast.loading("Đang tải ảnh lên...")
+        const toastId = toast.loading(t('messages.uploading'))
         try {
             const supabase = createClient()
             const fileExt = file.name.split('.').pop()
@@ -163,20 +165,20 @@ export default function ProfilePage() {
             if (res.ok) {
                 setUser({ ...user!, avatarUrl: publicUrl })
                 setStats((prev: any) => ({ ...prev, avatarUrl: publicUrl }))
-                toast.success("Cập nhật avatar thành công!", { id: toastId })
+                toast.success(t('messages.uploadSuccess'), { id: toastId })
             } else {
                 throw new Error("Failed to update profile")
             }
         } catch (error) {
             console.error(error)
-            toast.error("Lỗi khi tải ảnh lên", { id: toastId })
+            toast.error(t('messages.uploadError'), { id: toastId })
         } finally {
             e.target.value = ''
         }
     }
 
     if (!user) {
-        return <div className="h-screen flex items-center justify-center">Vui lòng đăng nhập để xem hồ sơ.</div>
+        return <div className="h-screen flex items-center justify-center">{t('loading')}</div>
     }
 
     if (isLoading) {
@@ -236,7 +238,7 @@ export default function ProfilePage() {
                                         <Mail className="w-4 h-4" /> {user.email}
                                     </span>
                                     <span className="flex items-center gap-1.5 justify-center sm:justify-start">
-                                        <Calendar className="w-4 h-4" /> Tham gia: {new Date(stats?.createdAt || Date.now()).toLocaleDateString('vi-VN')}
+                                        <Calendar className="w-4 h-4" /> {t('stats.joined')} {new Date(stats?.createdAt || Date.now()).toLocaleDateString('vi-VN')}
                                     </span>
                                 </div>
                             </div>
@@ -252,7 +254,7 @@ export default function ProfilePage() {
                                 <Trophy className="w-7 h-7" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-500">Tổng luyện tập & thi thử</p>
+                                <p className="text-sm font-medium text-gray-500">{t('stats.totalPractice')}</p>
                                 <h3 className="text-3xl font-bold text-gray-900">{stats?._count?.examSessions || 0}</h3>
                             </div>
                         </CardContent>
@@ -264,8 +266,8 @@ export default function ProfilePage() {
                                 <Flame className="w-7 h-7" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-500">Chuỗi học tập</p>
-                                <h3 className="text-3xl font-bold text-gray-900">{stats?.studyStreak || 0} <span className="text-lg font-medium text-gray-500">ngày</span></h3>
+                                <p className="text-sm font-medium text-gray-500">{t('stats.streak')}</p>
+                                <h3 className="text-3xl font-bold text-gray-900">{stats?.studyStreak || 0} <span className="text-lg font-medium text-gray-500">{t('stats.days')}</span></h3>
                             </div>
                         </CardContent>
                     </Card>
@@ -276,11 +278,11 @@ export default function ProfilePage() {
                     <TabsList className="grid w-full grid-cols-2 bg-gray-100/80 p-1 rounded-xl h-auto">
                         <TabsTrigger value="profile" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm rounded-lg py-3 text-sm font-semibold transition-all text-gray-500">
                             <User className="w-4 h-4 mr-2" />
-                            Hồ sơ cá nhân
+                            {t('tabs.profile')}
                         </TabsTrigger>
                         <TabsTrigger value="security" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm rounded-lg py-3 text-sm font-semibold transition-all text-gray-500">
                             <Shield className="w-4 h-4 mr-2" />
-                            Bảo mật
+                            {t('tabs.security')}
                         </TabsTrigger>
                     </TabsList>
 
@@ -288,26 +290,26 @@ export default function ProfilePage() {
                         <div className="space-y-6">
                             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
                                 <CardHeader>
-                                    <CardTitle className="text-xl">Cập nhật thông tin</CardTitle>
-                                    <CardDescription>Thay đổi tên hiển thị của bạn trên hệ thống.</CardDescription>
+                                    <CardTitle className="text-xl">{t('personalInfo.title')}</CardTitle>
+                                    <CardDescription>{t('personalInfo.description')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-5">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Tên hiển thị</label>
+                                        <label className="text-sm font-medium text-gray-700">{t('personalInfo.displayName')}</label>
                                         <div className="relative">
                                             <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                                             <Input
                                                 value={fullName}
                                                 onChange={(e) => setFullName(e.target.value)}
                                                 className="pl-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-                                                placeholder="Nhập tên hiển thị của bạn"
+                                                placeholder={t('personalInfo.placeholderName')}
                                             />
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Quốc gia</label>
+                                            <label className="text-sm font-medium text-gray-700">{t('personalInfo.country')}</label>
                                             <select
                                                 value={country}
                                                 onChange={(e) => setCountry(e.target.value)}
@@ -324,23 +326,23 @@ export default function ProfilePage() {
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Trình độ <span className="text-xs text-blue-500 font-normal ml-1">(Tự động xếp hạng)</span></label>
+                                            <label className="text-sm font-medium text-gray-700">{t('personalInfo.level')} <span className="text-xs text-blue-500 font-normal ml-1">{t('personalInfo.levelAuto')}</span></label>
                                             <div className="flex h-11 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-500 cursor-not-allowed">
-                                                {level === 'Expert' && 'Expert (Chuyên gia) 🏆'}
-                                                {level === 'Advanced' && 'Advanced (Nâng cao) 🥇'}
-                                                {level === 'Intermediate' && 'Intermediate (Trung bình) 🥈'}
-                                                {level === 'Beginner' && 'Beginner (Mới bắt đầu) 🥉'}
+                                                {level === 'Expert' && t('levels.Expert')}
+                                                {level === 'Advanced' && t('levels.Advanced')}
+                                                {level === 'Intermediate' && t('levels.Intermediate')}
+                                                {level === 'Beginner' && t('levels.Beginner')}
                                             </div>
                                             <p className="text-[10px] text-gray-400">
-                                                *Luyện tập nhiều hơn để thăng hạng tự động.
+                                                {t('personalInfo.levelHint')}
                                             </p>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Email</label>
+                                        <label className="text-sm font-medium text-gray-700">{t('personalInfo.email')}</label>
                                         <Input value={user.email || ''} disabled className="bg-gray-50 h-11" />
-                                        <p className="text-xs text-gray-500">Email không thể thay đổi.</p>
+                                        <p className="text-xs text-gray-500">{t('personalInfo.emailHint')}</p>
                                     </div>
                                     <div className="pt-2">
                                         <Button
@@ -349,9 +351,9 @@ export default function ProfilePage() {
                                             className="bg-gradient-to-r from-[#003366] to-[#0050a0] hover:from-[#002244] hover:to-[#003366] text-white shadow-lg hover:shadow-xl transition-all"
                                         >
                                             {isSaving ? (
-                                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang lưu...</>
+                                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('personalInfo.saving')}</>
                                             ) : (
-                                                <><Save className="mr-2 h-4 w-4" /> Lưu thay đổi</>
+                                                <><Save className="mr-2 h-4 w-4" /> {t('personalInfo.save')}</>
                                             )}
                                         </Button>
                                     </div>
@@ -364,12 +366,12 @@ export default function ProfilePage() {
                         <div className="space-y-6">
                             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
                                 <CardHeader>
-                                    <CardTitle className="text-xl">Đổi mật khẩu</CardTitle>
-                                    <CardDescription>Cập nhật mật khẩu mới cho tài khoản của bạn.</CardDescription>
+                                    <CardTitle className="text-xl">{t('security.title')}</CardTitle>
+                                    <CardDescription>{t('security.description')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-5">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Mật khẩu hiện tại</label>
+                                        <label className="text-sm font-medium text-gray-700">{t('security.currentPassword')}</label>
                                         <div className="relative">
                                             <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                                             <Input
@@ -382,7 +384,7 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Mật khẩu mới</label>
+                                        <label className="text-sm font-medium text-gray-700">{t('security.newPassword')}</label>
                                         <div className="relative">
                                             <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                                             <Input
@@ -395,7 +397,7 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Xác nhận mật khẩu mới</label>
+                                        <label className="text-sm font-medium text-gray-700">{t('security.confirmPassword')}</label>
                                         <div className="relative">
                                             <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                                             <Input
@@ -415,9 +417,9 @@ export default function ProfilePage() {
                                             className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 shadow-sm"
                                         >
                                             {isChangingPassword ? (
-                                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang cập nhật...</>
+                                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('security.changing')}</>
                                             ) : (
-                                                <><Lock className="mr-2 h-4 w-4" /> Đổi mật khẩu</>
+                                                <><Lock className="mr-2 h-4 w-4" /> {t('security.change')}</>
                                             )}
                                         </Button>
                                     </div>
