@@ -23,7 +23,7 @@ export default function StructuredData() {
         "name": "SOA Exam Practice",
         "description": "Nền tảng luyện thi SOA Actuarial chuyên nghiệp",
         "url": process.env.NEXT_PUBLIC_SITE_URL || "https://3hours.io.vn",
-        "logo": `${process.env.NEXT_PUBLIC_SITE_URL || "https://3hours.io.vn"}/logo.png`,
+        "logo": `${process.env.NEXT_PUBLIC_SITE_URL || "https://3hours.io.vn"}/logo-light-theme.png`,
         "sameAs": [
             // Add your social media links here
         ]

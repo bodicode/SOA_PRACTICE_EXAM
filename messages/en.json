@@ -113,27 +113,7 @@
         "privacy": "Privacy Policy",
         "rights": "©2026 SOA Prep. All rights reserved."
     },
-    "progress": {
-        "title": "My Progress",
-        "overview": "Overview",
-        "viewAll": "View All Stats",
-        "questionsAnswered": "Questions Answered",
-        "averageScore": "Average Score (Scale of 10)",
-        "studyStreak": "Study Streak",
-        "days": "Days",
-        "latestUpdate": "Latest Update",
-        "keepItUp": "Keep it up!",
-        "feedback": {
-            "excellent": "Excellent! Keep it up",
-            "good": "Good Result",
-            "pass": "Passed Requirements",
-            "improve": "Needs Improvement",
-            "noData": "No Simulation Data"
-        },
-        "performance": "PERFORMANCE",
-        "last7Days": "Last 7 Days",
-        "daily": "Daily"
-    },
+
     "leaderboard": {
         "badge": "Leaderboard",
         "title": "SOA Arena",
@@ -551,7 +531,12 @@
             "passRatio": "Pass Ratio",
             "count": "Count",
             "pass": "Pass",
-            "fail": "Fail"
+            "fail": "Fail",
+            "scoreTracking": "Score Evolution",
+            "target": "Target: 70% (7.0/10)",
+            "noData": "No chart data available",
+            "tooltipCorrect": "Correct",
+            "tooltipQuestions": "questions"
         },
         "history": {
             "title": "Recent History",

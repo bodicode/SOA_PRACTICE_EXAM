@@ -44,10 +44,10 @@ export default function ForgotPasswordPage() {
     }
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-blue-50 relative overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center bg-background relative overflow-hidden">
             <Link
                 href="/login"
-                className="absolute top-8 left-8 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 hover:bg-white/80 backdrop-blur-sm transition-all text-gray-600 hover:text-blue-600 font-medium group shadow-sm hover:shadow-md"
+                className="absolute top-8 left-8 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-card/50 hover:bg-card/80 backdrop-blur-sm transition-all text-muted-foreground hover:text-primary font-medium group shadow-sm hover:shadow-md"
             >
                 <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                 <span>Quay lại đăng nhập</span>
@@ -72,7 +72,7 @@ export default function ForgotPasswordPage() {
                 transition={{ duration: 0.5 }}
                 className="relative z-10 w-full max-w-lg p-6"
             >
-                <div className="bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl p-10 shadow-xl">
+                <div className="bg-card/80 backdrop-blur-xl border border-border/60 rounded-3xl p-10 shadow-xl">
                     <div className="text-center mb-8">
                         <motion.div
                             initial={{ scale: 0 }}
@@ -82,15 +82,15 @@ export default function ForgotPasswordPage() {
                         >
                             <Key className="w-8 h-8 text-white" />
                         </motion.div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Quên mật khẩu?</h1>
-                        <p className="text-gray-500">Nhập email của bạn để nhận hướng dẫn đặt lại mật khẩu</p>
+                        <h1 className="text-2xl font-bold text-foreground mb-2">Quên mật khẩu?</h1>
+                        <p className="text-muted-foreground">Nhập email của bạn để nhận hướng dẫn đặt lại mật khẩu</p>
                     </div>
 
                     <form onSubmit={handleReset} className="space-y-6">
                         <div className="space-y-2">
-                            <Label htmlFor="email" className="text-gray-700 font-medium">Email đã đăng ký</Label>
+                            <Label htmlFor="email" className="text-foreground font-medium">Email đã đăng ký</Label>
                             <div className="relative group">
-                                <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                                <Mail className="absolute left-3 top-3 w-5 h-5 text-muted-foreground group-focus-within:text-blue-600 transition-colors" />
                                 <Input
                                     id="email"
                                     type="email"
@@ -98,7 +98,7 @@ export default function ForgotPasswordPage() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
-                                    className="pl-10 h-12 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition-all rounded-xl"
+                                    className="pl-10 h-12 bg-muted/50 border-input text-foreground placeholder:text-muted-foreground focus:bg-background focus:border-blue-500 focus:ring-blue-100 transition-all rounded-xl"
                                 />
                             </div>
                         </div>

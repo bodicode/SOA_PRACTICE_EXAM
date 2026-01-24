@@ -43,12 +43,12 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Sticky Header */}
 
 
       {/* Hero Section */}
-      <section className="pt-8 pb-12 bg-white">
+      <section className="pt-8 pb-12 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative bg-[#1e293b] rounded-[2rem] p-8 md:p-16 overflow-hidden shadow-2xl">
             {/* Geometric Background Pattern */}
@@ -102,7 +102,7 @@ export default function Home() {
       {user && <HomeProgress />}
 
       {/* Features Section */}
-      <section className="pt-10 py-20 relative overflow-hidden bg-white">
+      <section className="pt-10 py-20 relative overflow-hidden bg-background">
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
           <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-50/50 rounded-full blur-[100px] mix-blend-multiply opacity-70 animate-blob" />
@@ -127,7 +127,7 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 tracking-tight leading-tight"
+              className="text-4xl lg:text-5xl font-bold text-foreground mb-6 tracking-tight leading-tight"
             >
               {tFeatures('title')}
             </motion.h2>
@@ -137,7 +137,7 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-xl text-gray-600 mx-auto leading-relaxed"
+              className="text-xl text-muted-foreground mx-auto leading-relaxed"
             >
               {tFeatures('subtitle')}
             </motion.p>
@@ -181,19 +181,17 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 + 0.3 }}
                 whileHover={{ y: -8 }}
-                className="group relative bg-white p-8 lg:p-10 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-300 h-full flex flex-col"
+                className="group relative bg-card p-8 lg:p-10 rounded-[2rem] border border-border shadow-xl shadow-border/40 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col"
               >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-gray-50 to-transparent rounded-bl-[10rem] opacity-50 group-hover:scale-110 transition-transform duration-500" />
 
                 <div className={`relative w-16 h-16 ${feature.bg} rounded-2xl flex items-center justify-center shadow-lg ${feature.shadow} mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
                   {feature.icon}
                 </div>
-
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">
                   {feature.title}
                 </h3>
-
-                <p className="text-gray-600 leading-relaxed mb-6">
+                <p className="text-muted-foreground leading-relaxed mb-6">
                   {feature.desc}
                 </p>
               </motion.div>
@@ -203,29 +201,29 @@ export default function Home() {
       </section>
 
       {/* Exam Programs Section - Deep SEO for Exam P & FM */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-blue-600 font-semibold tracking-wider uppercase text-sm">{tPrograms('badge')}</span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mt-2 mb-4">{tPrograms('title')}</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <span className="text-primary font-semibold tracking-wider uppercase text-sm">{tPrograms('badge')}</span>
+            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mt-2 mb-4">{tPrograms('title')}</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               {tPrograms('description')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             {/* Exam P Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100 hover:border-blue-200 transition-colors relative overflow-hidden group h-full flex flex-col">
+            <div className="bg-card rounded-3xl p-8 shadow-lg border border-border hover:border-blue-200 transition-colors relative overflow-hidden group h-full flex flex-col">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
               <div className="relative z-10 flex flex-col flex-1">
                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600 font-bold text-xl">P</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{tExams('p.title')}</h3>
-                <p className="text-gray-600 mb-6 line-clamp-2">
+                <h3 className="text-2xl font-bold text-foreground mb-3">{tExams('p.title')}</h3>
+                <p className="text-muted-foreground mb-6 line-clamp-2">
                   {tExams('p.description')}
                 </p>
                 <div className="space-y-3 mb-8">
                   {(tExams.raw('p.topics') as string[]).map((topic) => (
-                    <div key={topic} className="flex items-center text-sm text-gray-500">
+                    <div key={topic} className="flex items-center text-sm text-muted-foreground">
                       <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
                       {topic}
                     </div>
@@ -240,17 +238,17 @@ export default function Home() {
             </div>
 
             {/* Exam FM Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100 hover:border-indigo-200 transition-colors relative overflow-hidden group h-full flex flex-col">
+            <div className="bg-card rounded-3xl p-8 shadow-lg border border-border hover:border-indigo-200 transition-colors relative overflow-hidden group h-full flex flex-col">
               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
               <div className="relative z-10 flex flex-col flex-1">
                 <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 text-indigo-600 font-bold text-xl">FM</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{tExams('fm.title')}</h3>
-                <p className="text-gray-600 mb-6 line-clamp-2">
+                <h3 className="text-2xl font-bold text-foreground mb-3">{tExams('fm.title')}</h3>
+                <p className="text-muted-foreground mb-6 line-clamp-2">
                   {tExams('fm.description')}
                 </p>
                 <div className="space-y-3 mb-8">
                   {(tExams.raw('fm.topics') as string[]).map((topic) => (
-                    <div key={topic} className="flex items-center text-sm text-gray-500">
+                    <div key={topic} className="flex items-center text-sm text-muted-foreground">
                       <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
                       {topic}
                     </div>
@@ -316,31 +314,31 @@ export default function Home() {
       </section >
 
       {/* FAQ Section - SEO Optimization */}
-      <section className="py-20 bg-gray-50 border-t border-gray-100">
+      <section className="py-20 bg-muted/30 border-t border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">{tFaq('title')}</h2>
-            <p className="text-lg text-gray-600">{tFaq('subtitle')}</p>
+            <h2 className="text-3xl font-bold text-foreground mb-4">{tFaq('title')}</h2>
+            <p className="text-lg text-muted-foreground">{tFaq('subtitle')}</p>
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">{tFaq('q1.q')}</h3>
-              <p className="text-gray-600 leading-relaxed">
+            <div className="bg-card rounded-2xl p-8 shadow-sm border border-border hover:shadow-md transition-shadow">
+              <h3 className="text-xl font-bold text-foreground mb-3">{tFaq('q1.q')}</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 {tFaq('q1.a')}
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">{tFaq('q2.q')}</h3>
-              <p className="text-gray-600 leading-relaxed">
+            <div className="bg-card rounded-2xl p-8 shadow-sm border border-border hover:shadow-md transition-shadow">
+              <h3 className="text-xl font-bold text-foreground mb-3">{tFaq('q2.q')}</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 {tFaq('q2.a')}
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-bold text-gray-900 mb-3">{tFaq('q3.q')}</h3>
-              <p className="text-gray-600 leading-relaxed">
+            <div className="bg-card rounded-2xl p-8 shadow-sm border border-border hover:shadow-md transition-shadow">
+              <h3 className="text-xl font-bold text-foreground mb-3">{tFaq('q3.q')}</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 {tFaq('q3.a')}
               </p>
             </div>

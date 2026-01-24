@@ -113,27 +113,7 @@
         "privacy": "Bảo Mật",
         "rights": "©2026 SOA Prep. All rights reserved."
     },
-    "progress": {
-        "title": "Tiến Độ Của Tôi",
-        "overview": "Tổng quan",
-        "viewAll": "Xem Tất Cả Thống Kê",
-        "questionsAnswered": "Câu Hỏi Đã Trả Lời",
-        "averageScore": "Điểm Trung Bình (Thang 10)",
-        "studyStreak": "Chuỗi Ngày Học",
-        "days": "Ngày",
-        "latestUpdate": "Cập nhật mới nhất",
-        "keepItUp": "Giữ vững phong độ!",
-        "feedback": {
-            "excellent": "Xuất sắc! Tiếp tục phát huy",
-            "good": "Kết quả tốt",
-            "pass": "Đã đạt yêu cầu",
-            "improve": "Cần cải thiện thêm",
-            "noData": "Chưa có dữ liệu thi thử"
-        },
-        "performance": "HIỆU SUẤT",
-        "last7Days": "7 Ngày Qua",
-        "daily": "Hàng Ngày"
-    },
+
     "leaderboard": {
         "badge": "Bảng Xếp Hạng",
         "title": "Đấu Trường SOA",
@@ -551,7 +531,12 @@
             "passRatio": "Tỉ lệ Đậu",
             "count": "Số lượng",
             "pass": "Đậu",
-            "fail": "Trượt"
+            "fail": "Trượt",
+            "scoreTracking": "Theo dõi điểm số thi thử",
+            "target": "Mục tiêu: 70% (7.0/10)",
+            "noData": "Chưa có dữ liệu biểu đồ",
+            "tooltipCorrect": "Đúng",
+            "tooltipQuestions": "câu"
         },
         "history": {
             "title": "Lịch Sử Làm Bài Gần Đây",

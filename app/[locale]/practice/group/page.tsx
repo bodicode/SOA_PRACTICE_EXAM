@@ -61,38 +61,38 @@ export default function GroupStudyLobby() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 py-12 px-4 flex items-center justify-center">
+        <div className="min-h-screen bg-background py-12 px-4 flex items-center justify-center">
             <div className="max-w-4xl w-full grid md:grid-cols-2 gap-8">
 
                 {/* Intro Section */}
                 <div className="flex flex-col justify-center space-y-6">
                     <div className="space-y-2">
-                        <h1 className="text-4xl font-extrabold text-[#003366] flex items-center gap-3">
+                        <h1 className="text-4xl font-extrabold text-foreground flex items-center gap-3">
                             <Users className="w-10 h-10" />
                             {t('title')}
                         </h1>
-                        <p className="text-lg text-gray-600">
+                        <p className="text-lg text-muted-foreground">
                             {t('subtitle')}
                         </p>
                     </div>
 
                     <div className="space-y-4">
                         <div className="flex items-start gap-4">
-                            <div className="bg-white p-3 rounded-xl shadow-sm">
-                                <Users className="w-6 h-6 text-blue-600" />
+                            <div className="bg-card p-3 rounded-xl shadow-sm border border-border">
+                                <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-gray-900">{t('features.realtimeTitle')}</h3>
-                                <p className="text-sm text-gray-500">{t('features.realtimeDesc')}</p>
+                                <h3 className="font-semibold text-foreground">{t('features.realtimeTitle')}</h3>
+                                <p className="text-sm text-muted-foreground">{t('features.realtimeDesc')}</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-4">
-                            <div className="bg-white p-3 rounded-xl shadow-sm">
-                                <ArrowRight className="w-6 h-6 text-green-600" />
+                            <div className="bg-card p-3 rounded-xl shadow-sm border border-border">
+                                <ArrowRight className="w-6 h-6 text-green-600 dark:text-green-400" />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-gray-900">{t('features.progressTitle')}</h3>
-                                <p className="text-sm text-gray-500">{t('features.progressDesc')}</p>
+                                <h3 className="font-semibold text-foreground">{t('features.progressTitle')}</h3>
+                                <p className="text-sm text-muted-foreground">{t('features.progressDesc')}</p>
                             </div>
                         </div>
                     </div>
@@ -101,16 +101,16 @@ export default function GroupStudyLobby() {
                 {/* Action Cards */}
                 <div className="flex flex-col gap-6">
                     {/* Create Room */}
-                    <Card className="border-l-4 border-blue-600 shadow-md hover:shadow-xl transition-all cursor-pointer" onClick={handleCreateRoom}>
+                    <Card className="border-l-4 border-l-blue-600 shadow-md hover:shadow-xl transition-all cursor-pointer bg-card" onClick={handleCreateRoom}>
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-blue-800">
+                            <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
                                 <Plus className="w-5 h-5" /> {t('create.title')}
                             </CardTitle>
                             <CardDescription>{t('create.desc')}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Button
-                                className="w-full bg-blue-600 hover:bg-blue-700"
+                                className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
                                 disabled={isCreating}
                             >
                                 {isCreating ? t('create.loading') : t('create.button')}
@@ -119,9 +119,9 @@ export default function GroupStudyLobby() {
                     </Card>
 
                     {/* Join Room */}
-                    <Card className="border-l-4 border-green-600 shadow-md hover:shadow-xl transition-all">
+                    <Card className="border-l-4 border-l-green-600 shadow-md hover:shadow-xl transition-all bg-card">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-green-800">
+                            <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
                                 <LogIn className="w-5 h-5" /> {t('join.title')}
                             </CardTitle>
                             <CardDescription>{t('join.desc')}</CardDescription>
@@ -130,7 +130,7 @@ export default function GroupStudyLobby() {
                             <div className="space-y-2">
                                 <Input
                                     placeholder={t('join.placeholder')}
-                                    className="text-center text-lg tracking-widest uppercase font-bold text-gray-700"
+                                    className="text-center text-lg tracking-widest uppercase font-bold text-foreground bg-input"
                                     maxLength={6}
                                     value={roomCode}
                                     onChange={(e) => setRoomCode(e.target.value)}
@@ -138,7 +138,7 @@ export default function GroupStudyLobby() {
                             </div>
                             <Button
                                 variant="outline"
-                                className="w-full border-green-600 text-green-700 hover:bg-green-50"
+                                className="w-full border-green-600 text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950/20"
                                 onClick={handleJoinRoom}
                                 disabled={isJoining}
                             >

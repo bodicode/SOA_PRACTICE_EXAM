@@ -71,41 +71,41 @@ export default function ExamModeSelectionPage() {
     if (!category) return <div className="min-h-screen flex items-center justify-center">{t('notFound')}</div>
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6 md:p-12">
+        <div className="min-h-screen bg-background p-6 md:p-12">
             <div className="max-w-4xl mx-auto">
-                <Link href="/practice" className="text-gray-500 hover:text-[#003366] mb-6 inline-flex items-center gap-2">
+                <Link href="/practice" className="text-muted-foreground hover:text-primary mb-6 inline-flex items-center gap-2">
                     {t('back')}
                 </Link>
 
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-[#003366] mb-2">{category.name}</h1>
-                    <p className="text-gray-600">{t('subtitle')}</p>
+                    <h1 className="text-3xl font-bold text-foreground mb-2">{category.name}</h1>
+                    <p className="text-muted-foreground">{t('subtitle')}</p>
                 </div>
 
                 <Tabs defaultValue="practice" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 mb-8 h-auto p-1 bg-white border border-gray-200 rounded-xl">
+                    <TabsList className="grid w-full grid-cols-2 mb-8 h-auto p-1 bg-muted border border-border rounded-xl">
                         <TabsTrigger
                             value="practice"
-                            className="flex flex-col gap-2 py-4 data-[state=active]:bg-blue-50 data-[state=active]:text-[#003366] data-[state=active]:border-blue-200 border border-transparent rounded-lg transition-all"
+                            className="flex flex-col gap-2 py-4 data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm border border-transparent rounded-lg transition-all"
                         >
                             <Settings className="w-6 h-6" />
                             <div className="font-bold">{t('modes.practice.title')}</div>
-                            <span className="text-xs font-normal text-gray-500">{t('modes.practice.desc')}</span>
+                            <span className="text-xs font-normal text-muted-foreground">{t('modes.practice.desc')}</span>
                         </TabsTrigger>
                         <TabsTrigger
                             value="exam"
-                            className="flex flex-col gap-2 py-4 data-[state=active]:bg-blue-50 data-[state=active]:text-[#003366] data-[state=active]:border-blue-200 border border-transparent rounded-lg transition-all"
+                            className="flex flex-col gap-2 py-4 data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm border border-transparent rounded-lg transition-all"
                         >
                             <AlertCircle className="w-6 h-6" />
                             <div className="font-bold">{t('modes.exam.title')}</div>
-                            <span className="text-xs font-normal text-gray-500">{t('modes.exam.desc')}</span>
+                            <span className="text-xs font-normal text-muted-foreground">{t('modes.exam.desc')}</span>
                         </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="practice">
-                        <Card className="border-t-4 border-t-green-500 shadow-md">
+                        <Card className="border-t-4 border-t-green-500 shadow-md bg-card">
                             <CardHeader>
-                                <CardTitle className="text-green-700 flex items-center gap-2">
+                                <CardTitle className="text-green-600 dark:text-green-400 flex items-center gap-2">
                                     <Settings className="w-5 h-5" />
                                     {t('practice.title')}
                                 </CardTitle>
@@ -115,7 +115,7 @@ export default function ExamModeSelectionPage() {
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="space-y-4">
-                                    <h3 className="font-semibold text-gray-700">{t('practice.modeLabel')}</h3>
+                                    <h3 className="font-semibold text-foreground">{t('practice.modeLabel')}</h3>
                                     <Tabs defaultValue="random" onValueChange={(v) => {
                                         if (v === 'random') {
                                             setRangeMode(false)
@@ -123,15 +123,15 @@ export default function ExamModeSelectionPage() {
                                             setRangeMode(true)
                                         }
                                     }}>
-                                        <TabsList className="w-full grid grid-cols-2">
-                                            <TabsTrigger value="random">{t('practice.random')}</TabsTrigger>
-                                            <TabsTrigger value="range">{t('practice.range')}</TabsTrigger>
+                                        <TabsList className="w-full grid grid-cols-2 bg-muted">
+                                            <TabsTrigger value="random" className="data-[state=active]:bg-card">{t('practice.random')}</TabsTrigger>
+                                            <TabsTrigger value="range" className="data-[state=active]:bg-card">{t('practice.range')}</TabsTrigger>
                                         </TabsList>
                                     </Tabs>
                                 </div>
 
                                 {rangeMode && (
-                                    <div className="grid grid-cols-2 gap-4 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                                    <div className="grid grid-cols-2 gap-4 bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-lg border border-yellow-200 dark:border-yellow-900/30">
                                         <div className="space-y-2">
                                             <Label>{t('practice.from')}</Label>
                                             <Input
@@ -139,6 +139,7 @@ export default function ExamModeSelectionPage() {
                                                 min={1}
                                                 max={category.questionsCount}
                                                 value={rangeStart}
+                                                className="bg-background"
                                                 onChange={(e) => {
                                                     const valStr = e.target.value
                                                     if (valStr === '') {
@@ -173,7 +174,7 @@ export default function ExamModeSelectionPage() {
                                             />
                                         </div>
                                         <div className="col-span-2">
-                                            <p className="text-xs text-yellow-800">
+                                            <p className="text-xs text-yellow-800 dark:text-yellow-500">
                                                 {t('practice.rangeDesc', { count: questionCount, start: rangeStart || 1, end: rangeEnd || category.questionsCount })}
                                             </p>
                                         </div>
@@ -184,38 +185,38 @@ export default function ExamModeSelectionPage() {
                                     <div className="space-y-2">
                                         <Label>{t('practice.countLabel')}</Label>
                                         <div className="relative">
-                                            <BookOpen className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                            <BookOpen className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                                             <Input
                                                 type="number"
                                                 min={1}
                                                 max={rangeMode ? ((typeof rangeEnd === 'number' ? rangeEnd : category.questionsCount) - (typeof rangeStart === 'number' ? rangeStart : 1) + 1) : 100}
                                                 value={questionCount}
                                                 onChange={(e) => setQuestionCount(parseInt(e.target.value) || 0)}
-                                                className="pl-10"
+                                                className="pl-10 bg-background"
                                             />
                                         </div>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-xs text-muted-foreground">
                                             Tối đa: {rangeMode ? ((typeof rangeEnd === 'number' ? rangeEnd : category.questionsCount) - (typeof rangeStart === 'number' ? rangeStart : 1) + 1) : category.questionsCount} {t('practice.maxSuffix')}
                                         </p>
                                     </div>
                                     <div className="space-y-2">
                                         <Label>{t('practice.timeLabel')}</Label>
                                         <div className="relative">
-                                            <Clock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                            <Clock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                                             <Input
                                                 type="number"
                                                 min={1}
                                                 max={300}
                                                 value={timeLimit}
                                                 onChange={(e) => setTimeLimit(parseInt(e.target.value) || 0)}
-                                                className="pl-10"
+                                                className="pl-10 bg-background"
                                             />
                                         </div>
-                                        <p className="text-xs text-gray-500">{t('practice.timeHint')}</p>
+                                        <p className="text-xs text-muted-foreground">{t('practice.timeHint')}</p>
                                     </div>
                                 </div>
 
-                                <div className="bg-green-50 p-4 rounded-lg text-sm text-green-800 border border-green-200">
+                                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-sm text-green-800 dark:text-green-300 border border-green-200 dark:border-green-900/30">
                                     💡 <strong>{t('practice.tipTitle')}</strong> {t('practice.tipDesc')}
                                 </div>
 
@@ -228,9 +229,9 @@ export default function ExamModeSelectionPage() {
                     </TabsContent>
 
                     <TabsContent value="exam">
-                        <Card className="border-t-4 border-t-red-500 shadow-md">
+                        <Card className="border-t-4 border-t-red-500 shadow-md bg-card">
                             <CardHeader>
-                                <CardTitle className="text-red-700 flex items-center gap-2">
+                                <CardTitle className="text-red-600 dark:text-red-400 flex items-center gap-2">
                                     <AlertCircle className="w-5 h-5" />
                                     {t('exam.title')}
                                 </CardTitle>
@@ -240,36 +241,36 @@ export default function ExamModeSelectionPage() {
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div className="bg-gray-100 p-4 rounded-lg text-center">
-                                        <div className="text-2xl font-bold text-gray-900">30</div>
-                                        <div className="text-xs text-gray-500 uppercase font-semibold">{t('exam.stats.questions')}</div>
+                                    <div className="bg-muted p-4 rounded-lg text-center">
+                                        <div className="text-2xl font-bold text-foreground">30</div>
+                                        <div className="text-xs text-muted-foreground uppercase font-semibold">{t('exam.stats.questions')}</div>
                                     </div>
-                                    <div className="bg-gray-100 p-4 rounded-lg text-center">
-                                        <div className="text-2xl font-bold text-gray-900">180</div>
-                                        <div className="text-xs text-gray-500 uppercase font-semibold">{t('exam.stats.minutes')}</div>
+                                    <div className="bg-muted p-4 rounded-lg text-center">
+                                        <div className="text-2xl font-bold text-foreground">180</div>
+                                        <div className="text-xs text-muted-foreground uppercase font-semibold">{t('exam.stats.minutes')}</div>
                                     </div>
-                                    <div className="bg-gray-100 p-4 rounded-lg text-center">
-                                        <div className="text-2xl font-bold text-gray-900">70%</div>
-                                        <div className="text-xs text-gray-500 uppercase font-semibold">{t('exam.stats.passingScore')}</div>
+                                    <div className="bg-muted p-4 rounded-lg text-center">
+                                        <div className="text-2xl font-bold text-foreground">70%</div>
+                                        <div className="text-xs text-muted-foreground uppercase font-semibold">{t('exam.stats.passingScore')}</div>
                                     </div>
-                                    <div className="bg-gray-100 p-4 rounded-lg text-center">
-                                        <div className="text-2xl font-bold text-gray-900">CBT</div>
-                                        <div className="text-xs text-gray-500 uppercase font-semibold">{t('exam.stats.interface')}</div>
+                                    <div className="bg-muted p-4 rounded-lg text-center">
+                                        <div className="text-2xl font-bold text-foreground">CBT</div>
+                                        <div className="text-xs text-muted-foreground uppercase font-semibold">{t('exam.stats.interface')}</div>
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
                                     <div className="flex items-start gap-3">
-                                        <div className="w-5 h-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">1</div>
-                                        <p className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: t.raw('exam.rules.1') }} />
+                                        <div className="w-5 h-5 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 mt-0.5">1</div>
+                                        <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: t.raw('exam.rules.1') }} />
                                     </div>
                                     <div className="flex items-start gap-3">
-                                        <div className="w-5 h-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">2</div>
-                                        <p className="text-sm text-gray-700">{t('exam.rules.2')}</p>
+                                        <div className="w-5 h-5 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 mt-0.5">2</div>
+                                        <p className="text-sm text-muted-foreground">{t('exam.rules.2')}</p>
                                     </div>
                                     <div className="flex items-start gap-3">
-                                        <div className="w-5 h-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5">3</div>
-                                        <p className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: t.raw('exam.rules.3') }} />
+                                        <div className="w-5 h-5 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 mt-0.5">3</div>
+                                        <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: t.raw('exam.rules.3') }} />
                                     </div>
                                 </div>
 

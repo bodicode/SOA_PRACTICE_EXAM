@@ -56,18 +56,18 @@ export default function ExamCategoryList({ categories }: ExamCategoryListProps) 
         <>
             <div className="grid md:grid-cols-2 gap-4">
                 {categories.map((exam) => (
-                    <Card key={exam.id} className="hover:shadow-lg transition-shadow border-l-4 border-[#0066cc]">
+                    <Card key={exam.id} className="hover:shadow-lg transition-shadow border-l-4 border-l-primary/70">
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-[#003366] text-lg">{exam.name}</CardTitle>
+                            <CardTitle className="text-primary text-lg">{exam.name}</CardTitle>
                             <CardDescription>
                                 {exam.parentName ? `${t('belongsTo')}: ${exam.parentName}` : t('official')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="flex justify-between items-center">
-                            <span className="text-sm text-gray-500">{exam.questionsCount} {t('questions')}</span>
+                            <span className="text-sm text-muted-foreground">{exam.questionsCount} {t('questions')}</span>
                             <Button
                                 size="sm"
-                                className="bg-[#003366] hover:bg-[#002244]"
+                                className="bg-primary hover:bg-primary/90"
                                 onClick={() => handleStart(exam.id)}
                             >
                                 {t('start')}

@@ -186,15 +186,15 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100">
+        <div className="min-h-screen bg-background">
             <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-6">
 
                 {/* Hero Header with Banner */}
-                <div className="relative overflow-hidden rounded-3xl bg-white shadow-xl border border-gray-100/50">
+                <div className="relative overflow-hidden rounded-3xl bg-card shadow-xl border border-border/50">
                     {/* Gradient Banner */}
-                    <div className="h-36 sm:h-44 bg-gradient-to-r from-[#003366] via-[#0050a0] to-[#0066cc] relative">
+                    <div className="h-36 sm:h-44 bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 relative">
                         <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }}></div>
-                        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white/20 to-transparent"></div>
+                        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/20 to-transparent"></div>
                     </div>
 
                     {/* Profile Info Section */}
@@ -202,7 +202,7 @@ export default function ProfilePage() {
                         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
                             {/* Avatar with Upload */}
                             <div className="relative group">
-                                <div className="ring-4 ring-white rounded-full shadow-xl">
+                                <div className="ring-4 ring-card rounded-full shadow-xl">
                                     <Avatar className="w-28 h-28 sm:w-32 sm:h-32 cursor-pointer transition-transform group-hover:scale-105" onClick={() => document.getElementById('avatar-upload')?.click()}>
                                         <AvatarImage src={stats?.avatarUrl || user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} className="object-cover" />
                                         <AvatarFallback className="text-3xl bg-gradient-to-br from-blue-500 to-blue-600 text-white">
@@ -212,9 +212,9 @@ export default function ProfilePage() {
                                 </div>
                                 <button
                                     onClick={() => document.getElementById('avatar-upload')?.click()}
-                                    className="absolute bottom-1 right-1 p-2 bg-white rounded-full shadow-lg border border-gray-200 opacity-0 group-hover:opacity-100 transition-all hover:bg-gray-50 hover:scale-110"
+                                    className="absolute bottom-1 right-1 p-2 bg-card rounded-full shadow-lg border border-border opacity-0 group-hover:opacity-100 transition-all hover:bg-muted hover:scale-110"
                                 >
-                                    <Camera className="w-4 h-4 text-gray-600" />
+                                    <Camera className="w-4 h-4 text-muted-foreground" />
                                 </button>
                                 <input
                                     type="file"
@@ -228,12 +228,12 @@ export default function ProfilePage() {
                             {/* User Info */}
                             <div className="flex-1 text-center sm:text-left pb-2 sm:mt-20">
                                 <div className="flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-3 mb-2">
-                                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{stats?.fullName || user.fullName || "User"}</h1>
+                                    <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{stats?.fullName || user.fullName || "User"}</h1>
                                     <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 capitalize shadow-sm">
                                         {stats?.role || "Student"}
                                     </Badge>
                                 </div>
-                                <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-gray-500 text-sm justify-center sm:justify-start">
+                                <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 text-muted-foreground text-sm justify-center sm:justify-start">
                                     <span className="flex items-center gap-1.5 justify-center sm:justify-start">
                                         <Mail className="w-4 h-4" /> {user.email}
                                     </span>
@@ -248,26 +248,26 @@ export default function ProfilePage() {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Card className="group bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <Card className="group bg-card/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                         <CardContent className="p-6 flex items-center gap-4">
                             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
                                 <Trophy className="w-7 h-7" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-500">{t('stats.totalPractice')}</p>
-                                <h3 className="text-3xl font-bold text-gray-900">{stats?._count?.examSessions || 0}</h3>
+                                <p className="text-sm font-medium text-muted-foreground">{t('stats.totalPractice')}</p>
+                                <h3 className="text-3xl font-bold text-foreground">{stats?._count?.examSessions || 0}</h3>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="group bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <Card className="group bg-card/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                         <CardContent className="p-6 flex items-center gap-4">
                             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
                                 <Flame className="w-7 h-7" />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-500">{t('stats.streak')}</p>
-                                <h3 className="text-3xl font-bold text-gray-900">{stats?.studyStreak || 0} <span className="text-lg font-medium text-gray-500">{t('stats.days')}</span></h3>
+                                <p className="text-sm font-medium text-muted-foreground">{t('stats.streak')}</p>
+                                <h3 className="text-3xl font-bold text-foreground">{stats?.studyStreak || 0} <span className="text-lg font-medium text-muted-foreground">{t('stats.days')}</span></h3>
                             </div>
                         </CardContent>
                     </Card>
@@ -275,12 +275,12 @@ export default function ProfilePage() {
 
                 {/* Settings Tabs */}
                 <Tabs defaultValue="profile" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 bg-gray-100/80 p-1 rounded-xl h-auto">
-                        <TabsTrigger value="profile" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm rounded-lg py-3 text-sm font-semibold transition-all text-gray-500">
+                    <TabsList className="grid w-full grid-cols-2 bg-muted/80 p-1 rounded-xl h-auto">
+                        <TabsTrigger value="profile" className="data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-lg py-3 text-sm font-semibold transition-all text-muted-foreground">
                             <User className="w-4 h-4 mr-2" />
                             {t('tabs.profile')}
                         </TabsTrigger>
-                        <TabsTrigger value="security" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm rounded-lg py-3 text-sm font-semibold transition-all text-gray-500">
+                        <TabsTrigger value="security" className="data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-lg py-3 text-sm font-semibold transition-all text-muted-foreground">
                             <Shield className="w-4 h-4 mr-2" />
                             {t('tabs.security')}
                         </TabsTrigger>
@@ -288,20 +288,20 @@ export default function ProfilePage() {
 
                     <TabsContent value="profile" className="mt-6">
                         <div className="space-y-6">
-                            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+                            <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
                                 <CardHeader>
-                                    <CardTitle className="text-xl">{t('personalInfo.title')}</CardTitle>
-                                    <CardDescription>{t('personalInfo.description')}</CardDescription>
+                                    <CardTitle className="text-xl text-foreground">{t('personalInfo.title')}</CardTitle>
+                                    <CardDescription className="text-muted-foreground">{t('personalInfo.description')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-5">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">{t('personalInfo.displayName')}</label>
+                                        <label className="text-sm font-medium text-foreground">{t('personalInfo.displayName')}</label>
                                         <div className="relative">
-                                            <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                            <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                                             <Input
                                                 value={fullName}
                                                 onChange={(e) => setFullName(e.target.value)}
-                                                className="pl-10 h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                                                className="pl-10 h-11 border-border bg-background focus:border-primary focus:ring-primary text-foreground"
                                                 placeholder={t('personalInfo.placeholderName')}
                                             />
                                         </div>
@@ -309,11 +309,11 @@ export default function ProfilePage() {
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">{t('personalInfo.country')}</label>
+                                            <label className="text-sm font-medium text-foreground">{t('personalInfo.country')}</label>
                                             <select
                                                 value={country}
                                                 onChange={(e) => setCountry(e.target.value)}
-                                                className="flex h-11 w-full rounded-md border border-gray-200 bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                                                className="flex h-11 w-full rounded-md border border-border bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 text-foreground"
                                             >
                                                 <option value="VN">Vietnam 🇻🇳</option>
                                                 <option value="US">USA 🇺🇸</option>
@@ -326,23 +326,23 @@ export default function ProfilePage() {
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">{t('personalInfo.level')} <span className="text-xs text-blue-500 font-normal ml-1">{t('personalInfo.levelAuto')}</span></label>
-                                            <div className="flex h-11 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-500 cursor-not-allowed">
+                                            <label className="text-sm font-medium text-foreground">{t('personalInfo.level')} <span className="text-xs text-primary font-normal ml-1">{t('personalInfo.levelAuto')}</span></label>
+                                            <div className="flex h-11 w-full rounded-md border border-border bg-muted px-3 py-2.5 text-sm text-muted-foreground cursor-not-allowed">
                                                 {level === 'Expert' && t('levels.Expert')}
                                                 {level === 'Advanced' && t('levels.Advanced')}
                                                 {level === 'Intermediate' && t('levels.Intermediate')}
                                                 {level === 'Beginner' && t('levels.Beginner')}
                                             </div>
-                                            <p className="text-[10px] text-gray-400">
+                                            <p className="text-[10px] text-muted-foreground">
                                                 {t('personalInfo.levelHint')}
                                             </p>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">{t('personalInfo.email')}</label>
-                                        <Input value={user.email || ''} disabled className="bg-gray-50 h-11" />
-                                        <p className="text-xs text-gray-500">{t('personalInfo.emailHint')}</p>
+                                        <label className="text-sm font-medium text-foreground">{t('personalInfo.email')}</label>
+                                        <Input value={user.email || ''} disabled className="bg-muted h-11 border-border text-muted-foreground" />
+                                        <p className="text-xs text-muted-foreground">{t('personalInfo.emailHint')}</p>
                                     </div>
                                     <div className="pt-2">
                                         <Button
@@ -364,47 +364,47 @@ export default function ProfilePage() {
 
                     <TabsContent value="security" className="mt-6">
                         <div className="space-y-6">
-                            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+                            <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-lg">
                                 <CardHeader>
-                                    <CardTitle className="text-xl">{t('security.title')}</CardTitle>
-                                    <CardDescription>{t('security.description')}</CardDescription>
+                                    <CardTitle className="text-xl text-foreground">{t('security.title')}</CardTitle>
+                                    <CardDescription className="text-muted-foreground">{t('security.description')}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-5">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">{t('security.currentPassword')}</label>
+                                        <label className="text-sm font-medium text-foreground">{t('security.currentPassword')}</label>
                                         <div className="relative">
-                                            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                                             <Input
                                                 type="password"
                                                 value={oldPassword}
                                                 onChange={(e) => setOldPassword(e.target.value)}
-                                                className="pl-10 h-11 border-gray-200"
+                                                className="pl-10 h-11 border-border bg-background text-foreground"
                                                 placeholder="••••••••"
                                             />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">{t('security.newPassword')}</label>
+                                        <label className="text-sm font-medium text-foreground">{t('security.newPassword')}</label>
                                         <div className="relative">
-                                            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                                             <Input
                                                 type="password"
                                                 value={newPassword}
                                                 onChange={(e) => setNewPassword(e.target.value)}
-                                                className="pl-10 h-11 border-gray-200"
+                                                className="pl-10 h-11 border-border bg-background text-foreground"
                                                 placeholder="••••••••"
                                             />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">{t('security.confirmPassword')}</label>
+                                        <label className="text-sm font-medium text-foreground">{t('security.confirmPassword')}</label>
                                         <div className="relative">
-                                            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                                             <Input
                                                 type="password"
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                                className="pl-10 h-11 border-gray-200"
+                                                className="pl-10 h-11 border-border bg-background text-foreground"
                                                 placeholder="••••••••"
                                             />
                                         </div>

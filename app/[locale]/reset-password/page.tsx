@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
     }
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-blue-50 relative overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center bg-background relative overflow-hidden">
             {/* Animated Background */}
             <div className="absolute inset-0 z-0">
                 <motion.div
@@ -89,21 +89,21 @@ export default function ResetPasswordPage() {
                 transition={{ duration: 0.5 }}
                 className="relative z-10 w-full max-w-lg p-6"
             >
-                <div className="bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl p-10 shadow-xl">
+                <div className="bg-card/80 backdrop-blur-xl border border-border/60 rounded-3xl p-10 shadow-xl">
                     <div className="text-center mb-8">
                         <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-600/20">
                             <ShieldCheck className="w-8 h-8 text-white" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Đặt lại mật khẩu</h1>
-                        <p className="text-gray-500">Nhập mật khẩu mới cho tài khoản của bạn</p>
+                        <h1 className="text-2xl font-bold text-foreground mb-2">Đặt lại mật khẩu</h1>
+                        <p className="text-muted-foreground">Nhập mật khẩu mới cho tài khoản của bạn</p>
                     </div>
 
                     <form onSubmit={handleUpdatePassword} className="space-y-6">
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="password" className="text-gray-700 font-medium">Mật khẩu mới</Label>
+                                <Label htmlFor="password" className="text-foreground font-medium">Mật khẩu mới</Label>
                                 <div className="relative group">
-                                    <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                                    <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground group-focus-within:text-blue-600 transition-colors" />
                                     <Input
                                         id="password"
                                         type={showPassword ? "text" : "password"}
@@ -111,12 +111,12 @@ export default function ResetPasswordPage() {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
-                                        className="pl-10 pr-10 h-12 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition-all rounded-xl"
+                                        className="pl-10 pr-10 h-12 bg-muted/50 border-input text-foreground placeholder:text-muted-foreground focus:bg-background focus:border-blue-500 focus:ring-blue-100 transition-all rounded-xl"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-3 text-gray-400 hover:text-blue-600 transition-colors"
+                                        className="absolute right-3 top-3 text-muted-foreground hover:text-blue-600 transition-colors"
                                     >
                                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                     </button>
@@ -124,9 +124,9 @@ export default function ResetPasswordPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">Xác nhận mật khẩu</Label>
+                                <Label htmlFor="confirmPassword" className="text-foreground font-medium">Xác nhận mật khẩu</Label>
                                 <div className="relative group">
-                                    <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                                    <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground group-focus-within:text-blue-600 transition-colors" />
                                     <Input
                                         id="confirmPassword"
                                         type={showPassword ? "text" : "password"}
@@ -134,7 +134,7 @@ export default function ResetPasswordPage() {
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                         required
-                                        className="pl-10 h-12 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition-all rounded-xl"
+                                        className="pl-10 h-12 bg-muted/50 border-input text-foreground placeholder:text-muted-foreground focus:bg-background focus:border-blue-500 focus:ring-blue-100 transition-all rounded-xl"
                                     />
                                 </div>
                             </div>
@@ -145,8 +145,8 @@ export default function ResetPasswordPage() {
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 className={`p-4 rounded-xl text-sm flex items-start gap-3 ${msg.type === 'success'
-                                        ? 'bg-green-50 border border-green-200 text-green-700'
-                                        : 'bg-red-50 border border-red-200 text-red-600'
+                                    ? 'bg-green-50 border border-green-200 text-green-700'
+                                    : 'bg-red-50 border border-red-200 text-red-600'
                                     }`}
                             >
                                 <div className={`w-2 h-2 mt-1.5 rounded-full shrink-0 ${msg.type === 'success' ? 'bg-green-500' : 'bg-red-500'
