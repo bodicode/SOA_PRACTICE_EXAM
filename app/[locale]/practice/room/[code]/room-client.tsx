@@ -611,7 +611,7 @@ export default function RoomClient({ roomCode, roomId, hostUserId, currentUser }
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-white">
+        <div className="flex flex-col min-h-screen bg-white light-force">
             {/* Header */}
             <header className="sticky top-0 h-16 bg-[#003366] text-white flex items-center justify-between px-4 shadow-md z-50 font-sans">
                 <div className="font-bold text-lg flex items-center gap-2">

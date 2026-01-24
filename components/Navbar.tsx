@@ -19,6 +19,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ModeToggle } from './ui/mode-toggle'
 
 export function Navbar() {
     const { user, isLoading, logout } = useUserStore()
@@ -64,7 +65,7 @@ export function Navbar() {
 
     return (
         <header
-            className={`sticky top-0 z-50 w-full border-b border-gray-100 bg-white transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
+            className={`sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -73,17 +74,25 @@ export function Navbar() {
                         <Link href="/" className="flex items-center gap-2 group">
                             <div className="relative w-40 h-16 flex items-center justify-center group-hover:scale-105 transition-transform overflow-hidden">
                                 <Image
-                                    src="/logo.png"
+                                    src="/logo-light-theme.png"
                                     alt="SOA Prep Logo"
                                     width={160}
                                     height={64}
                                     priority
-                                    className="w-full h-full object-contain object-center scale-[2.5]"
+                                    className="w-full h-full object-contain object-center scale-[2.5] dark:hidden"
+                                />
+                                <Image
+                                    src="/logo-dark-theme.png"
+                                    alt="SOA Prep Logo"
+                                    width={160}
+                                    height={64}
+                                    priority
+                                    className="w-full h-full object-contain object-center scale-[2.5] hidden dark:block absolute inset-0"
                                 />
                             </div>
                         </Link>
                         {user && (
-                            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
+                            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
                                 <Link href="/practice" className="hover:text-blue-600 transition-colors">
                                     {t('practice')}
                                 </Link>
@@ -97,6 +106,7 @@ export function Navbar() {
                         )}
                     </div>
                     <div className="flex items-center gap-3">
+                        <ModeToggle />
                         {/* Language Switcher */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -106,15 +116,25 @@ export function Navbar() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => switchLocale('vi')} className="cursor-pointer">
-                                    🇻🇳 Tiếng Việt
+                                    <div className="flex items-center gap-2">
+                                        <div className="relative w-5 h-4 overflow-hidden rounded-[2px] shadow-sm">
+                                            <Image src="/vn.svg" alt="VN" fill className="object-cover" />
+                                        </div>
+                                        <span>Tiếng Việt</span>
+                                    </div>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => switchLocale('en')} className="cursor-pointer">
-                                    🇬🇧 English
+                                    <div className="flex items-center gap-2">
+                                        <div className="relative w-5 h-4 overflow-hidden rounded-[2px] shadow-sm">
+                                            <Image src="/gb.svg" alt="UK" fill className="object-cover" />
+                                        </div>
+                                        <span>English</span>
+                                    </div>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                         {isLoading ? (
-                            <div className="w-24 h-9 bg-gray-100 animate-pulse rounded-full" />
+                            <div className="w-24 h-9 bg-muted animate-pulse rounded-full" />
                         ) : user ? (
                             <div className="flex items-center gap-4">
                                 <div
@@ -125,11 +145,11 @@ export function Navbar() {
                                     <DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="relative h-10 w-auto p-0 hover:bg-transparent px-2 gap-2 rounded-full">
-                                                <div className="text-sm font-medium text-gray-700 hidden sm:block">
+                                                <div className="text-sm font-medium text-foreground hidden sm:block">
                                                     {user.fullName || user.email?.split('@')[0]}
                                                 </div>
-                                                <Avatar className="h-9 w-9 border border-gray-200 shadow-sm transition-transform hover:scale-105 relative bg-blue-100">
-                                                    <AvatarFallback className="bg-blue-100 text-blue-600 font-bold flex items-center justify-center w-full h-full">
+                                                <Avatar className="h-9 w-9 border border-border shadow-sm transition-transform hover:scale-105 relative bg-muted">
+                                                    <AvatarFallback className="bg-muted text-foreground font-bold flex items-center justify-center w-full h-full">
                                                         {user.fullName ? user.fullName[0].toUpperCase() : user.email?.[0]?.toUpperCase()}
                                                     </AvatarFallback>
                                                     {user.avatarUrl && (
@@ -178,7 +198,7 @@ export function Navbar() {
                         ) : (
                             <>
                                 <Link href="/login">
-                                    <Button variant="ghost" className="text-gray-600 hover:text-gray-900 font-medium">
+                                    <Button variant="ghost" className="text-muted-foreground hover:text-foreground font-medium">
                                         {t('login')}
                                     </Button>
                                 </Link>

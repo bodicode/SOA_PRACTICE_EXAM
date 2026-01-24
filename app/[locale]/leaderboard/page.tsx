@@ -88,7 +88,7 @@ export default function LeaderboardPage() {
             animate={{ opacity: 1, y: 0 }}
             className={cn(
                 "flex items-center p-4 rounded-xl mb-3 border transition-all duration-200",
-                isMe ? "bg-blue-50 border-blue-200 shadow-md ring-1 ring-blue-300 transform scale-[1.01]" : "bg-white border-gray-100 hover:shadow-sm hover:border-gray-200"
+                isMe ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 shadow-md ring-1 ring-blue-300 dark:ring-blue-700 transform scale-[1.01]" : "bg-card border-border hover:shadow-sm hover:border-muted-foreground/20"
             )}
         >
             {/* Rank */}
@@ -96,7 +96,7 @@ export default function LeaderboardPage() {
                 {entry.rank <= 3 ? (
                     <Trophy className={cn("w-6 h-6", getMedalColor(entry.rank))} />
                 ) : (
-                    <span className="font-bold text-gray-500 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm">
+                    <span className="font-bold text-muted-foreground w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm">
                         {entry.rank}
                     </span>
                 )}
@@ -110,7 +110,7 @@ export default function LeaderboardPage() {
                         <AvatarFallback>{entry.fullName?.[0]}</AvatarFallback>
                     </Avatar>
                     {entry.country && (
-                        <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-[2px] shadow-sm text-xs" title={entry.country}>
+                        <div className="absolute -bottom-1 -right-1 bg-card rounded-full p-[2px] shadow-sm text-xs" title={entry.country}>
                             {(() => {
                                 const c = COUNTRIES.find(c => c.code === entry.country);
                                 if (c?.nameKey) return t(c.nameKey as any).split(' ').pop();
@@ -120,11 +120,11 @@ export default function LeaderboardPage() {
                     )}
                 </div>
                 <div className="overflow-hidden">
-                    <h3 className={cn("font-bold truncate", isMe ? "text-blue-700" : "text-gray-900")}>
-                        {entry.fullName || t('user.hidden')} {isMe && <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{t('user.you')}</span>}
+                    <h3 className={cn("font-bold truncate", isMe ? "text-blue-700 dark:text-blue-400" : "text-foreground")}>
+                        {entry.fullName || t('user.hidden')} {isMe && <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full">{t('user.you')}</span>}
                     </h3>
-                    <p className="text-xs text-gray-500 flex items-center gap-1">
-                        <span className="bg-gray-100 px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <span className="bg-muted px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide">
                             {t(`levels.${entry.level || 'Beginner'}` as any)}
                         </span>
                     </p>
@@ -134,19 +134,19 @@ export default function LeaderboardPage() {
             {/* Stats */}
             <div className="flex gap-4 sm:gap-8 ml-4 text-right">
                 <div className="hidden sm:block">
-                    <div className="text-xs text-gray-400 font-medium uppercase">{t('columns.questions')}</div>
-                    <div className="font-bold text-gray-700">{entry.totalQuestions}</div>
+                    <div className="text-xs text-muted-foreground font-medium uppercase">{t('columns.questions')}</div>
+                    <div className="font-bold text-foreground">{entry.totalQuestions}</div>
                 </div>
                 <div>
-                    <div className="text-xs text-gray-400 font-medium uppercase">{t('columns.score')}</div>
-                    <div className="font-bold text-blue-600 text-lg">{entry.averageScore.toFixed(1)}</div>
+                    <div className="text-xs text-muted-foreground font-medium uppercase">{t('columns.score')}</div>
+                    <div className="font-bold text-blue-600 dark:text-blue-400 text-lg">{entry.averageScore.toFixed(1)}</div>
                 </div>
             </div>
         </motion.div>
     )
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-20">
+        <div className="min-h-screen bg-background pb-20">
             {/* Header */}
             <div className="bg-gradient-to-br from-indigo-900 via-blue-900 to-blue-800 text-white pb-20 pt-10 px-4 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
@@ -170,19 +170,19 @@ export default function LeaderboardPage() {
 
             {/* Filters & Content */}
             <div className="max-w-4xl mx-auto px-4 -mt-10 relative z-20">
-                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-xl mb-6 ring-1 ring-gray-100">
+                <Card className="border-0 shadow-xl bg-card/80 backdrop-blur-xl mb-6 ring-1 ring-border">
                     <CardContent className="p-4 flex flex-col sm:flex-row gap-4 items-center">
                         <div className="relative flex-1 w-full">
-                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder={t('searchPlaceholder')}
-                                className="pl-9 bg-white"
+                                className="pl-9 bg-background"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
                         <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-                            <SelectTrigger className="w-full sm:w-[200px] bg-white">
+                            <SelectTrigger className="w-full sm:w-[200px] bg-background">
                                 <SelectValue placeholder={t('selectCountry')} />
                             </SelectTrigger>
                             <SelectContent>
@@ -198,13 +198,13 @@ export default function LeaderboardPage() {
 
                 <div className="space-y-1">
                     {loading ? (
-                        <div className="text-center py-20 text-gray-400">{t('loading')}</div>
+                        <div className="text-center py-20 text-muted-foreground">{t('loading')}</div>
                     ) : filteredLeaderboard.length > 0 ? (
                         filteredLeaderboard.map(entry => (
                             <UserRow key={entry.userId} entry={entry} isMe={entry.userId === Number(user?.id)} />
                         ))
                     ) : (
-                        <div className="text-center py-20 text-gray-400 bg-white rounded-xl border border-dashed">
+                        <div className="text-center py-20 text-muted-foreground bg-card rounded-xl border border-dashed border-border">
                             {t('empty')}
                         </div>
                     )}
@@ -216,10 +216,10 @@ export default function LeaderboardPage() {
                 <motion.div
                     initial={{ y: 100 }}
                     animate={{ y: 0 }}
-                    className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-2xl z-30 sm:hidden"
+                    className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 shadow-2xl z-30 sm:hidden"
                 >
                     <div className="max-w-4xl mx-auto">
-                        <div className="text-xs font-bold text-gray-400 mb-2 uppercase">{t('user.yourRank')}</div>
+                        <div className="text-xs font-bold text-muted-foreground mb-2 uppercase">{t('user.yourRank')}</div>
                         <UserRow entry={currentUserRank} isMe={true} />
                     </div>
                 </motion.div>

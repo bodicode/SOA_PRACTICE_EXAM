@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ClientLayout } from "@/components/ClientLayout";
 import StructuredData from "@/components/StructuredData";
 
@@ -82,16 +83,23 @@ export default async function LocaleLayout({
   const messages = await getMessages({ locale });
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <StructuredData />
         <NextIntlClientProvider messages={messages} locale={locale}>
           <AuthProvider>
-            <ClientLayout>
-              {children}
-            </ClientLayout>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <ClientLayout>
+                {children}
+              </ClientLayout>
+            </ThemeProvider>
           </AuthProvider>
         </NextIntlClientProvider>
       </body>

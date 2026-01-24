@@ -17,16 +17,16 @@ export default async function PracticePage({ params }: { params: Promise<{ local
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: 'practice' })
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-background">
             {/* Main Content */}
             <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <h1 className="text-4xl font-bold text-[#003366] mb-8">
+                <h1 className="text-4xl font-bold text-foreground mb-8">
                     {t('title')}
                 </h1>
 
                 {/* Notice Box */}
-                <div className="bg-gray-100 border-l-4 border-[#003366] p-6 mb-8">
-                    <p className="text-gray-700 leading-relaxed">
+                <div className="bg-muted border-l-4 border-primary p-6 mb-8">
+                    <p className="text-muted-foreground leading-relaxed">
                         {t('notice')}
                     </p>
                 </div>
@@ -52,37 +52,37 @@ export default async function PracticePage({ params }: { params: Promise<{ local
                 </div>
 
                 {/* Description */}
-                <div className="prose prose-lg max-w-none mb-12">
-                    <p className="text-gray-700 leading-relaxed mb-4">
+                <div className="prose prose-lg max-w-none mb-12 dark:prose-invert">
+                    <p className="text-muted-foreground leading-relaxed mb-4">
                         {t('description.p1')}
                     </p>
-                    <p className="text-gray-700 leading-relaxed mb-4">
+                    <p className="text-muted-foreground leading-relaxed mb-4">
                         {t('description.p2')}
                     </p>
-                    <p className="text-gray-700 leading-relaxed mb-4">
+                    <p className="text-muted-foreground leading-relaxed mb-4">
                         {t('description.p3')}
                     </p>
-                    <p className="text-gray-700 leading-relaxed">
-                        {t('description.p4')} <a href="mailto:29.hoang.10@gmail.com" className="text-[#0066cc] hover:underline">
+                    <p className="text-muted-foreground leading-relaxed">
+                        {t('description.p4')} <a href="mailto:29.hoang.10@gmail.com" className="text-blue-600 dark:text-blue-400 hover:underline">
                             29.hoang.10@gmail.com</a>.
                     </p>
                 </div>
 
                 {/* Exam Categories */}
-                <h2 className="text-2xl font-bold text-[#003366] mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-6">
                     {t('chooseExam')}
                 </h2>
 
-                <Suspense fallback={<div className="text-center py-12">{t('loading')}</div>}>
+                <Suspense fallback={<div className="text-center py-12 text-muted-foreground">{t('loading')}</div>}>
                     <CategoryListLoader />
                 </Suspense>
 
                 {/* Reporting Errors Box */}
-                <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-6">
-                    <h3 className="font-bold text-[#003366] mb-2">{t('reportError.title')}</h3>
-                    <p className="text-gray-700 text-sm">
+                <div className="mt-12 bg-card border border-border rounded-lg p-6 shadow-sm">
+                    <h3 className="font-bold text-foreground mb-2">{t('reportError.title')}</h3>
+                    <p className="text-muted-foreground text-sm">
                         {t('reportError.content')} {' '}
-                        <a href="mailto:errors@soapractice.vn" className="text-[#0066cc] hover:underline">
+                        <a href="mailto:errors@soapractice.vn" className="text-blue-600 dark:text-blue-400 hover:underline">
                             29.hoang.10@gmail.com
                         </a>.
                     </p>

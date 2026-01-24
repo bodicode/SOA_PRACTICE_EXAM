@@ -11,10 +11,10 @@ import { useTranslations } from 'next-intl'
 export default function LoginPage() {
     const t = useTranslations('auth')
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-blue-50 relative overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center bg-background relative overflow-hidden">
             <Link
                 href="/"
-                className="absolute top-8 left-8 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 hover:bg-white/80 backdrop-blur-sm transition-all text-gray-600 hover:text-blue-600 font-medium group shadow-sm hover:shadow-md"
+                className="absolute top-8 left-8 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-card/50 hover:bg-card/80 backdrop-blur-sm transition-all text-muted-foreground hover:text-primary font-medium group shadow-sm hover:shadow-md"
             >
                 <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                 <span>{t('home')}</span>

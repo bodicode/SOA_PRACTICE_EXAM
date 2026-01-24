@@ -110,15 +110,15 @@ export function HeroSection() {
                 transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                 className="relative perspective-1000"
             >
-                <div className="relative z-10 bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(30,58,138,0.15)] border border-white/50 p-8 overflow-hidden transform-gpu hover:scale-[1.01] transition-transform duration-500">
+                <div className="relative z-10 bg-card/70 backdrop-blur-xl rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(30,58,138,0.15)] border border-border/50 p-8 overflow-hidden transform-gpu hover:scale-[1.01] transition-transform duration-500">
                     <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-background/40 to-transparent pointer-events-none" />
 
                     <div className="relative z-20">
                         <div className="flex justify-between items-center mb-6">
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900">Chào, {user.fullName || "User"}! 👋</h3>
-                                <p className="text-sm text-gray-500">Tiếp tục giữ vững phong độ nhé.</p>
+                                <h3 className="text-xl font-bold text-foreground">Chào, {user.fullName || "User"}! 👋</h3>
+                                <p className="text-sm text-muted-foreground">Tiếp tục giữ vững phong độ nhé.</p>
                             </div>
                         </div>
 
@@ -128,28 +128,28 @@ export function HeroSection() {
                                 <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mb-2 text-orange-600">
                                     <TrendingUp className="w-5 h-5" />
                                 </div>
-                                <div className="text-2xl font-bold text-gray-900">{stats.studyStreak}</div>
-                                <div className="text-xs text-gray-500 font-medium">Ngày liên tiếp</div>
+                                <div className="text-2xl font-bold text-foreground">{stats.studyStreak}</div>
+                                <div className="text-xs text-muted-foreground font-medium">Ngày liên tiếp</div>
                             </div>
 
 
                         </div>
 
                         {/* Recent Activity Bar Chart */}
-                        <div className="bg-white/50 rounded-xl p-5 border border-gray-100 mb-6">
+                        <div className="bg-card/50 rounded-xl p-5 border border-border mb-6">
                             <div className="flex items-center justify-between mb-4">
-                                <span className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                                    <BarChart2 className="w-4 h-4 text-blue-600" /> Biểu đồ điểm số
+                                <span className="text-sm font-bold text-foreground flex items-center gap-2">
+                                    <BarChart2 className="w-4 h-4 text-primary" /> Biểu đồ điểm số
                                 </span>
-                                <span className="text-xs text-gray-400">5 bài thi gần nhất</span>
+                                <span className="text-xs text-muted-foreground">5 bài thi gần nhất</span>
                             </div>
 
                             <div className="flex justify-between h-32 gap-2">
                                 {history.length > 0 ? (
                                     history.slice(0, 5).reverse().map((session, idx) => (
                                         <div key={session.id} className="flex flex-col items-center gap-2 flex-1 h-full justify-end group">
-                                            <div className="relative w-full flex-1 flex items-end justify-center bg-gray-50/50 rounded-t-md"> {/* Added track */}
-                                                <div className="opacity-0 group-hover:opacity-100 absolute -top-8 transition-opacity bg-gray-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-10">
+                                            <div className="relative w-full flex-1 flex items-end justify-center bg-muted/50 rounded-t-md"> {/* Added track */}
+                                                <div className="opacity-0 group-hover:opacity-100 absolute -top-8 transition-opacity bg-popover text-popover-foreground text-[10px] px-2 py-1 rounded whitespace-nowrap z-10 border border-border shadow-sm">
                                                     {new Date(session.startTime).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}
                                                 </div>
                                                 <motion.div
@@ -220,7 +220,7 @@ export function HeroSection() {
                             transformOrigin: "bottom center"
                         }}
                     >
-                        <div className="relative z-10 bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(30,58,138,0.2)] border border-white/60 p-8 overflow-hidden">
+                        <div className="relative z-10 bg-card rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(30,58,138,0.2)] border border-border p-8 overflow-hidden">
                             {/* Dynamic Gradient Border Top */}
                             <div className={`absolute inset-x-0 top-0 h-1.5 transition-colors duration-500 bg-gradient-to-r ${selectedOption !== null && isFront
                                 ? selectedOption === question.correctIndex
@@ -229,7 +229,7 @@ export function HeroSection() {
                                 : "from-blue-500 via-indigo-500 to-blue-500"
                                 }`} />
 
-                            <div className="absolute inset-0 bg-gradient-to-b from-white/60 to-transparent pointer-events-none" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-background/60 to-transparent pointer-events-none" />
 
                             <div className="relative mb-6">
                                 <div className="flex justify-between items-start mb-4">
@@ -240,9 +240,9 @@ export function HeroSection() {
                                         </span>
                                         Thử Tài Actuary
                                     </div>
-                                    <span className="text-xs font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">{question.category}</span>
+                                    <span className="text-xs font-bold text-muted-foreground bg-muted px-2 py-1 rounded-md border border-border">{question.category}</span>
                                 </div>
-                                <h3 className="text-xl lg:text-2xl font-bold text-slate-800 leading-snug min-h-[64px]">
+                                <h3 className="text-xl lg:text-2xl font-bold text-foreground leading-snug min-h-[64px]">
                                     {question.question}
                                 </h3>
                             </div>
@@ -291,7 +291,7 @@ export function HeroSection() {
                                             }`}>
                                             {selectedOption === question.correctIndex ? (
                                                 <>
-                                                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-lg shrink-0 scale-110">🥳</div>
+                                                    <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center shadow-sm text-lg shrink-0 scale-110">🥳</div>
                                                     <div>
                                                         <p className="font-bold text-base">Chính xác!</p>
                                                         <p className="text-xs opacity-90 mt-0.5 font-medium">{question.explanation.correct}</p>
@@ -311,7 +311,7 @@ export function HeroSection() {
                                                 </>
                                             ) : (
                                                 <>
-                                                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-lg shrink-0 scale-110">🤔</div>
+                                                    <div className="w-10 h-10 rounded-full bg-card flex items-center justify-center shadow-sm text-lg shrink-0 scale-110">🤔</div>
                                                     <div>
                                                         <p className="font-bold text-base">Chưa đúng rồi</p>
                                                         <p className="text-xs opacity-90 mt-0.5 font-medium">{question.explanation.incorrect}</p>
@@ -323,7 +323,7 @@ export function HeroSection() {
                                 )}
                             </AnimatePresence>
                             {/* Progress Indicators & Timer */}
-                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-100 flex">
+                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted flex">
                                 {/* Timer Bar - Only shows when not answered and not paused */}
                                 {selectedOption === null && isFront && (
                                     <motion.div

@@ -71,7 +71,7 @@ export default function LoginForm() {
             transition={{ duration: 0.5 }}
             className="relative z-10 w-full max-w-2xl p-6"
         >
-            <div className="bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl p-10 shadow-xl">
+            <div className="bg-card/80 backdrop-blur-xl border border-border/60 rounded-3xl p-10 shadow-xl">
                 <div className="text-center mb-10">
                     <motion.div
                         initial={{ scale: 0 }}
@@ -81,8 +81,8 @@ export default function LoginForm() {
                     >
                         <ShieldCheck className="w-8 h-8 text-white" />
                     </motion.div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('loginTitle')}</h1>
-                    <p className="text-gray-500">{t('loginSubtitle')}</p>
+                    <h1 className="text-3xl font-bold text-foreground mb-2">{t('loginTitle')}</h1>
+                    <p className="text-muted-foreground">{t('loginSubtitle')}</p>
                 </div>
 
                 {/* Floating Icons */}
@@ -107,9 +107,9 @@ export default function LoginForm() {
 
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="text-gray-700 font-medium">{t('email')}</Label>
+                        <Label htmlFor="email" className="text-foreground font-medium">{t('email')}</Label>
                         <div className="relative group">
-                            <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                            <Mail className="absolute left-3 top-3 w-5 h-5 text-muted-foreground group-focus-within:text-blue-600 transition-colors" />
                             <Input
                                 id="email"
                                 type="email"
@@ -117,20 +117,20 @@ export default function LoginForm() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="pl-10 h-12 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition-all rounded-xl"
+                                className="pl-10 h-12 bg-muted/50 border-input text-foreground placeholder:text-muted-foreground focus:bg-background focus:border-blue-500 focus:ring-blue-100 transition-all rounded-xl"
                             />
                         </div>
                     </div>
 
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                            <Label htmlFor="password" className="text-gray-700 font-medium">{t('password')}</Label>
+                            <Label htmlFor="password" className="text-foreground font-medium">{t('password')}</Label>
                             <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline relative z-10">
                                 {t('forgotPassword')}
                             </Link>
                         </div>
                         <div className="relative group">
-                            <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                            <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground group-focus-within:text-blue-600 transition-colors" />
                             <Input
                                 id="password"
                                 type={showPassword ? "text" : "password"}
@@ -138,12 +138,12 @@ export default function LoginForm() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="pl-10 pr-10 h-12 bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition-all rounded-xl"
+                                className="pl-10 pr-10 h-12 bg-muted/50 border-input text-foreground placeholder:text-muted-foreground focus:bg-background focus:border-blue-500 focus:ring-blue-100 transition-all rounded-xl"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-3 text-gray-400 hover:text-blue-600 transition-colors"
+                                className="absolute right-3 top-3 text-muted-foreground hover:text-blue-600 transition-colors"
                             >
                                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                             </button>
@@ -176,8 +176,8 @@ export default function LoginForm() {
                     </Button>
                 </form>
 
-                <div className="mt-8 text-center bg-gray-50/50 p-4 rounded-xl">
-                    <p className="text-gray-600 text-sm">
+                <div className="mt-8 text-center bg-muted/50 p-4 rounded-xl">
+                    <p className="text-muted-foreground text-sm">
                         {t('noAccount')}{' '}
                         <Link href="/register" className="text-blue-600 hover:text-blue-700 font-bold hover:underline transition-colors">
                             {t('createAccount')}

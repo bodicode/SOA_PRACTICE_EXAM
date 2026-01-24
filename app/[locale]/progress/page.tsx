@@ -85,7 +85,7 @@ export default function ProgressPage() {
                 total: total,
                 scale10: Number(scale10.toFixed(1)),
                 percentage: percentage,
-                mode: 'Thi thử' // Chart tooltip might need translation if logic is inside component, but "Thi thử" here is hardcoded. It's passed to chart.
+                mode: t('history.examPrefix') // Chart tooltip might need translation if logic is inside component, but "Thi thử" here is hardcoded. It's passed to chart.
                 // Assuming ProgressChart can handle labels or we pass generic key. For now assuming chart handles this or we leave it.
             };
         });
@@ -122,23 +122,23 @@ export default function ProgressPage() {
         : 0;
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] p-6 md:p-10 font-sans text-slate-800">
+        <div className="min-h-screen bg-background p-6 md:p-10 font-sans text-foreground">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
                     <div>
-                        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t('title')}</h1>
-                        <p className="text-slate-500 mt-1">{t('subtitle')}</p>
+                        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">{t('title')}</h1>
+                        <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
                     </div>
                 </div>
 
                 {/* Category Tabs */}
                 <div className="mb-6">
                     <Tabs defaultValue="all" className="w-full" onValueChange={(val) => setActiveCategory(val === 'all' ? undefined : parseInt(val))}>
-                        <TabsList className="grid w-full max-w-md grid-cols-3 bg-slate-100 p-1">
-                            <TabsTrigger value="all" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">{t('tabs.all')}</TabsTrigger>
-                            <TabsTrigger value="1" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">{t('tabs.examP')}</TabsTrigger>
-                            <TabsTrigger value="2" className="data-[state=active]:bg-white data-[state=active]:text-blue-700 data-[state=active]:shadow-sm text-slate-500 font-medium">{t('tabs.examFM')}</TabsTrigger>
+                        <TabsList className="grid w-full max-w-md grid-cols-3 bg-muted p-1">
+                            <TabsTrigger value="all" className="data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm text-muted-foreground font-medium">{t('tabs.all')}</TabsTrigger>
+                            <TabsTrigger value="1" className="data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm text-muted-foreground font-medium">{t('tabs.examP')}</TabsTrigger>
+                            <TabsTrigger value="2" className="data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm text-muted-foreground font-medium">{t('tabs.examFM')}</TabsTrigger>
                         </TabsList>
                     </Tabs>
                 </div>
@@ -147,69 +147,69 @@ export default function ProgressPage() {
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     {/* Average Score */}
-                    <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <Card className="border-none shadow-sm bg-card p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-4">
                             <div>
                                 <p className="text-sm font-medium text-blue-500 mb-1">{t('stats.avgScore')}</p>
-                                <div className="text-3xl font-bold text-slate-900">
-                                    {stats?.averageScore ? Number(stats.averageScore).toFixed(1) : 0}<span className="text-lg text-gray-400 font-normal">/10</span>
+                                <div className="text-3xl font-bold text-foreground">
+                                    {stats?.averageScore ? Number(stats.averageScore).toFixed(1) : 0}<span className="text-lg text-muted-foreground font-normal">/10</span>
                                 </div>
                             </div>
-                            <div className="p-2 bg-blue-50 rounded-lg">
-                                <TrendingUp className="w-5 h-5 text-blue-600" />
+                            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                             </div>
                         </div>
-                        <p className="text-xs font-semibold text-green-600 flex items-center gap-1">
+                        <p className="text-xs font-semibold text-green-600 dark:text-green-400 flex items-center gap-1">
                             <TrendingUp className="w-3 h-3" /> {t('stats.goal')}
                         </p>
                     </Card>
 
                     {/* Total Exams */}
-                    <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <Card className="border-none shadow-sm bg-card p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <p className="text-sm font-medium text-slate-500 mb-1">{t('stats.totalExams')}</p>
-                                <div className="text-3xl font-bold text-slate-900">{stats?.totalExams || 0}</div>
+                                <p className="text-sm font-medium text-muted-foreground mb-1">{t('stats.totalExams')}</p>
+                                <div className="text-3xl font-bold text-foreground">{stats?.totalExams || 0}</div>
                             </div>
-                            <div className="p-2 bg-indigo-50 rounded-lg">
-                                <FileText className="w-5 h-5 text-indigo-600" />
+                            <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                                <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                             </div>
                         </div>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-muted-foreground">
                             {t('stats.completed', { count: stats?.totalQuestions || 0 })}
                         </p>
                     </Card>
 
                     {/* Best Score (Replaces Strongest Topic) */}
-                    <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <Card className="border-none shadow-sm bg-card p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <p className="text-sm font-medium text-slate-500 mb-1">{t('stats.bestScore')}</p>
-                                <div className="text-3xl font-bold text-slate-900 leading-tight">
-                                    {bestScore.toFixed(1)}<span className="text-lg text-gray-400 font-normal">/10</span>
+                                <p className="text-sm font-medium text-muted-foreground mb-1">{t('stats.bestScore')}</p>
+                                <div className="text-3xl font-bold text-foreground leading-tight">
+                                    {bestScore.toFixed(1)}<span className="text-lg text-muted-foreground font-normal">/10</span>
                                 </div>
                             </div>
-                            <div className="p-2 bg-yellow-50 rounded-lg">
-                                <Star className="w-5 h-5 text-yellow-600 fill-yellow-600" />
+                            <div className="p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                                <Star className="w-5 h-5 text-yellow-600 dark:text-yellow-400 fill-yellow-600 dark:fill-yellow-400" />
                             </div>
                         </div>
-                        <p className="text-xs font-semibold text-green-600 flex items-center gap-1">
+                        <p className="text-xs font-semibold text-green-600 dark:text-green-400 flex items-center gap-1">
                             <VerifiedIcon className="w-3 h-3" /> {t('stats.record')}
                         </p>
                     </Card>
 
                     {/* Study Streak */}
-                    <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <Card className="border-none shadow-sm bg-card p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <p className="text-sm font-medium text-slate-500 mb-1">{t('stats.streak')}</p>
-                                <div className="text-3xl font-bold text-slate-900">{stats?.studyStreak || 0} {t('stats.days')}</div>
+                                <p className="text-sm font-medium text-muted-foreground mb-1">{t('stats.streak')}</p>
+                                <div className="text-3xl font-bold text-foreground">{stats?.studyStreak || 0} {t('stats.days')}</div>
                             </div>
-                            <div className="p-2 bg-orange-50 rounded-lg">
-                                <Flame className="w-5 h-5 text-orange-500 fill-orange-500" />
+                            <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                                <Flame className="w-5 h-5 text-orange-500 dark:text-orange-400 fill-orange-500 dark:fill-orange-400" />
                             </div>
                         </div>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-muted-foreground">
                             {t('stats.keepUp')}
                         </p>
                     </Card>
@@ -226,8 +226,8 @@ export default function ProgressPage() {
                 {/* Bottom Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Exam Outcomes */}
-                    <Card className="border-none shadow-md bg-white p-6">
-                        <h3 className="font-bold text-lg text-slate-900 mb-6">{t('charts.passRateTitle')}</h3>
+                    <Card className="border-none shadow-md bg-card p-6">
+                        <h3 className="font-bold text-lg text-foreground mb-6">{t('charts.passRateTitle')}</h3>
                         <div className="h-64 relative flex items-center justify-center">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
@@ -244,32 +244,32 @@ export default function ProgressPage() {
                                             <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
                                         ))}
                                     </Pie>
-                                    <RechartsTooltip formatter={(value: any) => [value, t('charts.count')]} />
+                                    <RechartsTooltip formatter={(value: any) => [value, t('charts.count')]} contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} itemStyle={{ color: 'var(--foreground)' }} />
                                 </PieChart>
                             </ResponsiveContainer>
                             {/* Center Text */}
                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                <span className="text-3xl font-bold text-slate-900">{passRate}%</span>
-                                <span className="text-xs uppercase font-bold text-slate-400 tracking-wider">{t('charts.passRatio')}</span>
+                                <span className="text-3xl font-bold text-foreground">{passRate}%</span>
+                                <span className="text-xs uppercase font-bold text-muted-foreground tracking-wider">{t('charts.passRatio')}</span>
                             </div>
                         </div>
                         <div className="flex justify-center gap-6 mt-4">
                             <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-                                <span className="text-sm text-slate-600">{t('charts.pass')} ({outcomes[0].value})</span>
+                                <span className="text-sm text-muted-foreground">{t('charts.pass')} ({outcomes[0].value})</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                                <span className="text-sm text-slate-600">{t('charts.fail')} ({outcomes[1].value})</span>
+                                <span className="text-sm text-muted-foreground">{t('charts.fail')} ({outcomes[1].value})</span>
                             </div>
                         </div>
                     </Card>
 
                     {/* Recent Attempts */}
-                    <Card className="lg:col-span-2 border-none shadow-md bg-white p-6">
+                    <Card className="lg:col-span-2 border-none shadow-md bg-card p-6">
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="font-bold text-lg text-slate-900">{t('history.title')}</h3>
-                            <Link href="#" className="text-sm font-semibold text-blue-600 hover:text-blue-700">{t('history.viewAll')}</Link>
+                            <h3 className="font-bold text-lg text-foreground">{t('history.title')}</h3>
+                            <Link href="#" className="text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">{t('history.viewAll')}</Link>
                         </div>
                         <div className="space-y-4">
                             {filteredHistory.slice(0, 4).map((session: ExamSession, i: number) => {
@@ -280,16 +280,16 @@ export default function ProgressPage() {
                                 const isPassed = percentage >= 70; // Logic đậu/trượt tạm thời
 
                                 return (
-                                    <div key={session.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-blue-100 hover:bg-blue-50/30 transition-all group">
+                                    <div key={session.id} className="flex items-center justify-between p-4 rounded-xl border border-border hover:border-blue-100 hover:bg-muted/50 transition-all group">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-lg bg-blue-100/50 flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
+                                            <div className="w-10 h-10 rounded-lg bg-blue-100/50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
                                                 <History className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <h4 className="font-semibold text-slate-900">
+                                                <h4 className="font-semibold text-foreground">
                                                     {session.mode === 'exam' ? `${t('history.examPrefix')} #${session.id}` : `${t('history.practicePrefix')} #${session.id}`}
                                                 </h4>
-                                                <p className="text-xs text-slate-500">{format.dateTime(new Date(session.startTime), { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+                                                <p className="text-xs text-muted-foreground">{format.dateTime(new Date(session.startTime), { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
@@ -304,7 +304,7 @@ export default function ProgressPage() {
                                 )
                             })}
                             {filteredHistory.length === 0 && (
-                                <div className="text-center py-8 text-slate-400">{t('history.empty')}</div>
+                                <div className="text-center py-8 text-muted-foreground">{t('history.empty')}</div>
                             )}
                         </div>
                     </Card>
