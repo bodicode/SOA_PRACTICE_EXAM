@@ -37,16 +37,32 @@ export async function middleware(request: NextRequest) {
         );
     }
 
+    // Explicit redirect for root path to default locale
+    const pathname = request.nextUrl.pathname;
+    if (pathname === '/') {
+        const url = request.nextUrl.clone();
+        url.pathname = '/en';
+        return NextResponse.redirect(url);
+    }
+
     // Handle locale routing with intl middleware
     const intlResponse = intlMiddleware(request);
 
-    // If intl middleware returns a response (redirect), use it
-    if (intlResponse) {
+    // If intl middleware returns a redirect response, use it
+    if (intlResponse.headers.get('location')) {
         return intlResponse;
     }
 
-    // Otherwise handle Supabase session
-    return await updateSession(request)
+    // For non-redirect responses, also handle Supabase session
+    // Clone the response and merge with session update
+    const sessionResponse = await updateSession(request);
+
+    // If session needs to set cookies, use that response
+    if (sessionResponse.headers.get('set-cookie')) {
+        return sessionResponse;
+    }
+
+    return intlResponse;
 }
 
 export const config = {
