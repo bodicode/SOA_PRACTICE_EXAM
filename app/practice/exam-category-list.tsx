@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useRef, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
@@ -23,7 +23,24 @@ interface ExamCategoryListProps {
 export default function ExamCategoryList({ categories }: ExamCategoryListProps) {
     const { user } = useUserStore()
     const router = useRouter()
+    const searchParams = useSearchParams()
     const [showLoginDialog, setShowLoginDialog] = useState(false)
+    const hasRedirected = useRef(false)
+
+    useEffect(() => {
+        const examParam = searchParams.get('exam')
+        if (examParam && !hasRedirected.current) {
+            const targetCategory = categories.find(c =>
+                c.name.toLowerCase().includes(examParam.toLowerCase())
+            )
+
+            if (targetCategory) {
+                hasRedirected.current = true
+                console.log(`Redirecting to exam ${examParam}:`, targetCategory)
+                router.push(`/practice/${targetCategory.id}`)
+            }
+        }
+    }, [searchParams, categories, router])
 
     const handleStart = (examId: number) => {
         if (!user) {

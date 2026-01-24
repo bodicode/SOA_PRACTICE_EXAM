@@ -73,8 +73,8 @@ export default function PracticePage() {
                     </p>
                     <p className="text-gray-700 leading-relaxed">
                         Nếu bạn có câu hỏi hoặc gặp khó khăn kỹ thuật với bài thi mẫu trực tuyến, vui lòng liên hệ
-                        với chúng tôi qua <a href="mailto:support@soapractice.vn" className="text-[#0066cc] hover:underline">
-                            support@soapractice.vn</a>.
+                        với chúng tôi qua <a href="mailto:29.hoang.10@gmail.com" className="text-[#0066cc] hover:underline">
+                            29.hoang.10@gmail.com</a>.
                     </p>
                 </div>
 
