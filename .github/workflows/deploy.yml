@@ -17,12 +17,11 @@ jobs:
           port: 22
           script: |
             export PATH=$PATH:/www/server/nvm/versions/node/v24.13.0/bin
-
             cd /www/wwwroot/3hours.io.vn
-
-            git pull origin main
-
+            git fetch --all
+            git reset --hard origin/main
             npm install
+            rm -rf .next
             npm run build
-
-            pm2 restart nextjs-app
+            pm2 restart nextjs-app --update-env
+            pm2 save
