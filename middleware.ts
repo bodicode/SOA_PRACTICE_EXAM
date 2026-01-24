@@ -1,10 +1,15 @@
 import { updateSession } from '@/lib/supabase/middleware'
 import { type NextRequest, NextResponse } from 'next/server'
+import createIntlMiddleware from 'next-intl/middleware';
+import { routing } from './routing';
 
 // Simple in-memory rate limiter
 const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
 const LIMIT = 100; // requests
 const WINDOW = 60 * 1000; // 1 minute
+
+// Create intl middleware
+const intlMiddleware = createIntlMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
     const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
@@ -32,6 +37,15 @@ export async function middleware(request: NextRequest) {
         );
     }
 
+    // Handle locale routing with intl middleware
+    const intlResponse = intlMiddleware(request);
+
+    // If intl middleware returns a response (redirect), use it
+    if (intlResponse) {
+        return intlResponse;
+    }
+
+    // Otherwise handle Supabase session
     return await updateSession(request)
 }
 

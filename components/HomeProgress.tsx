@@ -7,10 +7,12 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useProgressStore } from '@/stores/progressStore';
 import { useUserStore } from '@/stores/userStore';
+import { useTranslations } from 'next-intl';
 
 export function HomeProgress() {
     const { user } = useUserStore();
     const { getData, isLoading, fetchProgress } = useProgressStore();
+    const t = useTranslations('progress');
 
     // UI State
     const [selectedCategory, setSelectedCategory] = React.useState<number | null>(null);
@@ -55,7 +57,7 @@ export function HomeProgress() {
         <section className="py-12 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                    <h2 className="text-2xl font-bold text-gray-900">Tiến Độ Của Tôi</h2>
+                    <h2 className="text-2xl font-bold text-gray-900">{t('title')}</h2>
 
                     <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-gray-200 shadow-sm">
                         <Button
@@ -64,7 +66,7 @@ export function HomeProgress() {
                             onClick={() => setSelectedCategory(null)}
                             className={selectedCategory === null ? "bg-blue-100 text-blue-700 hover:bg-blue-200" : "text-gray-600 hover:text-gray-900"}
                         >
-                            Tổng quan
+                            {t('overview')}
                         </Button>
                         <Button
                             variant={selectedCategory === 1 ? "secondary" : "ghost"}
@@ -85,7 +87,7 @@ export function HomeProgress() {
                     </div>
 
                     <Button variant="ghost" className="text-blue-600 font-semibold hover:text-blue-700 hover:bg-blue-50 hidden md:flex">
-                        Xem Tất Cả Thống Kê
+                        {t('viewAll')}
                     </Button>
                 </div>
 
@@ -98,14 +100,14 @@ export function HomeProgress() {
                                 <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
                                     <HelpCircle className="w-6 h-6 text-blue-600" />
                                 </div>
-                                <span className="text-gray-600 font-medium">Câu Hỏi Đã Trả Lời</span>
+                                <span className="text-gray-600 font-medium">{t('questionsAnswered')}</span>
                             </div>
                             <div className="mb-2">
                                 <span className="text-3xl font-bold text-gray-900">{stats?.totalQuestions || 0}</span>
                             </div>
                             <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium">
                                 <TrendingUp className="w-3 h-3" />
-                                <span>Cập nhật mới nhất</span>
+                                <span>{t('latestUpdate')}</span>
                             </div>
                         </CardContent>
                     </Card>
@@ -117,7 +119,7 @@ export function HomeProgress() {
                                 <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
                                     <BarChart2 className="w-6 h-6 text-purple-600" />
                                 </div>
-                                <span className="text-gray-600 font-medium">Điểm Trung Bình (Thang 10)</span>
+                                <span className="text-gray-600 font-medium">{t('averageScore')}</span>
                             </div>
                             <div className="mb-2">
                                 <span className="text-3xl font-bold text-gray-900">{stats?.averageScore ? Number(stats.averageScore).toFixed(1) : 0}</span>
@@ -129,11 +131,11 @@ export function HomeProgress() {
                                 }`}>
                                 <TrendingUp className="w-3 h-3" />
                                 <span>
-                                    {(stats?.averageScore || 0) >= 8 ? 'Xuất sắc! Tiếp tục phát huy' :
-                                        (stats?.averageScore || 0) >= 7 ? 'Kết quả tốt' :
-                                            (stats?.averageScore || 0) >= 5 ? 'Đã đạt yêu cầu' :
-                                                (stats?.averageScore || 0) > 0 ? 'Cần cải thiện thêm' :
-                                                    'Chưa có dữ liệu thi thử'}
+                                    {(stats?.averageScore || 0) >= 8 ? t('feedback.excellent') :
+                                        (stats?.averageScore || 0) >= 7 ? t('feedback.good') :
+                                            (stats?.averageScore || 0) >= 5 ? t('feedback.pass') :
+                                                (stats?.averageScore || 0) > 0 ? t('feedback.improve') :
+                                                    t('feedback.noData')}
                                 </span>
                             </div>
                         </CardContent>
@@ -146,14 +148,14 @@ export function HomeProgress() {
                                 <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
                                     <Flame className="w-6 h-6 text-orange-600" />
                                 </div>
-                                <span className="text-gray-600 font-medium">Chuỗi Ngày Học</span>
+                                <span className="text-gray-600 font-medium">{t('studyStreak')}</span>
                             </div>
                             <div className="mb-2">
-                                <span className="text-3xl font-bold text-gray-900">{stats?.studyStreak || 0} Ngày</span>
+                                <span className="text-3xl font-bold text-gray-900">{stats?.studyStreak || 0} {t('days')}</span>
                             </div>
                             <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium">
                                 <CheckCircleIcon className="w-3 h-3" />
-                                <span>Giữ vững phong độ!</span>
+                                <span>{t('keepItUp')}</span>
                             </div>
                         </CardContent>
                     </Card>
@@ -165,11 +167,11 @@ export function HomeProgress() {
                     <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <div>
-                                <CardTitle className="text-gray-500 text-sm font-medium uppercase tracking-wider">HIỆU SUẤT</CardTitle>
-                                <div className="text-xl font-bold text-gray-900 mt-1">7 Ngày Qua</div>
+                                <CardTitle className="text-gray-500 text-sm font-medium uppercase tracking-wider">{t('performance')}</CardTitle>
+                                <div className="text-xl font-bold text-gray-900 mt-1">{t('last7Days')}</div>
                             </div>
                             <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
-                                Hàng Ngày <ChevronDown className="w-3 h-3" />
+                                {t('daily')} <ChevronDown className="w-3 h-3" />
                             </Button>
                         </CardHeader>
                         <CardContent>

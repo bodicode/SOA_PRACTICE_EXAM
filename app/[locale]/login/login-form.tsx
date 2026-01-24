@@ -10,8 +10,10 @@ import { Label } from '@/components/ui/label'
 import { motion } from 'framer-motion'
 import { Loader2, ArrowRight, ShieldCheck, Mail, Lock, Key, Fingerprint, Eye, EyeOff } from 'lucide-react'
 import { translateAuthError } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 export default function LoginForm() {
+    const t = useTranslations('auth')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
@@ -57,7 +59,7 @@ export default function LoginForm() {
             }
             router.refresh()
         } catch (err) {
-            setError('Đã có lỗi xảy ra. Vui lòng thử lại.')
+            setError(t('errorGeneric'))
             setLoading(false)
         }
     }
@@ -79,8 +81,8 @@ export default function LoginForm() {
                     >
                         <ShieldCheck className="w-8 h-8 text-white" />
                     </motion.div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Chào mừng trở lại</h1>
-                    <p className="text-gray-500">Đăng nhập để tiếp tục hành trình SOA</p>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('loginTitle')}</h1>
+                    <p className="text-gray-500">{t('loginSubtitle')}</p>
                 </div>
 
                 {/* Floating Icons */}
@@ -105,7 +107,7 @@ export default function LoginForm() {
 
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
+                        <Label htmlFor="email" className="text-gray-700 font-medium">{t('email')}</Label>
                         <div className="relative group">
                             <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                             <Input
@@ -122,9 +124,9 @@ export default function LoginForm() {
 
                     <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                            <Label htmlFor="password" className="text-gray-700 font-medium">Mật khẩu</Label>
+                            <Label htmlFor="password" className="text-gray-700 font-medium">{t('password')}</Label>
                             <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline relative z-10">
-                                Quên mật khẩu?
+                                {t('forgotPassword')}
                             </Link>
                         </div>
                         <div className="relative group">
@@ -168,7 +170,7 @@ export default function LoginForm() {
                             <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
                             <span className="flex items-center gap-2">
-                                Đăng nhập <ArrowRight className="w-5 h-5" />
+                                {t('signIn')} <ArrowRight className="w-5 h-5" />
                             </span>
                         )}
                     </Button>
@@ -176,9 +178,9 @@ export default function LoginForm() {
 
                 <div className="mt-8 text-center bg-gray-50/50 p-4 rounded-xl">
                     <p className="text-gray-600 text-sm">
-                        Chưa có tài khoản?{' '}
+                        {t('noAccount')}{' '}
                         <Link href="/register" className="text-blue-600 hover:text-blue-700 font-bold hover:underline transition-colors">
-                            Tạo tài khoản miễn phí
+                            {t('createAccount')}
                         </Link>
                     </p>
                 </div>

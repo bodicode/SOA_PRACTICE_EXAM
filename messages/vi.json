@@ -1,0 +1,566 @@
+{
+    "nav": {
+        "practice": "Ôn tập",
+        "leaderboard": "Bảng Xếp Hạng",
+        "progress": "Tiến độ học tập",
+        "profile": "Hồ sơ cá nhân",
+        "logout": "Đăng xuất",
+        "login": "Đăng Nhập",
+        "register": "Đăng Ký"
+    },
+    "hero": {
+        "title": "Luyện Thi SOA",
+        "subtitle": "Chinh Phục Chứng Chỉ Actuary",
+        "description": "Mô phỏng điều kiện thi thực tế với các bài luyện tập toàn diện cho Exam P, FM. Theo dõi tiến độ và tối ưu điểm số hiệu quả.",
+        "startButton": "Bắt Đầu Luyện Thi",
+        "progressButton": "Xem Tiến Độ"
+    },
+    "features": {
+        "title": "Tính Năng Nổi Bật",
+        "subtitle": "Nền tảng luyện thi SOA toàn diện với công nghệ AI tiên tiến",
+        "questionBank": {
+            "title": "Kho Bài Luyện Thi",
+            "description": "Hàng ngàn câu hỏi được phân loại theo chủ đề, độ khó, giúp bạn tập trung vào từng mảng kiến thức cụ thể."
+        },
+        "realExam": {
+            "title": "Mô Phỏng Kỳ Thi Thực",
+            "description": "Trải nghiệm kỳ thi SOA thực tế với giao diện chuyên nghiệp và đồng hồ đếm ngược chính xác."
+        },
+        "aiSupport": {
+            "title": "Trợ Lý AI Thông Minh",
+            "description": "Nhận hỗ trợ tức thì từ AI khi gặp khó khăn, giúp bạn hiểu sâu hơn về từng câu hỏi."
+        },
+        "videoCall": {
+            "title": "Học Nhóm Video",
+            "description": "Kết nối với bạn bè qua video call để cùng nhau thảo luận và giải quyết các bài tập khó."
+        },
+        "analytics": {
+            "title": "Phân Tích Chi Tiết",
+            "description": "Theo dõi tiến độ học tập với biểu đồ trực quan, xác định điểm mạnh và điểm yếu của bạn."
+        }
+    },
+    "exams": {
+        "title": "Các Kỳ Thi SOA",
+        "p": {
+            "title": "Exam P - Xác Suất",
+            "description": "Nền tảng về lý thuyết xác suất và phân phối thống kê cho Actuary",
+            "topics": [
+                "Tổ hợp và xác suất cơ bản",
+                "Biến ngẫu nhiên và phân phối",
+                "Kỳ vọng và phương sai",
+                "Phân phối đặc biệt",
+                "Định lý giới hạn trung tâm"
+            ],
+            "button": "Luyện Đề Exam P"
+        },
+        "fm": {
+            "title": "Exam FM - Toán Tài Chính",
+            "description": "Kiến thức về toán tài chính và lý thuyết lãi suất cho Actuary",
+            "topics": [
+                "Giá trị thời gian của tiền",
+                "Niên kim và dòng tiền",
+                "Trái phiếu và định giá",
+                "Tỷ suất lợi nhuận",
+                "Các công cụ phái sinh cơ bản"
+            ],
+            "button": "Luyện Đề Exam FM"
+        }
+    },
+    "stats": {
+        "students": "Học viên",
+        "questions": "Câu hỏi",
+        "passRate": "Tỷ lệ đậu",
+        "hours": "Giờ học"
+    },
+    "cta": {
+        "title": "Sẵn Sàng Chinh Phục SOA?",
+        "description": "Tham gia cùng hàng nghìn sinh viên đang chuẩn bị cho kỳ thi Actuary với nền tảng học tập toàn diện nhất.",
+        "button": "Bắt Đầu Ngay - Miễn Phí"
+    },
+    "programs": {
+        "badge": "Chương Trình Luyện Thi",
+        "title": "Các Kỳ Thi SOA Trọng Tâm",
+        "description": "Tập trung ôn luyện vào các chủ đề cốt lõi. Ngân hàng câu hỏi của chúng tôi bao phủ 100% syllabus mới nhất."
+    },
+    "testimonials": {
+        "an": {
+            "quote": "Tôi đã trượt Exam P hai lần trước khi biết đến SOA Prep. Phương pháp học thích ứng đã giúp tôi lấy lại căn bản và đỗ với điểm 9!",
+            "role": "Associate of the Society of Actuaries (ASA)"
+        },
+        "trust": "Được tin dùng bởi hơn 5,000 học viên Actuary trên toàn thế giới.",
+        "button": "Tham Gia Cộng Đồng Ngay"
+    },
+    "faq": {
+        "title": "Câu Hỏi Thường Gặp Về Luyện Thi SOA",
+        "subtitle": "Giải đáp thắc mắc cho người mới bắt đầu hành trình Actuary",
+        "q1": {
+            "q": "SOA là gì và chứng chỉ này dành cho ai?",
+            "a": "SOA (Society of Actuaries) là Hiệp hội Định phí Hoa Kỳ. Các kỳ thi SOA (như Exam P, FM) là bước khởi đầu bắt buộc để trở thành chuyên gia định phí (Actuary) - một trong những nghề nghiệp có thu nhập cao nhất thế giới, dành cho nhân sự ngành Toán, Thống kê, Tài chính và Bảo hiểm."
+        },
+        "q2": {
+            "q": "Tôi nên bắt đầu luyện thi SOA từ Exam nào?",
+            "a": "Hầu hết ứng viên bắt đầu với Exam P (Probability) hoặc Exam FM (Financial Mathematics). Tại SOA Exam Practice, chúng tôi cung cấp ngân hàng câu hỏi thích ứng (Adaptive Learning) cho cả hai kỳ thi này để giúp bạn tối ưu hóa thời gian ôn luyện."
+        },
+        "q3": {
+            "q": "Học phí và lệ phí thi SOA là bao nhiêu?",
+            "a": "Lệ phí thi chính thức của SOA thường dao động từ $250 - $350/exam (có giảm cho sinh viên). Về chi phí ôn luyện, SOA Prep cung cấp các gói luyện đề với chi phí tiết kiệm hơn 80% so với sách giáo khoa truyền thống, đồng thời cập nhật liên tục theo syllabus 2026."
+        }
+    },
+    "footer": {
+        "support": "Hỗ Trợ",
+        "exams": "Danh Mục Đề Thi",
+        "terms": "Điều Khoản",
+        "privacy": "Bảo Mật",
+        "rights": "©2026 SOA Prep. All rights reserved."
+    },
+    "progress": {
+        "title": "Tiến Độ Của Tôi",
+        "overview": "Tổng quan",
+        "viewAll": "Xem Tất Cả Thống Kê",
+        "questionsAnswered": "Câu Hỏi Đã Trả Lời",
+        "averageScore": "Điểm Trung Bình (Thang 10)",
+        "studyStreak": "Chuỗi Ngày Học",
+        "days": "Ngày",
+        "latestUpdate": "Cập nhật mới nhất",
+        "keepItUp": "Giữ vững phong độ!",
+        "feedback": {
+            "excellent": "Xuất sắc! Tiếp tục phát huy",
+            "good": "Kết quả tốt",
+            "pass": "Đã đạt yêu cầu",
+            "improve": "Cần cải thiện thêm",
+            "noData": "Chưa có dữ liệu thi thử"
+        },
+        "performance": "HIỆU SUẤT",
+        "last7Days": "7 Ngày Qua",
+        "daily": "Hàng Ngày"
+    },
+    "leaderboard": {
+        "badge": "Bảng Xếp Hạng",
+        "title": "Đấu Trường SOA",
+        "subtitle": "Tranh tài cùng cộng đồng Actuary toàn cầu. Khẳng định đẳng cấp và chinh phục đỉnh cao!",
+        "searchPlaceholder": "Tìm kiếm thành viên...",
+        "selectCountry": "Chọn Quốc gia",
+        "loading": "Đang tải dữ liệu...",
+        "empty": "Chưa có thành viên nào trong khu vực này.",
+        "columns": {
+            "questions": "Câu hỏi",
+            "score": "Điểm TB"
+        },
+        "user": {
+            "hidden": "Người dùng ẩn",
+            "you": "Bạn",
+            "yourRank": "Thứ hạng của bạn"
+        },
+        "levels": {
+            "Beginner": "Người Mới",
+            "Intermediate": "Trung Cấp",
+            "Advanced": "Cao Cấp",
+            "Expert": "Chuyên Gia"
+        },
+        "countries": {
+            "ALL": "Toàn cầu 🌍"
+        }
+    },
+    "profile": {
+        "loading": "Vui lòng đăng nhập để xem hồ sơ.",
+        "tabs": {
+            "profile": "Hồ sơ cá nhân",
+            "security": "Bảo mật"
+        },
+        "personalInfo": {
+            "title": "Cập nhật thông tin",
+            "description": "Thay đổi tên hiển thị của bạn trên hệ thống.",
+            "displayName": "Tên hiển thị",
+            "placeholderName": "Nhập tên hiển thị của bạn",
+            "country": "Quốc gia",
+            "level": "Trình độ",
+            "levelAuto": "(Tự động xếp hạng)",
+            "levelHint": "*Luyện tập nhiều hơn để thăng hạng tự động.",
+            "email": "Email",
+            "emailHint": "Email không thể thay đổi.",
+            "save": "Lưu thay đổi",
+            "saving": "Đang lưu..."
+        },
+        "security": {
+            "title": "Đổi mật khẩu",
+            "description": "Cập nhật mật khẩu mới cho tài khoản của bạn.",
+            "currentPassword": "Mật khẩu hiện tại",
+            "newPassword": "Mật khẩu mới",
+            "confirmPassword": "Xác nhận mật khẩu mới",
+            "change": "Đổi mật khẩu",
+            "changing": "Đang cập nhật..."
+        },
+        "stats": {
+            "totalPractice": "Tổng luyện tập & thi thử",
+            "streak": "Chuỗi học tập",
+            "days": "ngày",
+            "joined": "Tham gia:"
+        },
+        "messages": {
+            "updateSuccess": "Cập nhật thông tin thành công!",
+            "updateError": "Có lỗi xảy ra khi cập nhật.",
+            "fillAll": "Vui lòng nhập đầy đủ thông tin.",
+            "passwordMismatch": "Mật khẩu xác nhận không khớp.",
+            "passwordLength": "Mật khẩu mới phải có ít nhất 6 ký tự.",
+            "wrongPassword": "Mật khẩu hiện tại không đúng.",
+            "passwordSuccess": "Đổi mật khẩu thành công!",
+            "error": "Đã xảy ra lỗi không mong muốn.",
+            "sizeError": "Ảnh không được quá 2MB",
+            "uploading": "Đang tải ảnh lên...",
+            "uploadSuccess": "Cập nhật avatar thành công!",
+            "uploadError": "Lỗi khi tải ảnh lên"
+        },
+        "levels": {
+            "Beginner": "Beginner (Mới bắt đầu) 🥉",
+            "Intermediate": "Intermediate (Trung bình) 🥈",
+            "Advanced": "Advanced (Nâng cao) 🥇",
+            "Expert": "Expert (Chuyên gia) 🏆"
+        }
+    },
+    "practice": {
+        "title": "Đề Thi Mẫu Trực Tuyến",
+        "notice": "Chào mừng bạn đến với hệ thống luyện thi SOA trực tuyến. Đội ngũ của chúng tôi liên tục cập nhật ngân hàng câu hỏi để phù hợp với format thi mới nhất. Nếu bạn gặp bất kỳ vấn đề kỹ thuật nào, vui lòng liên hệ với chúng tôi qua email hỗ trợ.",
+        "groupStudy": {
+            "title": "👥 Ôn Tập Nhóm (Group Study)",
+            "description": "Mời bạn bè cùng tham gia giải đề. Chế độ đồng bộ thời gian thực giúp nhóm của bạn thảo luận và học tập hiệu quả hơn bao giờ hết.",
+            "button": "Tham Gia Ngay"
+        },
+        "description": {
+            "p1": "Hội Actuary Việt Nam (SOA Practice) cam kết hỗ trợ các ứng viên trong quá trình chuẩn bị cho các kỳ thi sơ cấp. Để đạt được mục tiêu này, chúng tôi cung cấp các bài thi mẫu trực tuyến cho một số kỳ thi sơ cấp. Hoàn toàn miễn phí, các bài thi mẫu này lựa chọn câu hỏi và lời giải trong môi trường thi trực tuyến mô phỏng gần nhất với format thi thực tế của SOA.",
+            "p2": "Các câu hỏi đã được mã hóa để đáp ứng các mục tiêu học tập của kỳ thi và đảm bảo ứng viên nhận được bộ câu hỏi cân bằng nhưng được xáo trộn ngẫu nhiên mỗi lần họ làm bài thi mẫu. Các câu hỏi hiện tại được lấy từ nguồn câu hỏi mẫu chính thức.",
+            "p3": "Quy trình được sử dụng để tạo ra các bài thi actuary của SOA từ một ngân hàng câu hỏi lớn rất phức tạp và tính đến nhiều yếu tố khác nhau, bao gồm độ khó tổng thể của bài thi và mức độ bao phủ của các mục tiêu học tập. Do đó, trong khi nằm trong phạm vi các mục tiêu học tập của kỳ thi, các câu hỏi trong những bài thi mẫu này có thể không đại diện cho độ khó trung bình của một bài thi thực tế.",
+            "p4": "Nếu bạn có câu hỏi hoặc gặp khó khăn kỹ thuật với bài thi mẫu trực tuyến, vui lòng liên hệ với chúng tôi qua email."
+        },
+        "chooseExam": "Chọn Kỳ Thi Để Bắt Đầu",
+        "loading": "Đang tải dữ liệu...",
+        "reportError": {
+            "title": "Báo Lỗi:",
+            "content": "Nếu bạn tìm thấy lỗi có thể xảy ra trong câu hỏi hoặc đáp án, vui lòng chụp màn hình câu hỏi cùng với lời giải của bạn và gửi cho chúng tôi qua email. Chúng tôi sẽ xem xét và phản hồi trong thời gian sớm nhất."
+        }
+    },
+    "auth": {
+        "home": "Trang chủ",
+        "loginTitle": "Chào mừng trở lại",
+        "loginSubtitle": "Đăng nhập để tiếp tục hành trình SOA",
+        "email": "Email",
+        "password": "Mật khẩu",
+        "forgotPassword": "Quên mật khẩu?",
+        "signIn": "Đăng nhập",
+        "noAccount": "Chưa có tài khoản?",
+        "createAccount": "Tạo tài khoản miễn phí",
+        "errorGeneric": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+        "loading": "Đang tải..."
+    },
+    "groupLobby": {
+        "title": "Học Nhóm",
+        "subtitle": "Ôn tập cùng bạn bè. Cùng nhau giải đề, thảo luận đáp án, và chinh phục kỳ thi SOA.",
+        "features": {
+            "realtimeTitle": "Học Nhóm Thời Gian Thực",
+            "realtimeDesc": "Đồng bộ câu hỏi với mọi người trong phòng.",
+            "progressTitle": "Tiến Độ Chung",
+            "progressDesc": "Chủ phòng điều khiển tốc độ làm bài."
+        },
+        "create": {
+            "title": "Tạo Phòng Mới",
+            "desc": "Bạn sẽ là chủ phòng và chọn đề thi.",
+            "button": "Tạo Phòng Ngay",
+            "loading": "Đang tạo...",
+            "success": "Phòng đã được tạo!",
+            "error": "Tạo phòng thất bại"
+        },
+        "join": {
+            "title": "Tham Gia Phòng",
+            "desc": "Nhập mã số phòng từ bạn bè của bạn.",
+            "placeholder": "Nhập mã phòng (VD: 123456)",
+            "button": "Vào Phòng",
+            "loading": "Đang vào...",
+            "success": "Tham gia phòng thành công!",
+            "error": "Thất bại",
+            "invalidCode": "Vui lòng nhập mã phòng hợp lệ!"
+        }
+    },
+    "groupRoom": {
+        "notFound": {
+            "title": "Không Tìm Thấy Phòng",
+            "desc": "Mã phòng không hợp lệ hoặc đã hết hạn.",
+            "back": "Quay lại Sảnh chờ"
+        },
+        "toast": {
+            "restore": "Đã khôi phục phiên làm việc trước đó",
+            "newExam": "Bài luyện tập mới đã bắt đầu!",
+            "submitted": "Bài làm đã nộp! Xem kết quả ngay.",
+            "disbanded": "Phòng đã bị chủ phòng giải tán!",
+            "videoError": "Lỗi kết nối video",
+            "micOn": "Đã bật Mic",
+            "micOff": "Đã tắt Mic",
+            "cameraOn": "Đã bật Camera",
+            "cameraOff": "Đã tắt Camera",
+            "noQuestions": "Không tìm thấy câu hỏi nào trong phạm vi này!",
+            "errorLoad": "Lỗi khi tải câu hỏi",
+            "browserError": "Trình duyệt không hỗ trợ hoặc kết nối chưa được bảo mật (HTTPS)",
+            "cameraError": "Lỗi Camera/Mic"
+        },
+        "header": {
+            "disband": "Giải Tán",
+            "leave": "Thoát",
+            "room": "Phòng ôn tập:",
+            "settings": "Cấu hình hiển thị",
+            "size": "Cỡ chữ",
+            "font": "Font"
+        },
+        "sidebar": {
+            "questions": "Danh sách câu hỏi",
+            "done": "đã làm",
+            "answered": "Đã trả lời",
+            "unanswered": "Chưa trả lời",
+            "viewing": "Đang xem",
+            "flagged": "Đã đánh dấu",
+            "submit": "Nộp Bài",
+            "disbandRoom": "Giải Tán Phòng",
+            "members": "Thành viên",
+            "online": "Online",
+            "you": "(Bạn)"
+        },
+        "lobby": {
+            "waitingTitle": "Đang đợi chủ phòng...",
+            "waitingDesc": "Vui lòng chờ trong giây lát.",
+            "configTitle": "Cấu Hình Bài Luyện Tập",
+            "configDesc": "Chọn số lượng câu hỏi và thời gian bạn muốn dành cho bài luyện tập này.",
+            "selectCategory": "1. Chọn Môn Học",
+            "questionsSuffix": "câu hỏi",
+            "modeTitle": "Chế độ chọn câu hỏi",
+            "modeRandom": "Ngẫu nhiên toàn bộ",
+            "modeRange": "Tùy chỉnh phạm vi",
+            "from": "Từ câu",
+            "to": "Đến câu",
+            "rangeDesc": "Hệ thống sẽ chọn ngẫu nhiên trong phạm vi từ câu",
+            "countTitle": "Số lượng câu muốn làm",
+            "maxSuffix": "câu",
+            "timeTitle": "Thời gian (phút)",
+            "timeHint": "Đề xuất: 2-3 phút/câu",
+            "tip": "Mẹo:",
+            "tipDesc": "Chế độ này phù hợp để ôn tập theo chủ đề hoặc tranh thủ luyện tập trong thời gian ngắn.",
+            "preparing": "Đang chuẩn bị...",
+            "start": "Bắt Đầu Luyện Tập"
+        },
+        "exam": {
+            "question": "Câu",
+            "flag": "Flag",
+            "flagged": "Flagged",
+            "explanation": "Giải thích:",
+            "prev": "Câu trước",
+            "next": "Câu tiếp theo"
+        },
+        "results": {
+            "title": "Kết Quả Luyện Tập",
+            "percentage": "Bạn đã trả lời đúng"
+        },
+        "tabs": {
+            "chat": "Chat",
+            "video": "Video"
+        },
+        "chat": {
+            "empty": "Chưa có tin nhắn nào",
+            "placeholder": "Nhập tin nhắn..."
+        },
+        "video": {
+            "desc": "Tham gia video call để trao đổi trực tiếp với mọi người.",
+            "join": "Tham gia Video",
+            "you": "Bạn",
+            "micOn": "Bật Micro",
+            "micOff": "Tắt Micro",
+            "camOn": "Bật Camera",
+            "camOff": "Tắt Camera",
+            "leave": "Rời Video"
+        },
+        "dialog": {
+            "submitTitle": "Xác nhận nộp bài",
+            "submitDesc": "Bạn có chắc chắn muốn nộp bài cho toàn bộ phòng không? Hành động này sẽ tính điểm và hiển thị kết quả cho tất cả thành viên.",
+            "cancel": "Hủy",
+            "confirm": "Xác nhận nộp",
+            "disbandTitle": "Giải tán phòng?",
+            "disbandDesc": "Bạn có chắc chắn muốn giải tán phòng này không? Tất cả thành viên sẽ bị đẩy ra khỏi phòng ngay lập tức.",
+            "disbandConfirm": "Giải tán ngay"
+        }
+    },
+    "examSelection": {
+        "loading": "Đang tải...",
+        "notFound": "Không tìm thấy kỳ thi",
+        "back": "← Quay lại danh sách",
+        "subtitle": "Chọn chế độ thi để bắt đầu làm bài",
+        "modes": {
+            "practice": {
+                "title": "Luyện Tập Linh Hoạt (Practice Mode)",
+                "desc": "Tùy chỉnh số câu & thời gian"
+            },
+            "exam": {
+                "title": "Thi Thử (Exam Mode)",
+                "desc": "Giả lập thi thật (CBT)"
+            }
+        },
+        "practice": {
+            "title": "Cấu Hình Bài Luyện Tập",
+            "desc": "Chọn số lượng câu hỏi và thời gian bạn muốn dành cho bài luyện tập này.",
+            "modeLabel": "Chế độ chọn câu hỏi",
+            "random": "Ngẫu nhiên toàn bộ",
+            "range": "Tùy chỉnh phạm vi",
+            "from": "Từ câu",
+            "to": "Đến câu",
+            "rangeDesc": "Hệ thống sẽ chọn ngẫu nhiên {count} câu hỏi trong phạm vi từ câu {start} đến câu {end}.",
+            "countLabel": "Số lượng câu muốn làm",
+            "maxSuffix": "câu",
+            "timeLabel": "Thời gian (phút)",
+            "timeHint": "Đề xuất: 2-3 phút/câu",
+            "tipTitle": "Mẹo:",
+            "tipDesc": "Chế độ này phù hợp để ôn tập theo chủ đề hoặc tranh thủ luyện tập trong thời gian ngắn.",
+            "startBtn": "Bắt Đầu Luyện Tập",
+            "list": {
+                "official": "Kỳ thi chính thức",
+                "belongsTo": "Thuộc",
+                "questions": "câu hỏi",
+                "start": "Bắt đầu",
+                "loginTitle": "Yêu cầu đăng nhập",
+                "loginDesc": "Bạn cần đăng nhập để bắt đầu làm bài thi thử. Tài khoản của bạn sẽ được lưu quá trình học tập.",
+                "cancel": "Hủy",
+                "loginBtn": "Đăng nhập ngay"
+            }
+        },
+        "exam": {
+            "title": "Thông Tin Bài Thi Chuẩn",
+            "desc": "Chế độ này mô phỏng chính xác áp lực và quy định của kỳ thi thật.",
+            "stats": {
+                "questions": "Câu hỏi",
+                "minutes": "Phút",
+                "passingScore": "Điểm đỗ",
+                "interface": "Giao diện"
+            },
+            "rules": {
+                "1": "Thời gian sẽ <strong>không thể tạm dừng</strong> một khi đã bắt đầu.",
+                "2": "Bạn có thể đánh dấu (flag) các câu hỏi để xem lại sau.",
+                "3": "Kết quả sẽ được tính vào <strong>Ranking System</strong> của hệ thống."
+            },
+            "startBtn": "Bắt Đầu Thi Thử"
+        }
+    },
+    "examRunner": {
+        "loading": "Đang tải đề thi...",
+        "noQuestions": "Không tìm thấy câu hỏi nào.",
+        "header": {
+            "exit": "Thoát",
+            "title": "SOA Exam Simulator",
+            "reference": "Bảng tra cứu (Reference Sheet)",
+            "referenceShort": "Bảng tra cứu",
+            "settings": "Cấu hình hiển thị",
+            "size": "Cỡ chữ",
+            "font": "Font Style",
+            "play": "Tiếp tục",
+            "pause": "Tạm dừng",
+            "saving": "Đang lưu...",
+            "submit": "Nộp Bài"
+        },
+        "sidebar": {
+            "title": "Danh sách câu hỏi",
+            "done": "đã làm",
+            "answered": "Đã trả lời",
+            "unanswered": "Chưa trả lời",
+            "viewing": "Đang xem",
+            "flagged": "Đã đánh dấu"
+        },
+        "results": {
+            "title": "Kết Quả Của Bạn",
+            "desc": "Bạn đã hoàn thành bài thi.",
+            "correct": "Câu trả lời đúng",
+            "retry": "Làm lại",
+            "list": "Danh sách bài tập",
+            "progress": "Xem tiến độ"
+        },
+        "question": {
+            "label": "Question",
+            "highlight": "Highlight",
+            "highlightTooltip": "Chế độ highlight (Bôi đen văn bản để highlight)",
+            "clearTooltip": "Xóa highlight",
+            "flag": "Flag",
+            "flagged": "Flagged",
+            "explanation": "Giải thích:"
+        },
+        "nav": {
+            "prev": "Câu trước",
+            "next": "Câu tiếp theo",
+            "submit": "Nộp bài"
+        },
+        "dialog": {
+            "submitTitle": "Xác nhận nộp bài",
+            "submitDesc": "Bạn có chắc chắn muốn nộp bài không? Hành động này không thể hoàn tác.",
+            "submitStat": "Bạn đã làm",
+            "cancel": "Hủy",
+            "confirm": "Nộp Bài",
+            "clearHighlightTitle": "Xóa Highlights",
+            "clearHighlightDesc": "Bạn có chắc muốn xóa tất cả highlight của câu hỏi này không?",
+            "delete": "Xóa",
+            "referenceTitle": "Bảng Tra Cứu (Reference Sheet)",
+            "referenceDesc": "Tài liệu tham khảo cho kỳ thi",
+            "exitTitle": "Xác nhận thoát",
+            "exitDesc": "Bạn có chắc chắn muốn thoát? Kết quả bài làm hiện tại sẽ không được lưu.",
+            "exitConfirm": "Thoát"
+        },
+        "error": {
+            "user": "Không thể xác định tài khoản người dùng. Vui lòng tải lại trang.",
+            "save": "Lỗi khi lưu kết quả"
+        }
+    },
+    "progress": {
+        "title": "Thống Kê Hiệu Quả",
+        "subtitle": "Theo dõi chi tiết tiến độ ôn thi Exam P & FM",
+        "overview": "Tổng quan",
+        "viewAll": "Xem tất cả",
+        "questionsAnswered": "Câu hỏi đã trả lời",
+        "latestUpdate": "Cập nhật mới nhất",
+        "averageScore": "Điểm trung bình",
+        "studyStreak": "Chuỗi ngày học",
+        "keepItUp": "Giữ vững phong độ!",
+        "performance": "Hiệu suất",
+        "last7Days": "7 ngày qua",
+        "daily": "Hàng ngày",
+        "days": "Ngày",
+        "feedback": {
+            "excellent": "Xuất sắc",
+            "good": "Tốt",
+            "pass": "Đạt",
+            "improve": "Cần cải thiện",
+            "noData": "Chưa có dữ liệu"
+        },
+        "loading": "Đang tải dữ liệu...",
+        "tabs": {
+            "all": "Tất cả",
+            "examP": "Exam P",
+            "examFM": "Exam FM"
+        },
+        "stats": {
+            "avgScore": "Điểm Trung Bình",
+            "totalExams": "Tổng Số Bài Thi",
+            "completed": "Đã hoàn thành {count} câu hỏi",
+            "bestScore": "Điểm Cao Nhất",
+            "record": "Kỷ lục cá nhân",
+            "streak": "Chuỗi Ngày Học",
+            "days": "Ngày",
+            "keepUp": "Giữ vững phong độ nhé!",
+            "goal": "Mục tiêu: 7.0/10"
+        },
+        "charts": {
+            "passRateTitle": "Tỉ Lệ Đạt (Pass Rate)",
+            "passRatio": "Tỉ lệ Đậu",
+            "count": "Số lượng",
+            "pass": "Đậu",
+            "fail": "Trượt"
+        },
+        "history": {
+            "title": "Lịch Sử Làm Bài Gần Đây",
+            "viewAll": "Xem tất cả",
+            "empty": "Chưa có dữ liệu trong khoảng thời gian này.",
+            "examPrefix": "Bài Thi Thử",
+            "practicePrefix": "Luyện Tập",
+            "passStatus": "ĐẠT",
+            "failStatus": "CHƯA ĐẠT"
+        }
+    }
+}

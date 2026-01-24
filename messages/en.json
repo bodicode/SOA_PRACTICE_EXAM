@@ -1,0 +1,566 @@
+{
+    "nav": {
+        "practice": "Practice",
+        "leaderboard": "Leaderboard",
+        "progress": "My Progress",
+        "profile": "Profile",
+        "logout": "Logout",
+        "login": "Login",
+        "register": "Sign Up"
+    },
+    "hero": {
+        "title": "SOA Exam Prep",
+        "subtitle": "Master Your Actuary Certification",
+        "description": "Simulate real exam conditions with comprehensive practice materials for Exam P, FM. Track progress and optimize your scores effectively.",
+        "startButton": "Start Practicing",
+        "progressButton": "View Progress"
+    },
+    "features": {
+        "title": "Key Features",
+        "subtitle": "Comprehensive SOA prep platform powered by advanced AI technology",
+        "questionBank": {
+            "title": "Question Bank",
+            "description": "Thousands of questions categorized by topic and difficulty, helping you focus on specific knowledge areas."
+        },
+        "realExam": {
+            "title": "Real Exam Simulation",
+            "description": "Experience authentic SOA exams with professional interface and accurate countdown timer."
+        },
+        "aiSupport": {
+            "title": "Smart AI Assistant",
+            "description": "Get instant help from AI when you're stuck, helping you understand each question deeply."
+        },
+        "videoCall": {
+            "title": "Group Video Study",
+            "description": "Connect with friends via video call to discuss and solve challenging problems together."
+        },
+        "analytics": {
+            "title": "Detailed Analytics",
+            "description": "Track your learning progress with visual charts, identify your strengths and weaknesses."
+        }
+    },
+    "exams": {
+        "title": "SOA Exams",
+        "p": {
+            "title": "Exam P - Probability",
+            "description": "Foundation in probability theory and statistical distributions for Actuaries",
+            "topics": [
+                "Combinatorics and basic probability",
+                "Random variables and distributions",
+                "Expected value and variance",
+                "Special distributions",
+                "Central limit theorem"
+            ],
+            "button": "Practice Exam P"
+        },
+        "fm": {
+            "title": "Exam FM - Financial Mathematics",
+            "description": "Financial mathematics and interest theory knowledge for Actuaries",
+            "topics": [
+                "Time value of money",
+                "Annuities and cash flows",
+                "Bonds and valuation",
+                "Rate of return",
+                "Basic derivatives"
+            ],
+            "button": "Practice Exam FM"
+        }
+    },
+    "stats": {
+        "students": "Students",
+        "questions": "Questions",
+        "passRate": "Pass Rate",
+        "hours": "Study Hours"
+    },
+    "cta": {
+        "title": "Ready to Conquer SOA?",
+        "description": "Join thousands of students preparing for the Actuary exam with the most comprehensive learning platform.",
+        "button": "Get Started - Free"
+    },
+    "programs": {
+        "badge": "Exam Programs",
+        "title": "Core SOA Exams",
+        "description": "Focus on core topics. Our question bank covers 100% of the latest syllabus."
+    },
+    "testimonials": {
+        "an": {
+            "quote": "I failed Exam P twice before finding SOA Prep. The adaptive learning method helped me regain my basics and pass with a score of 9!",
+            "role": "Associate of the Society of Actuaries (ASA)"
+        },
+        "trust": "Trusted by over 5,000 Actuary students worldwide.",
+        "button": "Join Community Now"
+    },
+    "faq": {
+        "title": "Common Questions About SOA Prep",
+        "subtitle": "Answering questions for beginners in the Actuary journey",
+        "q1": {
+            "q": "What is SOA and who is this certification for?",
+            "a": "SOA (Society of Actuaries) is the US professional organization for actuaries. SOA exams (like Exam P, FM) are the required first steps to become an Actuary - one of the highest-paying professions globally, for personnel in Mathematics, Statistics, Finance, and Insurance."
+        },
+        "q2": {
+            "q": "Which SOA Exam should I start with?",
+            "a": "Most candidates start with Exam P (Probability) or Exam FM (Financial Mathematics). At SOA Exam Practice, we provide adaptive question banks for both exams to help you optimize your study time."
+        },
+        "q3": {
+            "q": "How much are SOA exam fees and tuition?",
+            "a": "Official SOA exam fees typically range from $250 - $350/exam (with student discounts). Regarding prep costs, SOA Prep offers practice packages that are over 80% cheaper than traditional textbooks, while continuously updating according to the 2026 syllabus."
+        }
+    },
+    "footer": {
+        "support": "Support",
+        "exams": "Exam Catalog",
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy",
+        "rights": "©2026 SOA Prep. All rights reserved."
+    },
+    "progress": {
+        "title": "My Progress",
+        "overview": "Overview",
+        "viewAll": "View All Stats",
+        "questionsAnswered": "Questions Answered",
+        "averageScore": "Average Score (Scale of 10)",
+        "studyStreak": "Study Streak",
+        "days": "Days",
+        "latestUpdate": "Latest Update",
+        "keepItUp": "Keep it up!",
+        "feedback": {
+            "excellent": "Excellent! Keep it up",
+            "good": "Good Result",
+            "pass": "Passed Requirements",
+            "improve": "Needs Improvement",
+            "noData": "No Simulation Data"
+        },
+        "performance": "PERFORMANCE",
+        "last7Days": "Last 7 Days",
+        "daily": "Daily"
+    },
+    "leaderboard": {
+        "badge": "Leaderboard",
+        "title": "SOA Arena",
+        "subtitle": "Compete with the global Actuary community. Prove your skills and reach the top!",
+        "searchPlaceholder": "Search members...",
+        "selectCountry": "Select Country",
+        "loading": "Loading data...",
+        "empty": "No members found in this region.",
+        "columns": {
+            "questions": "Questions",
+            "score": "Avg Score"
+        },
+        "user": {
+            "hidden": "Hidden User",
+            "you": "You",
+            "yourRank": "Your Rank"
+        },
+        "levels": {
+            "Beginner": "Beginner",
+            "Intermediate": "Intermediate",
+            "Advanced": "Advanced",
+            "Expert": "Expert"
+        },
+        "countries": {
+            "ALL": "Global 🌍"
+        }
+    },
+    "profile": {
+        "loading": "Please sign in to view profile.",
+        "tabs": {
+            "profile": "Profile Info",
+            "security": "Security"
+        },
+        "personalInfo": {
+            "title": "Update Information",
+            "description": "Change your display name on the system.",
+            "displayName": "Display Name",
+            "placeholderName": "Enter your display name",
+            "country": "Country",
+            "level": "Level",
+            "levelAuto": "(Auto-ranked)",
+            "levelHint": "*Practice more to rank up automatically.",
+            "email": "Email",
+            "emailHint": "Email cannot be changed.",
+            "save": "Save Changes",
+            "saving": "Saving..."
+        },
+        "security": {
+            "title": "Change Password",
+            "description": "Update a new password for your account.",
+            "currentPassword": "Current Password",
+            "newPassword": "New Password",
+            "confirmPassword": "Confirm New Password",
+            "change": "Change Password",
+            "changing": "Updating..."
+        },
+        "stats": {
+            "totalPractice": "Total Practice & Exams",
+            "streak": "Study Streak",
+            "days": "days",
+            "joined": "Joined:"
+        },
+        "messages": {
+            "updateSuccess": "Information updated successfully!",
+            "updateError": "An error occurred while updating.",
+            "fillAll": "Please fill in all fields.",
+            "passwordMismatch": "Confirm password does not match.",
+            "passwordLength": "New password must be at least 6 characters.",
+            "wrongPassword": "Current password is incorrect.",
+            "passwordSuccess": "Password changed successfully!",
+            "error": "An unexpected error occurred.",
+            "sizeError": "Image must not exceed 2MB",
+            "uploading": "Uploading image...",
+            "uploadSuccess": "Avatar updated successfully!",
+            "uploadError": "Error uploading image"
+        },
+        "levels": {
+            "Beginner": "Beginner 🥉",
+            "Intermediate": "Intermediate 🥈",
+            "Advanced": "Advanced 🥇",
+            "Expert": "Expert 🏆"
+        }
+    },
+    "practice": {
+        "title": "Online Practice Exams",
+        "notice": "Welcome to the online SOA exam prep system. Our team continuously updates the question bank to match the latest exam format. If you encounter any technical issues, please contact us via support email.",
+        "groupStudy": {
+            "title": "👥 Group Study",
+            "description": "Invite friends to solve problems together. Real-time synchronization helps your group discuss and learn more effectively than ever.",
+            "button": "Join Now"
+        },
+        "description": {
+            "p1": "Vietnam Actuary Community (SOA Practice) is committed to supporting candidates preparing for preliminary exams. To achieve this, we provide online practice exams for selected preliminary exams. Completely free, these practice exams select questions and solutions in an online environment closely simulating the actual SOA exam format.",
+            "p2": "Questions have been coded to meet exam learning objectives and ensure candidates receive a balanced but randomized set of questions each time they take a practice exam. Current questions are drawn from official sample question sources.",
+            "p3": "The process used to create SOA actuarial exams from a large question bank is complex and considers many factors, including overall exam difficulty and coverage of learning objectives. Therefore, while falling within the scope of exam learning objectives, questions in these practice exams may not represent the average difficulty of an actual exam.",
+            "p4": "If you have questions or encounter technical difficulties with the online practice exam, please contact us via email."
+        },
+        "chooseExam": "Select an Exam to Start",
+        "loading": "Loading data...",
+        "reportError": {
+            "title": "Report Error:",
+            "content": "If you find a potential error in a question or solution, please screenshot the question along with your solution and send it to us via email. We will review and respond as soon as possible."
+        }
+    },
+    "auth": {
+        "home": "Home",
+        "loginTitle": "Welcome Back",
+        "loginSubtitle": "Sign in to continue your SOA journey",
+        "email": "Email",
+        "password": "Password",
+        "forgotPassword": "Forgot password?",
+        "signIn": "Sign In",
+        "noAccount": "No account yet?",
+        "createAccount": "Create free account",
+        "errorGeneric": "An error occurred. Please try again.",
+        "loading": "Loading..."
+    },
+    "groupLobby": {
+        "title": "Group Study",
+        "subtitle": "Study with friends. Solve problems together, discuss answers, and conquer SOA exams.",
+        "features": {
+            "realtimeTitle": "Real-time Collaboration",
+            "realtimeDesc": "Sync questions with everyone in the room.",
+            "progressTitle": "Shared Progress",
+            "progressDesc": "Host controls the pace of the exam."
+        },
+        "create": {
+            "title": "Create New Room",
+            "desc": "You will be the host and select the exam.",
+            "button": "Create Room",
+            "loading": "Creating...",
+            "success": "Room created successfully!",
+            "error": "Failed to create room"
+        },
+        "join": {
+            "title": "Join Room",
+            "desc": "Enter the room code from your friend.",
+            "placeholder": "Enter Room Code (e.g. 123456)",
+            "button": "Join Room",
+            "loading": "Joining...",
+            "success": "Joined room successfully!",
+            "error": "Failed to join",
+            "invalidCode": "Please enter a valid room code!"
+        }
+    },
+    "groupRoom": {
+        "notFound": {
+            "title": "Room Not Found",
+            "desc": "Room code is invalid or expired.",
+            "back": "Back to Lobby"
+        },
+        "toast": {
+            "restore": "Restored previous session",
+            "newExam": "New practice exam started!",
+            "submitted": "Exam submitted! Check results now.",
+            "disbanded": "Room has been disbanded by the host!",
+            "videoError": "Video connection error",
+            "micOn": "Mic On",
+            "micOff": "Mic Off",
+            "cameraOn": "Camera On",
+            "cameraOff": "Camera Off",
+            "noQuestions": "No questions found in this range!",
+            "errorLoad": "Error loading questions",
+            "browserError": "Browser not supported or connection not secure (HTTPS)",
+            "cameraError": "Camera/Mic Error"
+        },
+        "header": {
+            "disband": "Disband",
+            "leave": "Leave",
+            "room": "Room:",
+            "settings": "Display Settings",
+            "size": "Size",
+            "font": "Font"
+        },
+        "sidebar": {
+            "questions": "Questions List",
+            "done": "done",
+            "answered": "Answered",
+            "unanswered": "Unanswered",
+            "viewing": "Viewing",
+            "flagged": "Flagged",
+            "submit": "Submit Exam",
+            "disbandRoom": "Disband Room",
+            "members": "Members",
+            "online": "Online",
+            "you": "(You)"
+        },
+        "lobby": {
+            "waitingTitle": "Waiting for host...",
+            "waitingDesc": "Please wait a moment.",
+            "configTitle": "Practice Configuration",
+            "configDesc": "Select the number of questions and time you want for this practice session.",
+            "selectCategory": "1. Select Category",
+            "questionsSuffix": "questions",
+            "modeTitle": "Question Selection Mode",
+            "modeRandom": "Totally Random",
+            "modeRange": "Custom Range",
+            "from": "From",
+            "to": "To",
+            "rangeDesc": "System will select randomly from question",
+            "countTitle": "Number of Questions",
+            "maxSuffix": "questions",
+            "timeTitle": "Time (minutes)",
+            "timeHint": "Recommended: 2-3 mins/question",
+            "tip": "Tip:",
+            "tipDesc": "This mode is suitable for topic-based review or quick practice.",
+            "preparing": "Preparing...",
+            "start": "Start Practice"
+        },
+        "exam": {
+            "question": "Question",
+            "flag": "Flag",
+            "flagged": "Flagged",
+            "explanation": "Explanation:",
+            "prev": "Previous",
+            "next": "Next"
+        },
+        "results": {
+            "title": "Practice Results",
+            "percentage": "You answered correctly"
+        },
+        "tabs": {
+            "chat": "Chat",
+            "video": "Video"
+        },
+        "chat": {
+            "empty": "No messages yet",
+            "placeholder": "Type a message..."
+        },
+        "video": {
+            "desc": "Join video call to discuss directly with everyone.",
+            "join": "Join Video",
+            "you": "You",
+            "micOn": "Unmute Mic",
+            "micOff": "Mute Mic",
+            "camOn": "Turn Camera On",
+            "camOff": "Turn Camera Off",
+            "leave": "Leave Video"
+        },
+        "dialog": {
+            "submitTitle": "Confirm Submission",
+            "submitDesc": "Are you sure you want to submit for the entire room? This will calculate scores and show results for all members.",
+            "cancel": "Cancel",
+            "confirm": "Confirm Submit",
+            "disbandTitle": "Disband Room?",
+            "disbandDesc": "Are you sure you want to disband this room? All members will be removed instantly.",
+            "disbandConfirm": "Disband Now"
+        }
+    },
+    "examSelection": {
+        "loading": "Loading...",
+        "notFound": "Exam not found",
+        "back": "← Back to list",
+        "subtitle": "Choose exam mode to start",
+        "modes": {
+            "practice": {
+                "title": "Flexible Practice (Practice Mode)",
+                "desc": "Customize question count & time"
+            },
+            "exam": {
+                "title": "Mock Exam (Exam Mode)",
+                "desc": "Simulate real exam (CBT)"
+            }
+        },
+        "practice": {
+            "title": "Practice Configuration",
+            "desc": "Select the number of questions and time you want for this practice session.",
+            "modeLabel": "Question Selection Mode",
+            "random": "Totally Random",
+            "range": "Custom Range",
+            "from": "From Question",
+            "to": "To Question",
+            "rangeDesc": "System will select {count} random questions from question {start} to {end}.",
+            "countLabel": "Number of Questions",
+            "maxSuffix": "questions",
+            "timeLabel": "Time (minutes)",
+            "timeHint": "Recommended: 2-3 mins/question",
+            "tipTitle": "Tip:",
+            "tipDesc": "This mode is suitable for topic-based review or quick practice.",
+            "startBtn": "Start Practice",
+            "list": {
+                "official": "Official Exam",
+                "belongsTo": "Belongs to",
+                "questions": "questions",
+                "start": "Start",
+                "loginTitle": "Login Required",
+                "loginDesc": "You need to login to start the exam. Your progress will be saved.",
+                "cancel": "Cancel",
+                "loginBtn": "Login Now"
+            }
+        },
+        "exam": {
+            "title": "Standard Exam Information",
+            "desc": "This mode exactly simulates the pressure and regulations of the real exam.",
+            "stats": {
+                "questions": "Questions",
+                "minutes": "Minutes",
+                "passingScore": "Passing Score",
+                "interface": "Interface"
+            },
+            "rules": {
+                "1": "Time <strong>cannot be paused</strong> once started.",
+                "2": "You can flag questions to review later.",
+                "3": "Results will count towards the system's <strong>Ranking System</strong>."
+            },
+            "startBtn": "Start Mock Exam"
+        }
+    },
+    "examRunner": {
+        "loading": "Loading exam...",
+        "noQuestions": "No questions found.",
+        "header": {
+            "exit": "Exit",
+            "title": "SOA Exam Simulator",
+            "reference": "Reference Sheet",
+            "referenceShort": "Reference",
+            "settings": "Display Settings",
+            "size": "Size",
+            "font": "Font Style",
+            "play": "Resume",
+            "pause": "Pause",
+            "saving": "Saving...",
+            "submit": "Submit"
+        },
+        "sidebar": {
+            "title": "Questions List",
+            "done": "done",
+            "answered": "Answered",
+            "unanswered": "Unanswered",
+            "viewing": "Viewing",
+            "flagged": "Flagged"
+        },
+        "results": {
+            "title": "Your Results",
+            "desc": "You have completed the exam.",
+            "correct": "Correct Answers",
+            "retry": "Retry",
+            "list": "Exercise List",
+            "progress": "View Progress"
+        },
+        "question": {
+            "label": "Question",
+            "highlight": "Highlight",
+            "highlightTooltip": "Highlight Mode (Select text to highlight)",
+            "clearTooltip": "Clear Highlight",
+            "flag": "Flag",
+            "flagged": "Flagged",
+            "explanation": "Explanation:"
+        },
+        "nav": {
+            "prev": "Previous",
+            "next": "Next",
+            "submit": "Submit"
+        },
+        "dialog": {
+            "submitTitle": "Confirm Submission",
+            "submitDesc": "Are you sure you want to submit? This action cannot be undone.",
+            "submitStat": "You answered",
+            "cancel": "Cancel",
+            "confirm": "Submit Exam",
+            "clearHighlightTitle": "Clear Highlights",
+            "clearHighlightDesc": "Are you sure you want to clear all highlights for this question?",
+            "delete": "Clear",
+            "referenceTitle": "Reference Sheet",
+            "referenceDesc": "Reference material for the exam",
+            "exitTitle": "Confirm Exit",
+            "exitDesc": "Are you sure you want to exit? Current progress will not be saved.",
+            "exitConfirm": "Exit"
+        },
+        "error": {
+            "user": "Cannot identify user. Please reload the page.",
+            "save": "Error saving result"
+        }
+    },
+    "progress": {
+        "title": "Performance Statistics",
+        "subtitle": "Detailed progress tracking for Exam P & FM",
+        "overview": "Overview",
+        "viewAll": "View All",
+        "questionsAnswered": "Questions Answered",
+        "latestUpdate": "Latest Update",
+        "averageScore": "Average Score",
+        "studyStreak": "Study Streak",
+        "keepItUp": "Keep it up!",
+        "performance": "Performance",
+        "last7Days": "Last 7 Days",
+        "daily": "Daily",
+        "days": "Days",
+        "feedback": {
+            "excellent": "Excellent",
+            "good": "Good",
+            "pass": "Pass",
+            "improve": "Needs Improvement",
+            "noData": "No Data"
+        },
+        "loading": "Loading analytics...",
+        "tabs": {
+            "all": "All",
+            "examP": "Exam P",
+            "examFM": "Exam FM"
+        },
+        "stats": {
+            "avgScore": "Average Score",
+            "totalExams": "Total Exams",
+            "completed": "Completed {count} questions",
+            "bestScore": "Best Score",
+            "record": "Personal Best",
+            "streak": "Study Streak",
+            "days": "Days",
+            "keepUp": "Keep it up!",
+            "goal": "Goal: 7.0/10"
+        },
+        "charts": {
+            "passRateTitle": "Pass Rate",
+            "passRatio": "Pass Ratio",
+            "count": "Count",
+            "pass": "Pass",
+            "fail": "Fail"
+        },
+        "history": {
+            "title": "Recent History",
+            "viewAll": "View all",
+            "empty": "No data available for this period.",
+            "examPrefix": "Mock Exam",
+            "practicePrefix": "Practice",
+            "passStatus": "PASS",
+            "failStatus": "FAIL"
+        }
+    }
+}

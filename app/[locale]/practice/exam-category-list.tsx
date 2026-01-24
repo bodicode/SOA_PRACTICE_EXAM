@@ -7,6 +7,7 @@ import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { CategoryData } from '@/lib/categories'
+import { useTranslations } from 'next-intl'
 import {
     Dialog,
     DialogContent,
@@ -21,6 +22,7 @@ interface ExamCategoryListProps {
 }
 
 export default function ExamCategoryList({ categories }: ExamCategoryListProps) {
+    const t = useTranslations('examSelection.practice.list')
     const { user } = useUserStore()
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -58,17 +60,17 @@ export default function ExamCategoryList({ categories }: ExamCategoryListProps) 
                         <CardHeader className="pb-2">
                             <CardTitle className="text-[#003366] text-lg">{exam.name}</CardTitle>
                             <CardDescription>
-                                {exam.parentName ? `Thuộc: ${exam.parentName}` : 'Kỳ thi chính thức'}
+                                {exam.parentName ? `${t('belongsTo')}: ${exam.parentName}` : t('official')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="flex justify-between items-center">
-                            <span className="text-sm text-gray-500">{exam.questionsCount} câu hỏi</span>
+                            <span className="text-sm text-gray-500">{exam.questionsCount} {t('questions')}</span>
                             <Button
                                 size="sm"
                                 className="bg-[#003366] hover:bg-[#002244]"
                                 onClick={() => handleStart(exam.id)}
                             >
-                                Bắt đầu
+                                {t('start')}
                             </Button>
                         </CardContent>
                     </Card>
@@ -78,18 +80,18 @@ export default function ExamCategoryList({ categories }: ExamCategoryListProps) 
             <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Yêu cầu đăng nhập</DialogTitle>
+                        <DialogTitle>{t('loginTitle')}</DialogTitle>
                         <DialogDescription>
-                            Bạn cần đăng nhập để bắt đầu làm bài thi thử. Tài khoản của bạn sẽ được lưu quá trình học tập.
+                            {t('loginDesc')}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowLoginDialog(false)}>
-                            Hủy
+                            {t('cancel')}
                         </Button>
                         <Link href="/login">
                             <Button onClick={() => setShowLoginDialog(false)}>
-                                Đăng nhập ngay
+                                {t('loginBtn')}
                             </Button>
                         </Link>
                     </DialogFooter>

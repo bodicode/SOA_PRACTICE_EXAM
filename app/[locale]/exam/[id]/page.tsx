@@ -13,6 +13,7 @@ import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import { useTranslations } from 'next-intl'
 
 const MathRender = dynamic(() => import('@/components/MathRender'), { ssr: false })
 import {
@@ -26,6 +27,7 @@ import {
 
 export default function ExamPage() {
     // Hooks
+    const t = useTranslations('examRunner')
     const params = useParams()
     const searchParams = useSearchParams()
     const router = useRouter()
@@ -292,7 +294,7 @@ export default function ExamPage() {
                     console.warn("User ID is not a number (likely UUID):", user.id);
                     // Attempt to use 1 as fallback or handle error?
                     // For now, let's alert if we can't identify the user
-                    // alert("Không thể xác định tài khoản người dùng. Vui lòng tải lại trang.");
+                    // alert(t('error.user'));
                     // return;
                 }
             }
@@ -357,7 +359,7 @@ export default function ExamPage() {
             setIsSubmitted(true);
         } catch (error) {
             console.error("Failed to save result", error);
-            alert(`Lỗi khi lưu kết quả: ${error instanceof Error ? error.message : "Không xác định"}`);
+            alert(`${t('error.save')}: ${error instanceof Error ? error.message : "Unkown"}`);
             setIsSubmitted(true);
         } finally {
             setIsSaving(false);
@@ -452,8 +454,8 @@ export default function ExamPage() {
         return answers[q.id] === q.correctOption
     }
 
-    if (isLoading) return <div className="h-screen flex items-center justify-center">Đang tải đề thi...</div>
-    if (questions.length === 0) return <div className="h-screen flex items-center justify-center">Không tìm thấy câu hỏi nào.</div>
+    if (isLoading) return <div className="h-screen flex items-center justify-center">{t('loading')}</div>
+    if (questions.length === 0) return <div className="h-screen flex items-center justify-center">{t('noQuestions')}</div>
 
     const fetchPageForIndex = async (index: number) => {
         if (questions[index]) return true; // Already loaded
@@ -524,9 +526,9 @@ export default function ExamPage() {
             <header className="sticky top-0 h-16 bg-[#003366] text-white flex items-center justify-between px-6 shadow-md z-50 font-sans text-base">
                 <div className="font-bold text-lg flex items-center gap-4">
                     <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 gap-2" onClick={handleExitClick}>
-                        <ChevronLeft className="w-4 h-4" /> Thoát
+                        <ChevronLeft className="w-4 h-4" /> {t('header.exit')}
                     </Button>
-                    SOA Exam Simulator
+                    {t('header.title')}
                 </div>
                 <div className="flex items-center gap-6 relative">
                     {/* Font Settings Button */}
@@ -538,10 +540,10 @@ export default function ExamPage() {
                                 size="sm"
                                 className={cn("text-white hover:bg-white/20 gap-2 px-3 border border-white/20", showReferenceSheet && "bg-white/20")}
                                 onClick={() => setShowReferenceSheet(!showReferenceSheet)}
-                                title="Bảng tra cứu (Reference Sheet)"
+                                title={t('header.reference')}
                             >
                                 <FileText className="w-4 h-4" />
-                                <span className="hidden md:inline font-sans text-sm">Bảng tra cứu</span>
+                                <span className="hidden md:inline font-sans text-sm">{t('header.referenceShort')}</span>
                             </Button>
                         )}
 
@@ -550,10 +552,10 @@ export default function ExamPage() {
                             size="sm"
                             className={cn("text-white hover:bg-white/20 gap-2 px-3 border border-white/20", showFontSettings && "bg-white/20")}
                             onClick={() => setShowFontSettings(!showFontSettings)}
-                            title="Cấu hình hiển thị"
+                            title={t('header.settings')}
                         >
                             <span className="font-serif text-lg font-bold">Aa</span>
-                            <span className="hidden sm:inline font-sans text-sm font-normal">Cỡ chữ</span>
+                            <span className="hidden sm:inline font-sans text-sm font-normal">{t('header.size')}</span>
                             <ChevronDown className="w-3 h-3 opacity-70" />
                         </Button>
 
@@ -561,7 +563,7 @@ export default function ExamPage() {
                             <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 p-4 text-gray-800 z-50 animate-in fade-in zoom-in-95 duration-200">
                                 <div className="space-y-4">
                                     <div>
-                                        <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Size</div>
+                                        <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">{t('header.size')}</div>
                                         <div className="flex items-center gap-2 bg-gray-100 rounded p-1">
                                             <Button
                                                 variant="ghost"
@@ -585,7 +587,7 @@ export default function ExamPage() {
                                         </div>
                                     </div>
                                     <div>
-                                        <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Font Style</div>
+                                        <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">{t('header.font')}</div>
                                         <div className="grid grid-cols-2 gap-2">
                                             <Button
                                                 variant={fontFamily === 'serif' ? 'secondary' : 'outline'}
@@ -632,7 +634,7 @@ export default function ExamPage() {
                                 "text-white hover:bg-white/20 h-auto py-1 px-2",
                                 isPaused && "bg-yellow-500/20 text-yellow-200 animate-pulse"
                             )}
-                            title={isPaused ? "Tiếp tục" : "Tạm dừng"}
+                            title={isPaused ? t('header.play') : t('header.pause')}
                         >
                             {isPaused ? <Play className="w-5 h-5 fill-current" /> : <Pause className="w-5 h-5 fill-current" />}
                         </Button>
@@ -645,7 +647,7 @@ export default function ExamPage() {
                         onClick={() => setShowSubmitDialog(true)}
                         disabled={isSubmitted || isSaving}
                     >
-                        {isSaving ? 'Đang lưu...' : 'Nộp Bài'}
+                        {isSaving ? t('header.saving') : t('header.submit')}
                     </Button>
                 </div>
             </header>
@@ -655,10 +657,10 @@ export default function ExamPage() {
                 <aside className="sticky top-16 w-72 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 flex flex-col shadow-lg z-40 hidden lg:flex overflow-y-auto">
                     <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50 shrink-0 font-sans">
                         <span className="font-bold text-gray-700 flex items-center gap-2">
-                            <Grid className="w-4 h-4" /> Danh sách câu hỏi
+                            <Grid className="w-4 h-4" /> {t('sidebar.title')}
                         </span>
                         <div className="text-xs text-gray-500">
-                            {Object.keys(answers).length}/{questions.length} đã làm
+                            {Object.keys(answers).length}/{questions.length} {t('sidebar.done')}
                         </div>
                     </div>
                     <div className="flex-1 overflow-y-auto p-4 font-sans">
@@ -690,19 +692,19 @@ export default function ExamPage() {
                     <div className="p-4 border-t border-gray-100 bg-gray-50 text-sm text-gray-700 space-y-3 shrink-0 font-sans">
                         <div className="flex items-center gap-3">
                             <div className="w-4 h-4 rounded bg-blue-600 border border-blue-600 shadow-sm"></div>
-                            <span className="font-medium text-[12px]">Đã trả lời</span>
+                            <span className="font-medium text-[12px]">{t('sidebar.answered')}</span>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-4 h-4 rounded bg-white border border-gray-300 shadow-sm"></div>
-                            <span className="font-medium text-[12px]">Chưa trả lời</span>
+                            <span className="font-medium text-[12px]">{t('sidebar.unanswered')}</span>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-4 h-4 rounded bg-blue-50 border border-blue-600 ring-1 ring-blue-100 shadow-sm"></div>
-                            <span className="font-medium text-[12px]">Đang xem</span>
+                            <span className="font-medium text-[12px]">{t('sidebar.viewing')}</span>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="w-4 h-4 rounded bg-yellow-400 border border-yellow-500 shadow-sm"></div>
-                            <span className="font-medium text-[12px]">Đã đánh dấu</span>
+                            <span className="font-medium text-[12px]">{t('sidebar.flagged')}</span>
                         </div>
                     </div>
                 </aside>
@@ -719,27 +721,27 @@ export default function ExamPage() {
                     {isSubmitted && (
                         <div className="mb-6 bg-white p-6 rounded-lg shadow border border-blue-100 flex items-center justify-between font-sans">
                             <div>
-                                <h3 className="text-2xl font-bold text-[#003366]">Kết Quả Của Bạn</h3>
-                                <p className="text-gray-600">Bạn đã hoàn thành bài thi.</p>
+                                <h3 className="text-2xl font-bold text-[#003366]">{t('results.title')}</h3>
+                                <p className="text-gray-600">{t('results.desc')}</p>
                             </div>
                             <div className="text-right flex flex-col items-end gap-2">
                                 <div className="text-4xl font-bold text-blue-600">
                                     {questions.reduce((acc, q) => acc + (answers[q.id] === q.correctOption ? 1 : 0), 0)} / {questions.length}
                                 </div>
-                                <div className="text-sm font-medium text-gray-500">Câu trả lời đúng</div>
+                                <div className="text-sm font-medium text-gray-500">{t('results.correct')}</div>
                                 <div className="flex gap-2 mt-2">
                                     <Button size="sm" variant="outline" onClick={() => {
                                         shouldPersist.current = false
                                         localStorage.removeItem(STORAGE_KEY)
                                         window.location.reload()
                                     }}>
-                                        Làm lại
+                                        {t('results.retry')}
                                     </Button>
                                     <Button size="sm" variant="secondary" onClick={() => router.push('/practice')}>
-                                        Danh sách bài tập
+                                        {t('results.list')}
                                     </Button>
                                     <Button size="sm" onClick={() => router.push('/progress')}>
-                                        Xem tiến độ
+                                        {t('results.progress')}
                                     </Button>
                                 </div>
                             </div>
@@ -748,7 +750,7 @@ export default function ExamPage() {
 
                     <div className="flex justify-between items-start mb-2 border-b pb-1 border-gray-200">
                         <h2 className="text-[15px] font-bold text-gray-800">
-                            Question {currentQuestionIndex + 1}
+                            {t('question.label')} {currentQuestionIndex + 1}
                         </h2>
                         <div className="flex items-center gap-2">
                             <div className="flex bg-gray-100 rounded-md p-0.5 border border-gray-200 mr-2">
@@ -760,10 +762,10 @@ export default function ExamPage() {
                                         "h-7 px-2 text-xs font-sans gap-2 transition-colors",
                                         isHighlightMode ? "bg-yellow-200 text-yellow-800 hover:bg-yellow-300" : "text-gray-600 hover:bg-gray-200 hover:text-gray-900"
                                     )}
-                                    title="Chế độ highlight (Bôi đen văn bản để highlight)"
+                                    title={t('question.highlightTooltip')}
                                 >
                                     <Highlighter className="w-3.5 h-3.5" />
-                                    <span className="hidden sm:inline">Highlight</span>
+                                    <span className="hidden sm:inline">{t('question.highlight')}</span>
                                 </Button>
                                 {highlights[currentQuestion.id]?.length > 0 && (
                                     <Button
@@ -771,7 +773,7 @@ export default function ExamPage() {
                                         size="sm"
                                         onClick={clearHighlights}
                                         className="h-7 w-7 p-0 text-red-400 hover:text-red-600 hover:bg-red-50"
-                                        title="Xóa highlight"
+                                        title={t('question.clearTooltip')}
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
                                     </Button>
@@ -788,7 +790,7 @@ export default function ExamPage() {
                                 )}
                             >
                                 <Flag className={cn("w-3 h-3", flagged[currentQuestion.id] && "fill-current")} />
-                                {flagged[currentQuestion.id] ? 'Flagged' : 'Flag'}
+                                {flagged[currentQuestion.id] ? t('question.flagged') : t('question.flag')}
                             </Button>
                         </div>
                     </div>
@@ -838,7 +840,7 @@ export default function ExamPage() {
 
                         {isSubmitted && currentQuestion.explanation && (
                             <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-lg">
-                                <h4 className="font-bold text-green-800 mb-2 font-sans text-sm">Giải thích:</h4>
+                                <h4 className="font-bold text-green-800 mb-2 font-sans text-sm">{t('question.explanation')}</h4>
                                 <div className="text-green-900">
                                     <MathRender text={currentQuestion.explanation ?? ""} />
                                 </div>
@@ -852,7 +854,7 @@ export default function ExamPage() {
                             onClick={handlePrev}
                             disabled={currentQuestionIndex === 0 || loadingMore}
                             className="w-10 h-10 p-0 rounded-full border-gray-300"
-                            title="Previous Question"
+                            title={t('nav.prev')}
                         >
                             <ChevronLeft className="w-5 h-5 text-gray-600" />
                         </Button>
@@ -866,7 +868,7 @@ export default function ExamPage() {
                                 }
                             }}
                             disabled={loadingMore}
-                            title={currentQuestionIndex === totalQuestions - 1 ? "Nộp bài" : "Câu tiếp theo"}
+                            title={currentQuestionIndex === totalQuestions - 1 ? t('nav.submit') : t('nav.next')}
                         >
                             {currentQuestionIndex === totalQuestions - 1 ? <Check className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                         </Button>
@@ -877,16 +879,16 @@ export default function ExamPage() {
             <Dialog open={showSubmitDialog} onOpenChange={setShowSubmitDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Xác nhận nộp bài</DialogTitle>
+                        <DialogTitle>{t('dialog.submitTitle')}</DialogTitle>
                         <DialogDescription>
-                            Bạn có chắc chắn muốn nộp bài không? Hành động này không thể hoàn tác.
+                            {t('dialog.submitDesc')}
                             <br />
-                            Bạn đã làm {Object.keys(answers).length}/{questions.length} câu hỏi.
+                            {t('dialog.submitStat')} {Object.keys(answers).length}/{questions.length} {t('sidebar.done').toLowerCase()}.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowSubmitDialog(false)}>Hủy</Button>
-                        <Button className="bg-[#003366]" onClick={handleSubmit}>Nộp Bài</Button>
+                        <Button variant="outline" onClick={() => setShowSubmitDialog(false)}>{t('dialog.cancel')}</Button>
+                        <Button className="bg-[#003366]" onClick={handleSubmit}>{t('dialog.confirm')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -894,14 +896,14 @@ export default function ExamPage() {
             <Dialog open={showClearHighlightDialog} onOpenChange={setShowClearHighlightDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Xóa Highlights</DialogTitle>
+                        <DialogTitle>{t('dialog.clearHighlightTitle')}</DialogTitle>
                         <DialogDescription>
-                            Bạn có chắc muốn xóa tất cả highlight của câu hỏi này không?
+                            {t('dialog.clearHighlightDesc')}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowClearHighlightDialog(false)}>Hủy</Button>
-                        <Button variant="destructive" onClick={confirmClearHighlights}>Xóa</Button>
+                        <Button variant="outline" onClick={() => setShowClearHighlightDialog(false)}>{t('dialog.cancel')}</Button>
+                        <Button variant="destructive" onClick={confirmClearHighlights}>{t('dialog.delete')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -910,8 +912,8 @@ export default function ExamPage() {
                 <DialogContent className="w-[98vw] max-w-[98vw] h-[98vh] flex flex-col p-0 overflow-hidden sm:max-w-[98vw]">
                     <DialogHeader className="px-6 py-4 flex flex-row items-center justify-between border-b shrink-0">
                         <div className="flex flex-col">
-                            <DialogTitle>Bảng Tra Cứu (Reference Sheet)</DialogTitle>
-                            <DialogDescription>Tài liệu tham khảo cho kỳ thi</DialogDescription>
+                            <DialogTitle>{t('dialog.referenceTitle')}</DialogTitle>
+                            <DialogDescription>{t('dialog.referenceDesc')}</DialogDescription>
                         </div>
                     </DialogHeader>
                     <div className="flex-1 overflow-auto bg-gray-100 p-4 flex items-start justify-center">
@@ -930,14 +932,14 @@ export default function ExamPage() {
             <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Xác nhận thoát</DialogTitle>
+                        <DialogTitle>{t('dialog.exitTitle')}</DialogTitle>
                         <DialogDescription>
-                            Bạn có chắc chắn muốn thoát? Kết quả bài làm hiện tại sẽ không được lưu.
+                            {t('dialog.exitDesc')}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowExitDialog(false)}>Hủy</Button>
-                        <Button variant="destructive" onClick={confirmExit}>Thoát</Button>
+                        <Button variant="outline" onClick={() => setShowExitDialog(false)}>{t('dialog.cancel')}</Button>
+                        <Button variant="destructive" onClick={confirmExit}>{t('dialog.exitConfirm')}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

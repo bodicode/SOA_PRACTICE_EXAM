@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input'
 import { useUserStore } from '@/stores/userStore'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 interface LeaderboardUser {
     userId: number
@@ -23,7 +24,7 @@ interface LeaderboardUser {
 }
 
 const COUNTRIES = [
-    { code: 'ALL', name: 'Toàn cầu 🌍' },
+    { code: 'ALL', nameKey: 'countries.ALL' },
     { code: 'VN', name: 'Vietnam 🇻🇳' },
     { code: 'US', name: 'USA 🇺🇸' },
     { code: 'UK', name: 'UK 🇬🇧' },
@@ -35,6 +36,7 @@ const COUNTRIES = [
 ]
 
 export default function LeaderboardPage() {
+    const t = useTranslations('leaderboard')
     const { user } = useUserStore()
     const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([])
     const [loading, setLoading] = useState(true)
@@ -109,16 +111,22 @@ export default function LeaderboardPage() {
                     </Avatar>
                     {entry.country && (
                         <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-[2px] shadow-sm text-xs" title={entry.country}>
-                            {COUNTRIES.find(c => c.code === entry.country)?.name.split(' ').pop() || '🌍'}
+                            {(() => {
+                                const c = COUNTRIES.find(c => c.code === entry.country);
+                                if (c?.nameKey) return t(c.nameKey as any).split(' ').pop();
+                                return c?.name?.split(' ').pop() || '🌍';
+                            })()}
                         </div>
                     )}
                 </div>
                 <div className="overflow-hidden">
                     <h3 className={cn("font-bold truncate", isMe ? "text-blue-700" : "text-gray-900")}>
-                        {entry.fullName || "Người dùng ẩn"} {isMe && <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Bạn</span>}
+                        {entry.fullName || t('user.hidden')} {isMe && <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{t('user.you')}</span>}
                     </h3>
                     <p className="text-xs text-gray-500 flex items-center gap-1">
-                        <span className="bg-gray-100 px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide">{entry.level || 'Người mới'}</span>
+                        <span className="bg-gray-100 px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide">
+                            {t(`levels.${entry.level || 'Beginner'}` as any)}
+                        </span>
                     </p>
                 </div>
             </div>
@@ -126,11 +134,11 @@ export default function LeaderboardPage() {
             {/* Stats */}
             <div className="flex gap-4 sm:gap-8 ml-4 text-right">
                 <div className="hidden sm:block">
-                    <div className="text-xs text-gray-400 font-medium uppercase">Câu hỏi</div>
+                    <div className="text-xs text-gray-400 font-medium uppercase">{t('columns.questions')}</div>
                     <div className="font-bold text-gray-700">{entry.totalQuestions}</div>
                 </div>
                 <div>
-                    <div className="text-xs text-gray-400 font-medium uppercase">Điểm TB</div>
+                    <div className="text-xs text-gray-400 font-medium uppercase">{t('columns.score')}</div>
                     <div className="font-bold text-blue-600 text-lg">{entry.averageScore.toFixed(1)}</div>
                 </div>
             </div>
@@ -149,13 +157,13 @@ export default function LeaderboardPage() {
                         className="inline-flex items-center justify-center p-3 bg-white/10 backdrop-blur-md rounded-full mb-2 ring-1 ring-white/20"
                     >
                         <Globe className="w-6 h-6 mr-2 text-blue-200" />
-                        <span className="font-semibold text-blue-100">Bảng Xếp Hạng</span>
+                        <span className="font-semibold text-blue-100">{t('badge')}</span>
                     </motion.div>
                     <h1 className="text-4xl sm:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-100 to-blue-200">
-                        Đấu Trường SOA
+                        {t('title')}
                     </h1>
                     <p className="text-blue-200 text-lg max-w-xl mx-auto leading-relaxed">
-                        Tranh tài cùng cộng đồng Actuary toàn cầu. Khẳng định đẳng cấp và chinh phục đỉnh cao!
+                        {t('subtitle')}
                     </p>
                 </div>
             </div>
@@ -167,7 +175,7 @@ export default function LeaderboardPage() {
                         <div className="relative flex-1 w-full">
                             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                             <Input
-                                placeholder="Tìm kiếm thành viên..."
+                                placeholder={t('searchPlaceholder')}
                                 className="pl-9 bg-white"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -175,11 +183,13 @@ export default function LeaderboardPage() {
                         </div>
                         <Select value={selectedCountry} onValueChange={setSelectedCountry}>
                             <SelectTrigger className="w-full sm:w-[200px] bg-white">
-                                <SelectValue placeholder="Chọn Quốc gia" />
+                                <SelectValue placeholder={t('selectCountry')} />
                             </SelectTrigger>
                             <SelectContent>
                                 {COUNTRIES.map(c => (
-                                    <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+                                    <SelectItem key={c.code} value={c.code}>
+                                        {c.nameKey ? t(c.nameKey as any) : c.name}
+                                    </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
@@ -188,14 +198,14 @@ export default function LeaderboardPage() {
 
                 <div className="space-y-1">
                     {loading ? (
-                        <div className="text-center py-20 text-gray-400">Đang tải dữ liệu...</div>
+                        <div className="text-center py-20 text-gray-400">{t('loading')}</div>
                     ) : filteredLeaderboard.length > 0 ? (
                         filteredLeaderboard.map(entry => (
                             <UserRow key={entry.userId} entry={entry} isMe={entry.userId === Number(user?.id)} />
                         ))
                     ) : (
                         <div className="text-center py-20 text-gray-400 bg-white rounded-xl border border-dashed">
-                            Chưa có thành viên nào trong khu vực này.
+                            {t('empty')}
                         </div>
                     )}
                 </div>
@@ -209,7 +219,7 @@ export default function LeaderboardPage() {
                     className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-2xl z-30 sm:hidden"
                 >
                     <div className="max-w-4xl mx-auto">
-                        <div className="text-xs font-bold text-gray-400 mb-2 uppercase">Thứ hạng của bạn</div>
+                        <div className="text-xs font-bold text-gray-400 mb-2 uppercase">{t('user.yourRank')}</div>
                         <UserRow entry={currentUserRank} isMe={true} />
                     </div>
                 </motion.div>

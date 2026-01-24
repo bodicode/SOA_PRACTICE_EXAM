@@ -6,7 +6,10 @@ import { motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
 import LoginForm from './login-form'
 
+import { useTranslations } from 'next-intl'
+
 export default function LoginPage() {
+    const t = useTranslations('auth')
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-blue-50 relative overflow-hidden">
             <Link
@@ -14,7 +17,7 @@ export default function LoginPage() {
                 className="absolute top-8 left-8 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 hover:bg-white/80 backdrop-blur-sm transition-all text-gray-600 hover:text-blue-600 font-medium group shadow-sm hover:shadow-md"
             >
                 <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                <span>Trang chủ</span>
+                <span>{t('home')}</span>
             </Link>
             {/* Animated Background */}
             <div className="absolute inset-0 z-0">
@@ -38,7 +41,7 @@ export default function LoginPage() {
                 />
             </div>
 
-            <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center">{t('loading')}</div>}>
                 <LoginForm />
             </Suspense>
         </div>
