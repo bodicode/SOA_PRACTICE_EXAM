@@ -10,6 +10,8 @@ const WINDOW = 60 * 1000;
 const intlMiddleware = createIntlMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
+    console.log("Middleware IS RUNNING on path:", request.nextUrl.pathname);
+
     const ip = request.headers.get('x-forwarded-for') ?? '127.0.0.1';
 
     if (request.nextUrl.pathname.startsWith('/api/debug-stats')) {
@@ -36,7 +38,7 @@ export async function middleware(request: NextRequest) {
     // Explicit redirect for root path to /en
     if (request.nextUrl.pathname === '/') {
         const url = request.nextUrl.clone();
-        url.pathname = '/en';
+        url.pathname = '/vi';
         return NextResponse.redirect(url);
     }
 
