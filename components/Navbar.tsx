@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { Link } from '@/navigation'
 import Image from 'next/image'
 // import { useRouter, usePathname } from 'next/navigation' // Removed standard hooks
 import { useRouter, usePathname } from '@/navigation' // Use next-intl hooks
@@ -59,7 +59,6 @@ export function Navbar() {
     }
 
     const switchLocale = (newLocale: string) => {
-        // next-intl router handles the path and prefix automatically
         router.replace(pathname, { locale: newLocale })
     }
 
