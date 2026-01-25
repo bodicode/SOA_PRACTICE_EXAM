@@ -33,6 +33,13 @@ export async function middleware(request: NextRequest) {
         );
     }
 
+    // Explicit redirect for root path to /en
+    if (request.nextUrl.pathname === '/') {
+        const url = request.nextUrl.clone();
+        url.pathname = '/en';
+        return NextResponse.redirect(url);
+    }
+
     const handleI18nResponse = intlMiddleware(request);
 
     const supabaseResponse = await updateSession(request);
