@@ -17,7 +17,7 @@
     },
     "features": {
         "title": "Tính Năng Nổi Bật",
-        "subtitle": "Nền tảng luyện thi SOA toàn diện với công nghệ AI tiên tiến",
+        "subtitle": "Nền tảng luyện thi SOA toàn diện",
         "questionBank": {
             "title": "Kho Bài Luyện Thi",
             "description": "Hàng ngàn câu hỏi được phân loại theo chủ đề, độ khó, giúp bạn tập trung vào từng mảng kiến thức cụ thể."
@@ -113,7 +113,6 @@
         "privacy": "Bảo Mật",
         "rights": "©2026 SOA Prep. All rights reserved."
     },
-
     "leaderboard": {
         "badge": "Bảng Xếp Hạng",
         "title": "Đấu Trường SOA",

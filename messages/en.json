@@ -17,7 +17,7 @@
     },
     "features": {
         "title": "Key Features",
-        "subtitle": "Comprehensive SOA prep platform powered by advanced AI technology",
+        "subtitle": "Comprehensive SOA prep platform",
         "questionBank": {
             "title": "Question Bank",
             "description": "Thousands of questions categorized by topic and difficulty, helping you focus on specific knowledge areas."
@@ -113,7 +113,6 @@
         "privacy": "Privacy Policy",
         "rights": "©2026 SOA Prep. All rights reserved."
     },
-
     "leaderboard": {
         "badge": "Leaderboard",
         "title": "SOA Arena",
