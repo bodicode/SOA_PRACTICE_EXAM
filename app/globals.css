@@ -156,7 +156,32 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Disable transition on page load to prevent flash */
+  .no-transition,
+  .no-transition *,
+  .no-transition *::before,
+  .no-transition *::after {
+    transition: none !important;
+  }
+}
+
+/* View Transitions API specific styles */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Ensure the new view is always on top during transition */
+::view-transition-new(root) {
+  z-index: 2147483646;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
 }

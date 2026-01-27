@@ -2,12 +2,11 @@
 
 import { Link } from '@/navigation'
 import Image from 'next/image'
-// import { useRouter, usePathname } from 'next/navigation' // Removed standard hooks
-import { useRouter, usePathname } from '@/navigation' // Use next-intl hooks
+import { useRouter, usePathname } from '@/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, LogOut, Languages } from 'lucide-react'
+import { LogOut, Languages } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import {
@@ -37,10 +36,8 @@ export function Navbar() {
             const currentScrollY = window.scrollY
 
             if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                // Scrolling down & past threshold
                 setIsVisible(false)
             } else {
-                // Scrolling up
                 setIsVisible(true)
             }
 
