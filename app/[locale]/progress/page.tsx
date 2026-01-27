@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Card, } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Trophy, Target, Calendar, TrendingUp, Clock, History, ArrowLeft, Filter, Map, Zap, Star, Flame, Download, FileText } from 'lucide-react'
 import Link from 'next/link'
@@ -48,9 +47,9 @@ export default function ProgressPage() {
         if (user && !isNaN(Number(user.id))) {
             const uid = Number(user.id);
             // Prefetch all categories to ensure smooth tab switching
-            fetchProgress(uid, undefined); // All
-            fetchProgress(uid, 1);       // Exam P
-            fetchProgress(uid, 2);       // Exam FM
+            fetchProgress(uid, undefined, true); // All
+            fetchProgress(uid, 1, true);       // Exam P
+            fetchProgress(uid, 2, true);       // Exam FM
         }
     }, [user, fetchProgress]);
 

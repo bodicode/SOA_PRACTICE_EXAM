@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const userId = parseInt(searchParams.get('userId') || '0');
@@ -43,7 +45,7 @@ export async function GET(req: Request) {
             const sessions = await prisma.examSession.findMany({
                 where: {
                     ...filter,
-                    mode: { in: ['mock', 'exam'] },
+                    mode: { in: ['mock', 'exam', 'practice'] },
                     questionCount: { gt: 0 } // exclude invalid sessions
                 },
                 select: { totalScore: true, questionCount: true }
@@ -90,7 +92,7 @@ export async function GET(req: Request) {
             totalExams = await prisma.examSession.count({
                 where: {
                     userId,
-                    mode: { in: ['mock', 'exam'] },
+                    mode: { in: ['mock', 'exam', 'practice'] },
                     questionCount: { gt: 0 }
                 }
             });
@@ -103,7 +105,7 @@ export async function GET(req: Request) {
                 where: {
                     userId,
                     categoryId: categoryId ? categoryId : undefined, // Still filter by category if selected
-                    mode: { in: ['mock', 'exam'] },
+                    mode: { in: ['mock', 'exam', 'practice'] },
                     startTime: { gte: new Date(new Date().setDate(new Date().getDate() - 7)) }
                 },
                 select: { startTime: true, totalScore: true, questionCount: true },

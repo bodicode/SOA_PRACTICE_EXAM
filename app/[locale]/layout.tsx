@@ -8,6 +8,8 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ClientLayout } from "@/components/ClientLayout";
 import StructuredData from "@/components/StructuredData";
 
+import Mascot from "@/components/Mascot";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -98,6 +100,7 @@ export default async function LocaleLayout({
             >
               <ClientLayout>
                 {children}
+                <Mascot />
               </ClientLayout>
             </ThemeProvider>
           </AuthProvider>
