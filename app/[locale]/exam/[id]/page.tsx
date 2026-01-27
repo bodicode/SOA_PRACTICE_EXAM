@@ -159,6 +159,12 @@ export default function ExamPage() {
                         setFlagged(parsed.flagged || {})
                         setIsSubmitted(parsed.isSubmitted || false)
 
+                        // Restore totalQuestions
+                        // Fallback to URL params if not in storage (for legacy/first reload)
+                        let defaultTotal = countParam;
+                        if (mode === 'exam') defaultTotal = 30;
+                        setTotalQuestions(parsed.totalQuestions || defaultTotal)
+
                         // Auto-show Reference Sheet for Exam P (Category 1) if not submitted
                         if (categoryId === 1 && !parsed.isSubmitted) {
                             setShowReferenceSheet(true);
@@ -233,13 +239,13 @@ export default function ExamPage() {
                 currentQuestionIndex,
                 timeLeft,
                 isSubmitted,
-
+                totalQuestions, // Persist totalQuestions
                 highlights,
                 timestamp: Date.now()
             }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
         }
-    }, [questions, answers, flagged, currentQuestionIndex, timeLeft, isSubmitted, isLoading, highlights])
+    }, [questions, answers, flagged, currentQuestionIndex, timeLeft, isSubmitted, isLoading, highlights, totalQuestions])
 
     // Clear storage on unmount is NOT desired because we want to persist on reload.
     // We only clear on explicit exit or submit.
@@ -285,25 +291,40 @@ export default function ExamPage() {
         setIsSaving(true);
         try {
             // Validate User
-            let currentUserId = 0;
+            let currentUserId = 1; // Default to Guest (ID 1)
+            let userIdSource = "default";
+
+            // 1. Try from Store
             if (user && user.id) {
                 const parsedId = parseInt(user.id);
-                if (!isNaN(parsedId)) {
+                if (!isNaN(parsedId) && parsedId > 0) {
                     currentUserId = parsedId;
-                } else {
-                    console.warn("User ID is not a number (likely UUID):", user.id);
-                    // Attempt to use 1 as fallback or handle error?
-                    // For now, let's alert if we can't identify the user
-                    // alert(t('error.user'));
-                    // return;
+                    userIdSource = "store";
                 }
             }
 
-            if (currentUserId === 0) {
-                // Try to fallback to '1' if we want to allow guest saves, BUT 
-                // this might be risky if User 1 doesn't exist or is a real user.
-                // Let's assume for now we NEED a valid user.
-                console.error("No valid numeric user ID found");
+            // 2. Try from LocalStorage directly (if Store is empty/loading)
+            if (userIdSource === "default" && typeof window !== 'undefined') {
+                try {
+                    const storedUser = localStorage.getItem('user-storage');
+                    if (storedUser) {
+                        const parsed = JSON.parse(storedUser);
+                        const storageUser = parsed.state?.user;
+                        if (storageUser && storageUser.id) {
+                            const parsedId = parseInt(storageUser.id);
+                            if (!isNaN(parsedId) && parsedId > 0) {
+                                currentUserId = parsedId;
+                                userIdSource = "localStorage";
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to parse user-storage", e);
+                }
+            }
+
+            if (currentUserId === 1) {
+                console.warn("Using Guest User ID (1) for submission.");
             }
 
             const details = questions.map(q => {
@@ -517,7 +538,8 @@ export default function ExamPage() {
 
     const formatQuestionContent = (index: number, content: string) => {
         const trimmed = content?.trim() || "";
-        return trimmed.replace(/^(\d+)\./, "$1\\.");
+        // Remove leading number and dot (e.g. "82. ")
+        return trimmed.replace(/^\d+\.\s*/, "");
     };
 
     return (

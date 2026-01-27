@@ -37,7 +37,8 @@ export default function ProfilePage() {
             if (isNaN(Number(user.id))) return
 
             try {
-                const res = await fetch(`/api/profile?userId=${user.id}`)
+                // Force fresh fetch with timestamp
+                const res = await fetch(`/api/profile?userId=${user.id}&t=${Date.now()}`)
                 if (res.ok) {
                     const data = await res.json()
                     setFullName(data.fullName || '')

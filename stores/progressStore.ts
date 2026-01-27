@@ -46,7 +46,7 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
         }));
 
         try {
-            let url = `/api/progress?userId=${userId}`;
+            let url = `/api/progress?userId=${userId}&t=${Date.now()}`;
             if (categoryId) url += `&categoryId=${categoryId}`;
 
             const res = await fetch(url);
