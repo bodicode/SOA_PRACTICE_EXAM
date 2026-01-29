@@ -231,7 +231,7 @@ export default function Home() {
                   ))}
                 </div>
                 <Link href="/practice?exam=P" className="mt-auto">
-                  <Button className="w-full bg-slate-900 hover:bg-blue-600 text-white transition-colors">
+                  <Button className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white transition-all hover:scale-[1.02] font-semibold text-lg">
                     {tExams('p.button')}
                   </Button>
                 </Link>
@@ -256,7 +256,7 @@ export default function Home() {
                   ))}
                 </div>
                 <Link href="/practice?exam=FM" className="mt-auto">
-                  <Button className="w-full bg-slate-900 hover:bg-indigo-600 text-white transition-colors">
+                  <Button className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white transition-all hover:scale-[1.02] font-semibold text-lg">
                     {tExams('fm.button')}
                   </Button>
                 </Link>
@@ -340,8 +340,22 @@ export default function Home() {
                         <motion.div
                           key={star}
                           initial={{ opacity: 0, scale: 0 }}
-                          whileInView={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.4 + star * 0.1 }}
+                          animate={{
+                            opacity: 1,
+                            scale: [1, 1.4, 1]
+                          }}
+                          transition={{
+                            opacity: {
+                              duration: 0.5,
+                              delay: 0.2 + star * 0.1
+                            },
+                            scale: {
+                              repeat: Infinity,
+                              duration: 1.5,
+                              repeatDelay: 0.2, // Faster repeat delay
+                              delay: 1 + star * 0.1 // Staggered start of loop
+                            }
+                          }}
                         >
                           <Star className="w-6 h-6 fill-amber-400 text-amber-400 drop-shadow-sm" />
                         </motion.div>
