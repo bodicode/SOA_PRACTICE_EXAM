@@ -3,21 +3,13 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Card, } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Trophy, Target, Calendar, TrendingUp, Clock, History, ArrowLeft, Filter, Map, Zap, Star, Flame, Download, FileText } from 'lucide-react'
+import { TrendingUp, History, Star, Flame, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { useUserStore } from '@/stores/userStore'
 import { useProgressStore } from '@/stores/progressStore'
 import ProgressChart from '@/components/ProgressChart'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts'
 import { useTranslations, useFormatter } from 'next-intl'
-
-interface UserStats {
-    totalExams: number
-    studyStreak: number
-    lastStudyDate: string | null
-    averageScore: number
-    totalQuestions: number
-}
 
 interface ExamSession {
     id: number
@@ -35,7 +27,6 @@ export default function ProgressPage() {
 
     const [activeCategory, setActiveCategory] = useState<number | undefined>(undefined)
 
-    // Derive data from store cache
     const activeData = useMemo(() => {
         return getData(activeCategory);
     }, [getData, activeCategory, cache]);
@@ -46,21 +37,19 @@ export default function ProgressPage() {
     useEffect(() => {
         if (user && !isNaN(Number(user.id))) {
             const uid = Number(user.id);
-            // Prefetch all categories to ensure smooth tab switching
-            fetchProgress(uid, undefined, true); // All
-            fetchProgress(uid, 1, true);       // Exam P
-            fetchProgress(uid, 2, true);       // Exam FM
+            fetchProgress(uid, undefined); // All
+            fetchProgress(uid, 1);       // Exam P
+            fetchProgress(uid, 2);       // Exam FM
         }
     }, [user, fetchProgress]);
 
-    // Show loading only if we have NO data yet for this specific combination
     const isInitialLoading = isLoading(activeCategory) && !activeData;
 
-    // Use full history directly
-    const filteredHistory = history;
+    const filteredHistory = useMemo(() => {
+        return [...history].sort((a: any, b: any) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
+    }, [history]);
 
     const chartData = useMemo(() => {
-        // Filter for exams only
         const examSessions = filteredHistory.filter((s: ExamSession) => s.mode === 'exam' && (s.questionCount || 0) > 0);
 
         const sorted = [...examSessions].reverse();
@@ -71,30 +60,25 @@ export default function ProgressPage() {
             const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
             const dateObj = new Date(session.startTime);
-            // const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-            // const dayPrefix = days[dateObj.getDay()];
-            // Use format.dateTime for day/date
             const dayPrefix = format.dateTime(dateObj, { weekday: 'short' });
             const dateStr = format.dateTime(dateObj, { day: '2-digit', month: '2-digit' });
 
             return {
+                id: session.id,
                 date: `${dayPrefix} ${dateStr}`,
-                fullDate: format.dateTime(dateObj, { dateStyle: 'medium', timeStyle: 'short' }),
+                fullDate: format.dateTime(dateObj, { dateStyle: 'medium', timeStyle: 'medium' }),
                 score: score,
                 total: total,
                 scale10: Number(scale10.toFixed(1)),
                 percentage: percentage,
-                mode: t('history.examPrefix') // Chart tooltip might need translation if logic is inside component, but "Thi thử" here is hardcoded. It's passed to chart.
-                // Assuming ProgressChart can handle labels or we pass generic key. For now assuming chart handles this or we leave it.
+                mode: t('history.examPrefix')
             };
         });
     }, [filteredHistory, format]);
 
-    // Calculate outcomes
     const outcomes = useMemo(() => {
         let pass = 0;
         let fail = 0;
-        // Also filter outcomes to only Exam mode
         filteredHistory.filter((s: ExamSession) => s.mode === 'exam').forEach((session: ExamSession) => {
             const total = session.questionCount || 0;
             const score = Number(session.totalScore || 0);
@@ -268,7 +252,12 @@ export default function ProgressPage() {
                     <Card className="lg:col-span-2 border-none shadow-md bg-card p-6">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="font-bold text-lg text-foreground">{t('history.title')}</h3>
-                            <Link href="#" className="text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">{t('history.viewAll')}</Link>
+                            <Link
+                                href={activeCategory ? `/progress/history?categoryId=${activeCategory}` : "/progress/history"}
+                                className="text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                            >
+                                {t('history.viewAll')}
+                            </Link>
                         </div>
                         <div className="space-y-4">
                             {filteredHistory.slice(0, 4).map((session: ExamSession, i: number) => {
@@ -288,7 +277,7 @@ export default function ProgressPage() {
                                                 <h4 className="font-semibold text-foreground">
                                                     {session.mode === 'exam' ? `${t('history.examPrefix')} #${session.id}` : `${t('history.practicePrefix')} #${session.id}`}
                                                 </h4>
-                                                <p className="text-xs text-muted-foreground">{format.dateTime(new Date(session.startTime), { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+                                                <p className="text-xs text-muted-foreground">{format.dateTime(new Date(session.startTime), { dateStyle: 'medium', timeStyle: 'medium' })}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">

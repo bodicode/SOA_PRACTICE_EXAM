@@ -544,7 +544,24 @@
             "examPrefix": "Bài Thi Thử",
             "practicePrefix": "Luyện Tập",
             "passStatus": "ĐẠT",
-            "failStatus": "CHƯA ĐẠT"
+            "failStatus": "CHƯA ĐẠT",
+            "filters": {
+                "allExams": "Tất Cả Bài Thi",
+                "examP": "Exam P",
+                "examFM": "Exam FM"
+            },
+            "sort": {
+                "sortBy": "Sắp Xếp Theo",
+                "newest": "Mới Nhất",
+                "oldest": "Cũ Nhất",
+                "highScore": "Điểm Cao Nhất",
+                "lowScore": "Điểm Thấp Nhất"
+            },
+            "pagination": {
+                "previous": "Trước",
+                "next": "Sau",
+                "page": "Trang"
+            }
         }
     }
 }
