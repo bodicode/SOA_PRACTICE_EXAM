@@ -6,6 +6,7 @@ import { TrendingUp } from 'lucide-react'
 
 interface ProgressChartProps {
     data: {
+        id: number
         date: string
         score: number
         total: number
@@ -22,7 +23,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
         return (
             <div className="bg-white p-3 border border-gray-100 shadow-md rounded-lg text-sm">
-                <p className="font-semibold text-gray-700 mb-1">{label}</p>
+                <p className="font-semibold text-gray-700 mb-1">{payload[0].payload.fullDate}</p>
                 <div className="text-blue-600 font-bold">
                     {payload[0].value}/10
                     <span className="text-xs font-normal text-gray-500 ml-1">
@@ -73,12 +74,13 @@ export default function ProgressChart({ data }: ProgressChartProps) {
                                 </linearGradient>
                             </defs>
                             <XAxis
-                                dataKey="date"
+                                dataKey="id"
                                 axisLine={false}
                                 tickLine={false}
                                 tick={{ fill: '#6B7280', fontSize: 11 }}
                                 dy={10}
                                 interval="preserveStartEnd"
+                                tickFormatter={(value) => data.find(item => item.id === value)?.date || ''}
                             />
                             <YAxis
                                 axisLine={false}

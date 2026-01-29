@@ -544,7 +544,24 @@
             "examPrefix": "Mock Exam",
             "practicePrefix": "Practice",
             "passStatus": "PASS",
-            "failStatus": "FAIL"
+            "failStatus": "FAIL",
+            "filters": {
+                "allExams": "All Exams",
+                "examP": "Exam P",
+                "examFM": "Exam FM"
+            },
+            "sort": {
+                "sortBy": "Sort By",
+                "newest": "Newest First",
+                "oldest": "Oldest First",
+                "highScore": "Highest Score",
+                "lowScore": "Lowest Score"
+            },
+            "pagination": {
+                "previous": "Previous",
+                "next": "Next",
+                "page": "Page"
+            }
         }
     }
 }
