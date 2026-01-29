@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { motion } from 'framer-motion'
 import { ArrowRight, CheckCircle2, BarChart2, BookOpen, Target, LogOut, LayoutDashboard, ChevronRight, Star, Sparkles, Zap, Users } from 'lucide-react'
 import { HeroSection } from '@/components/HeroSection'
@@ -265,53 +266,98 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonial Section */}
-      < section className="py-24 overflow-hidden" >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative bg-blue-600 rounded-3xl p-12 lg:p-24 overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
+      {/* Testimonial Section - Enhanced UI */}
+      <section className="py-24 relative overflow-hidden">
+        {/* Ambient Background Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-7xl h-[600px] bg-blue-500/5 rounded-full blur-[120px] -z-10" />
 
-            <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mb-8">
-                  <span className="text-4xl">❝</span>
-                </div>
-                <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6 leading-tight">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 rounded-[2.5rem] p-8 md:p-12 lg:p-20 overflow-hidden shadow-2xl shadow-blue-900/20"
+          >
+            {/* Decorative Background Elements */}
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-white rounded-full blur-[100px] mix-blend-overlay translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-900 rounded-full blur-[80px] mix-blend-multiply -translate-x-1/3 translate-y-1/3" />
+              <svg className="absolute inset-0 w-full h-full opacity-30" width="100%" height="100%">
+                <pattern id="grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M0 40L40 0H20L0 20M40 40V20L20 40" stroke="white" strokeWidth="1" fill="none" />
+                </pattern>
+                <rect width="100%" height="100%" fill="url(#grid-pattern)" />
+              </svg>
+            </div>
+
+            <div className="relative z-10 grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+              {/* Left Column: Testimonial */}
+              <div className="flex flex-col">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-10 border border-white/20 shadow-lg"
+                >
+                  <span className="text-4xl text-blue-100">❝</span>
+                </motion.div>
+
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8 leading-tight tracking-tight font-display">
                   "{tTestimonials('an.quote')}"
                 </h2>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white font-bold text-lg border border-white/30">
-                    AN
+
+                <div className="flex items-center gap-5 mt-4">
+                  <div className="relative">
+                    <Avatar className="w-16 h-16 border-2 border-white/50 shadow-lg">
+                      <AvatarImage src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=100&h=100&q=80" alt="Nguyễn Phước Thịnh" />
+                      <AvatarFallback className="bg-gradient-to-tr from-blue-100 to-white text-blue-700 text-xl font-bold">AN</AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -bottom-1 -right-1 bg-green-500 p-1 rounded-full border-2 border-indigo-600">
+                      <CheckCircle2 className="w-3 h-3 text-white" />
+                    </div>
                   </div>
                   <div>
-                    <div className="font-bold text-white text-lg">Nguyễn Phước Thịnh</div>
-                    <div className="text-blue-200">{tTestimonials('an.role')}</div>
+                    <div className="font-bold text-white text-xl">Nguyễn Phước Thịnh</div>
+                    <div className="text-blue-100/80 font-medium">{tTestimonials('an.role')}</div>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-center lg:justify-end">
-                <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/20 max-w-sm">
-                  <div className="flex items-center gap-2 mb-4 text-white">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <svg key={star} className="w-5 h-5 fill-yellow-400 text-yellow-400" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
+              {/* Right Column: Floating CTA Card */}
+              <div className="flex justify-center lg:justify-end perspective-1000">
+                <motion.div
+                  animate={{ y: [0, -15, 0] }}
+                  transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                  className="relative group w-full max-w-sm"
+                >
+                  {/* Card Glow */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-300 to-indigo-300 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-1000" />
+
+                  <div className="relative bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl">
+                    <div className="flex items-center gap-1.5 mb-6">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <motion.div
+                          key={star}
+                          initial={{ opacity: 0, scale: 0 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.4 + star * 0.1 }}
+                        >
+                          <Star className="w-6 h-6 fill-amber-400 text-amber-400 drop-shadow-sm" />
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    <p className="text-white/90 text-lg mb-8 leading-relaxed font-medium">
+                      {tTestimonials('trust')}
+                    </p>
                   </div>
-                  <p className="text-white/90 mb-4">
-                    {tTestimonials('trust')}
-                  </p>
-                  <Button className="w-full bg-white text-blue-600 hover:bg-blue-50 border-0 font-bold">
-                    {tTestimonials('button')}
-                  </Button>
-                </div>
+                </motion.div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </section >
+      </section>
 
       {/* FAQ Section - SEO Optimization */}
       <section className="py-20 bg-muted/30 border-t border-border">
