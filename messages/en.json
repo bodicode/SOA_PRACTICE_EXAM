@@ -5,6 +5,7 @@
         "progress": "My Progress",
         "profile": "Profile",
         "logout": "Logout",
+        "community": "Community",
         "login": "Login",
         "register": "Sign Up"
     },
@@ -563,5 +564,30 @@
                 "page": "Page"
             }
         }
+    },
+    "community": {
+        "title": "Community",
+        "subtitle": "Share experiences and support each other on the SOA journey",
+        "createPost": "Create Post",
+        "placeholder": "Share your experience, ask questions...",
+        "addImage": "Add Image",
+        "post": "Post",
+        "like": "Like",
+        "comment": "Comment",
+        "comments": "Comments",
+        "noComments": "No comments yet",
+        "writeComment": "Write a comment...",
+        "delete": "Delete",
+        "loginRequired": "Sign in to post and interact",
+        "loginToComment": "Sign in to comment",
+        "noPosts": "No posts yet. Be the first to share!",
+        "loadMore": "Load More",
+        "uploadFailed": "Upload failed",
+        "postFailed": "Failed to create post",
+        "editPost": "Edit Post",
+        "cancel": "Cancel",
+        "save": "Save",
+        "deleteConfirmTitle": "Delete Post",
+        "deleteConfirmDescription": "This action cannot be undone. Are you sure you want to delete this post?"
     }
 }

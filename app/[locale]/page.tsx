@@ -365,6 +365,13 @@ export default function Home() {
                     <p className="text-white/90 text-lg mb-8 leading-relaxed font-medium">
                       {tTestimonials('trust')}
                     </p>
+
+                    <Link href="/community" className="w-full block">
+                      <Button size="lg" className="w-full bg-white text-indigo-600 hover:bg-blue-50 font-bold text-lg h-12 rounded-xl shadow-lg hover:shadow-xl transition-all group">
+                        {tTestimonials('button')}
+                        <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
                   </div>
                 </motion.div>
               </div>

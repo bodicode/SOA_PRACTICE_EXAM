@@ -98,6 +98,9 @@ export function Navbar() {
                                 <Link href="/progress" className="hover:text-blue-600 transition-colors">
                                     {t('progress')}
                                 </Link>
+                                <Link href="/community" className="hover:text-blue-600 transition-colors">
+                                    {t('community')}
+                                </Link>
                             </nav>
                         )}
                     </div>

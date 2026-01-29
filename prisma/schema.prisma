@@ -33,6 +33,11 @@ model User {
   roomParticipations RoomParticipant[]
   pdfAssetsUploaded  PdfAsset[]        @relation("PdfAssetUploader")
   badges             UserBadge[]
+  
+  // Community
+  posts              Post[]
+  reactions          Reaction[]
+  comments           Comment[]
 }
 
 model Badge {
@@ -223,4 +228,45 @@ model PdfRegionQuestion {
   examDetails ExamDetail[]
 
   @@unique([pdfAssetId, questionNo])
+}
+
+// 7. Community
+model Post {
+  id        Int       @id @default(autoincrement())
+  authorId  Int
+  content   String    @db.Text
+  imageUrl  String?   // Supabase Storage URL
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  author    User      @relation(fields: [authorId], references: [id])
+  reactions Reaction[]
+  comments  Comment[]
+}
+
+model Reaction {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  userId    Int
+  type      String   // "like", "love", "haha", "wow", "sad", "angry"
+  createdAt DateTime @default(now())
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  authorId  Int
+  content   String   @db.Text
+  parentId  Int?     // For reply functionality
+  createdAt DateTime @default(now())
+
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id])
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
 }
