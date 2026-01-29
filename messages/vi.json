@@ -5,6 +5,7 @@
         "progress": "Tiến độ học tập",
         "profile": "Hồ sơ cá nhân",
         "logout": "Đăng xuất",
+        "community": "Cộng đồng",
         "login": "Đăng Nhập",
         "register": "Đăng Ký"
     },
@@ -563,5 +564,30 @@
                 "page": "Trang"
             }
         }
+    },
+    "community": {
+        "title": "Cộng Đồng",
+        "subtitle": "Chia sẻ kinh nghiệm và hỗ trợ lẫn nhau trong hành trình chinh phục SOA",
+        "createPost": "Đăng bài",
+        "placeholder": "Chia sẻ kinh nghiệm, hỏi đáp...",
+        "addImage": "Thêm ảnh",
+        "post": "Đăng",
+        "like": "Thích",
+        "comment": "Bình luận",
+        "comments": "Bình luận",
+        "noComments": "Chưa có bình luận nào",
+        "writeComment": "Viết bình luận...",
+        "delete": "Xóa bài",
+        "loginRequired": "Đăng nhập để đăng bài và tương tác",
+        "loginToComment": "Đăng nhập để bình luận",
+        "noPosts": "Chưa có bài đăng nào. Hãy là người đầu tiên chia sẻ!",
+        "loadMore": "Xem thêm",
+        "uploadFailed": "Tải ảnh thất bại",
+        "postFailed": "Đăng bài thất bại",
+        "editPost": "Sửa bài viết",
+        "cancel": "Hủy",
+        "save": "Lưu",
+        "deleteConfirmTitle": "Xác nhận xóa bài",
+        "deleteConfirmDescription": "Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa bài viết này không?"
     }
 }
