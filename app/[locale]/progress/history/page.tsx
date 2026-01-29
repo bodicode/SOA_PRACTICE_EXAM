@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, History } from 'lucide-react'
+import { ChevronLeft, History, Loader2 } from 'lucide-react'
 import { useUserStore } from '@/stores/userStore'
 import { useProgressStore } from '@/stores/progressStore'
 import { useTranslations, useFormatter } from 'next-intl'
@@ -29,83 +29,88 @@ function HistoryContent() {
     const t = useTranslations('progress')
     const format = useFormatter()
 
+    // State
     const [history, setHistory] = useState<ExamSession[]>([])
-    const [loading, setLoading] = useState(true)
-    const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
+    const [loading, setLoading] = useState(false)
+    const [page, setPage] = useState(1)
 
-    // Derived state from URL
+    // Derived state from URL (Filters)
     const filterCategory = searchParams.get('categoryId') || 'all'
     const sortOrder = searchParams.get('sort') || 'time_desc'
 
+    // Reset when Filters Change (Reset page to 1)
     useEffect(() => {
+        setPage(1)
+    }, [filterCategory, sortOrder])
+
+    // Main Data Fetching Effect
+    useEffect(() => {
+        if (!user || isNaN(Number(user.id))) return;
+
         let isActive = true;
 
-        if (user && !isNaN(Number(user.id))) {
-            const loadData = async () => {
-                const params: any = {
-                    userId: user.id,
-                    page,
-                    limit: LIMIT,
-                    sort: sortOrder
-                }
-
-                if (filterCategory !== 'all') {
-                    params.categoryId = filterCategory;
-                }
-
-                const cacheKey = JSON.stringify(params)
-                const cachedData = historyCache[cacheKey]
-
-                if (cachedData) {
-                    // Cache hit: Show immediately
-                    if (isActive) {
-                        setHistory(cachedData.data)
-                        setTotalPages(cachedData.meta.totalPages || 1)
-                        setLoading(false)
-                    }
-
-                    // SWR: Fetch fresh data in background (force=true)
-                    try {
-                        const freshData = await fetchHistoryList(params, true)
-                        if (isActive && freshData && freshData.data) {
-                            setHistory(freshData.data)
-                            setTotalPages(freshData.meta.totalPages || 1)
-                        }
-                    } catch (err) {
-                        console.error("Background fetch failed", err)
-                    }
-                } else {
-                    // Cache miss: Show loading, then fetch
-                    if (isActive) setLoading(true)
-                    try {
-                        const data = await fetchHistoryList(params, false)
-
-                        if (isActive) {
-                            if (data && data.data) {
-                                setHistory(data.data)
-                                setTotalPages(data.meta.totalPages || 1)
-                            } else {
-                                setHistory([])
-                                setTotalPages(1)
-                            }
-                        }
-                    } catch (error) {
-                        console.error("Failed to fetch history", error)
-                        if (isActive) setHistory([])
-                    } finally {
-                        if (isActive) setLoading(false)
-                    }
-                }
+        const loadData = async () => {
+            const params: any = {
+                userId: user.id,
+                page,
+                limit: LIMIT,
+                sort: sortOrder
             }
-            loadData()
+
+            if (filterCategory !== 'all') {
+                params.categoryId = filterCategory;
+            }
+
+            // SWR Logic
+            const cacheKey = JSON.stringify(params)
+            const cachedData = historyCache[cacheKey]
+
+            // 1. Check Cache
+            if (cachedData) {
+                if (isActive) {
+                    setHistory(cachedData.data)
+                    setTotalPages(cachedData.meta.totalPages)
+                    setLoading(false)
+                }
+            } else {
+                if (isActive) setLoading(true)
+            }
+
+            // 2. Fetch Network (If not cached)
+            try {
+                // If we have cache, we don't force fetch to avoid "jumping" or "lag".
+                // We trust the cache for history (unless explicitly refreshed, but history is mostly static).
+                const shouldFetch = !cachedData;
+
+                if (shouldFetch) {
+                    const data = await fetchHistoryList(params, false)
+
+                    if (isActive && data && data.data) {
+                        setHistory(data.data)
+                        setTotalPages(data.meta.totalPages)
+                    }
+                }
+            } catch (err) {
+                console.error(err)
+            } finally {
+                if (isActive) setLoading(false)
+            }
         }
 
+        loadData();
+
         return () => { isActive = false }
-    }, [user, page, filterCategory, sortOrder])
+    }, [page, filterCategory, sortOrder, user, fetchHistoryList]) // Removed historyCache from dep
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setPage(newPage)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+    }
 
     const updateParams = (key: string, value: string) => {
-        setPage(1)
         const newParams = new URLSearchParams(searchParams.toString())
         if (value === 'all' && key === 'categoryId') {
             newParams.delete('categoryId')
@@ -159,10 +164,12 @@ function HistoryContent() {
                 </div>
 
                 {loading ? (
-                    <div className="text-center py-12 text-muted-foreground">{t('loading')}</div>
+                    <div className="flex justify-center py-20">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
                 ) : (
                     <div className="grid gap-4">
-                        {history.map((session: ExamSession) => {
+                        {history.length > 0 ? history.map((session: ExamSession) => {
                             const total = session.questionCount || 0;
                             const score = Number(session.totalScore || 0);
                             const scale10 = total > 0 ? (score / total) * 10 : 0;
@@ -197,36 +204,34 @@ function HistoryContent() {
                                     </div>
                                 </Card>
                             )
-                        })}
-
-                        {history.length === 0 && (
+                        }) : (
                             <div className="text-center py-12 text-muted-foreground">
                                 {t('history.empty')}
                             </div>
                         )}
+                    </div>
+                )}
 
-                        {/* Pagination Controls */}
-                        {totalPages > 1 && (
-                            <div className="flex justify-center items-center gap-4 mt-8">
-                                <Button
-                                    variant="outline"
-                                    disabled={page <= 1}
-                                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                                >
-                                    {t('history.pagination.previous')}
-                                </Button>
-                                <span className="text-sm text-muted-foreground">
-                                    {t('history.pagination.page')} {page} / {totalPages}
-                                </span>
-                                <Button
-                                    variant="outline"
-                                    disabled={page >= totalPages}
-                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                >
-                                    {t('history.pagination.next')}
-                                </Button>
-                            </div>
-                        )}
+                {/* Pagination Controls */}
+                {!loading && history.length > 0 && (
+                    <div className="flex justify-center items-center gap-4 mt-8">
+                        <Button
+                            variant="outline"
+                            disabled={page === 1}
+                            onClick={() => handlePageChange(page - 1)}
+                        >
+                            {t('history.pagination.previous')}
+                        </Button>
+                        <span className="text-sm text-muted-foreground">
+                            {t('history.pagination.page')} {page} / {totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            disabled={page >= totalPages}
+                            onClick={() => handlePageChange(page + 1)}
+                        >
+                            {t('history.pagination.next')}
+                        </Button>
                     </div>
                 )}
             </div>
