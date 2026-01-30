@@ -100,7 +100,7 @@ export default async function LocaleLayout({
             >
               <ClientLayout>
                 {children}
-                <Mascot />
+                {/* <Mascot /> */}
               </ClientLayout>
             </ThemeProvider>
           </AuthProvider>
