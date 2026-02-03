@@ -29,13 +29,19 @@ export default function ProfilePage() {
     const [confirmPassword, setConfirmPassword] = useState('')
     const [isChangingPassword, setIsChangingPassword] = useState(false)
 
+    // Force fetch on every mount/navigation to this page
     useEffect(() => {
-        if (!user) return
-
         const fetchProfile = async () => {
-            if (!user.id) return
-            if (isNaN(Number(user.id))) return
+            if (!user?.id) {
+                setIsLoading(false)
+                return
+            }
+            if (isNaN(Number(user.id))) {
+                setIsLoading(false)
+                return
+            }
 
+            setIsLoading(true)
             try {
                 // Force fresh fetch with timestamp
                 const res = await fetch(`/api/profile?userId=${user.id}&t=${Date.now()}`)
@@ -54,7 +60,8 @@ export default function ProfilePage() {
         }
 
         fetchProfile()
-    }, [user])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.id])
 
     const handleSave = async () => {
         if (!user || isSaving) return
