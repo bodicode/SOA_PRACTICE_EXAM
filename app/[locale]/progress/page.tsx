@@ -37,11 +37,13 @@ export default function ProgressPage() {
     useEffect(() => {
         if (user && !isNaN(Number(user.id))) {
             const uid = Number(user.id);
-            fetchProgress(uid, undefined); // All
-            fetchProgress(uid, 1);       // Exam P
-            fetchProgress(uid, 2);       // Exam FM
+            // Force refresh on mount to ensure fresh data
+            fetchProgress(uid, undefined, true); // All
+            fetchProgress(uid, 1, true);       // Exam P
+            fetchProgress(uid, 2, true);       // Exam FM
         }
-    }, [user, fetchProgress]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.id]);
 
     const isInitialLoading = isLoading(activeCategory) && !activeData;
 

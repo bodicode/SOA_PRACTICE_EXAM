@@ -229,7 +229,9 @@
         "noAccount": "No account yet?",
         "createAccount": "Create free account",
         "errorGeneric": "An error occurred. Please try again.",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "orContinueWith": "or continue with",
+        "continueWithGoogle": "Continue with Google"
     },
     "groupLobby": {
         "title": "Group Study",

@@ -229,7 +229,9 @@
         "noAccount": "Chưa có tài khoản?",
         "createAccount": "Tạo tài khoản miễn phí",
         "errorGeneric": "Đã có lỗi xảy ra. Vui lòng thử lại.",
-        "loading": "Đang tải..."
+        "loading": "Đang tải...",
+        "orContinueWith": "hoặc tiếp tục với",
+        "continueWithGoogle": "Tiếp tục với Google"
     },
     "groupLobby": {
         "title": "Học Nhóm",

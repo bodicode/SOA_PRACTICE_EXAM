@@ -9,6 +9,20 @@ import { useProgressStore } from '@/stores/progressStore';
 import { useUserStore } from '@/stores/userStore';
 import { useTranslations } from 'next-intl';
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-white dark:bg-slate-950 p-3 border border-gray-100 dark:border-slate-800 shadow-md rounded-lg text-sm">
+                <p className="font-semibold text-gray-700 dark:text-gray-200 mb-1">{label}</p>
+                <div className="text-blue-600 dark:text-blue-400 font-bold">
+                    Điểm trung bình : {Number(payload[0].value).toFixed(1)}/10
+                </div>
+            </div>
+        )
+    }
+    return null
+}
+
 export function HomeProgress() {
     const { user } = useUserStore();
     const { getData, isLoading, fetchProgress } = useProgressStore();
@@ -195,9 +209,8 @@ export function HomeProgress() {
                                         />
                                         <YAxis hide domain={[0, 10]} />
                                         <Tooltip
-                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            content={<CustomTooltip />}
                                             cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }}
-                                            formatter={(value: any) => [`${Number(value).toFixed(1)}/10`, "Điểm trung bình"]}
                                         />
                                         <Area
                                             type="monotone"
