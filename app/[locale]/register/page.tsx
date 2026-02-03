@@ -46,6 +46,7 @@ export default function RegisterPage() {
         }
 
         try {
+            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
             const { error } = await supabase.auth.signUp({
                 email,
                 password,
@@ -53,7 +54,7 @@ export default function RegisterPage() {
                     data: {
                         full_name: fullName,
                     },
-                    emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+                    emailRedirectTo: `${siteUrl}/api/auth/callback`,
                 },
             })
 
