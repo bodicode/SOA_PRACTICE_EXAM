@@ -102,9 +102,11 @@ export default function ProgressPage() {
         return <div className="p-8 flex justify-center text-gray-500">{t('loading')}</div>
     }
 
-    const bestScore = history.length > 0
-        ? Math.max(...history.map((s: ExamSession) => s.questionCount ? (s.totalScore / s.questionCount) * 10 : 0))
-        : 0;
+    if (isInitialLoading) {
+        return <div className="p-8 flex justify-center text-gray-500">{t('loading')}</div>
+    }
+
+    const bestScore = stats?.bestScore || 0;
 
     return (
         <div className="min-h-screen bg-background p-6 md:p-10 font-sans text-foreground">

@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { motion } from 'framer-motion'
-import { Loader2, ArrowRight, Mail, ChevronLeft, Key } from 'lucide-react'
+import { ArrowRight, Mail, ChevronLeft, Key } from 'lucide-react'
+import { Loader } from '@/components/ui/loader'
 import { translateAuthError } from '@/lib/utils'
 
 export default function ForgotPasswordPage() {
@@ -124,7 +125,7 @@ export default function ForgotPasswordPage() {
                             className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-900/10 hover:shadow-blue-900/20"
                         >
                             {loading ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <Loader size="icon" className="text-white" />
                             ) : (
                                 <span className="flex items-center gap-2">
                                     Gửi yêu cầu <ArrowRight className="w-5 h-5" />

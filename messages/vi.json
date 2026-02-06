@@ -142,7 +142,8 @@
         }
     },
     "profile": {
-        "loading": "Vui lòng đăng nhập để xem hồ sơ.",
+        "loading": "Đang tải hồ sơ...",
+        "signInRequired": "Vui lòng đăng nhập để xem hồ sơ.",
         "tabs": {
             "profile": "Hồ sơ cá nhân",
             "security": "Bảo mật"
@@ -195,6 +196,10 @@
             "Intermediate": "Intermediate (Trung bình) 🥈",
             "Advanced": "Advanced (Nâng cao) 🥇",
             "Expert": "Expert (Chuyên gia) 🏆"
+        },
+        "badges": {
+            "title": "Huy hiệu & Thành tích",
+            "empty": "Hãy học tập để nhận huy hiệu nhé!"
         }
     },
     "practice": {
@@ -583,6 +588,7 @@
         "loginRequired": "Đăng nhập để đăng bài và tương tác",
         "loginToComment": "Đăng nhập để bình luận",
         "noPosts": "Chưa có bài đăng nào. Hãy là người đầu tiên chia sẻ!",
+        "loading": "Đang tải các bài viết...",
         "loadMore": "Xem thêm",
         "uploadFailed": "Tải ảnh thất bại",
         "postFailed": "Đăng bài thất bại",

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { toast } from "react-hot-toast";
 import { Users, Plus, LogIn, ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Loader } from '@/components/ui/loader'
 
 export default function GroupStudyLobby() {
     const t = useTranslations("groupLobby");
@@ -113,7 +114,14 @@ export default function GroupStudyLobby() {
                                 className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
                                 disabled={isCreating}
                             >
-                                {isCreating ? t('create.loading') : t('create.button')}
+                                {isCreating ? (
+                                    <>
+                                        <Loader size="icon" className="mr-2 text-white" />
+                                        {t('create.loading')}
+                                    </>
+                                ) : (
+                                    t('create.button')
+                                )}
                             </Button>
                         </CardContent>
                     </Card>
@@ -142,7 +150,14 @@ export default function GroupStudyLobby() {
                                 onClick={handleJoinRoom}
                                 disabled={isJoining}
                             >
-                                {isJoining ? t('join.loading') : t('join.button')}
+                                {isJoining ? (
+                                    <>
+                                        <Loader size="icon" className="mr-2" />
+                                        {t('join.loading')}
+                                    </>
+                                ) : (
+                                    t('join.button')
+                                )}
                             </Button>
                         </CardContent>
                     </Card>

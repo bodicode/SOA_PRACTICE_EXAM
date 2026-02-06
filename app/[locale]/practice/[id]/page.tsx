@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Clock, BookOpen, AlertCircle, PlayCircle, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import { Loader } from '@/components/ui/loader'
 
 export default function ExamModeSelectionPage() {
     const t = useTranslations('examSelection')
@@ -67,7 +68,7 @@ export default function ExamModeSelectionPage() {
         router.push(`/exam/${category.id}?mode=exam`)
     }
 
-    if (isLoading) return <div className="min-h-screen flex items-center justify-center">{t('loading')}</div>
+    if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader text={t('loading')} /></div>
     if (!category) return <div className="min-h-screen flex items-center justify-center">{t('notFound')}</div>
 
     return (

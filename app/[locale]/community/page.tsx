@@ -2,7 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { Loader2, Users, X } from 'lucide-react'
+import { Users, X } from 'lucide-react'
+import { Loader2 } from 'lucide-react' // Keep for buttons if needed, or replace all. 
+// actually I will replace all usage.
+import { Loader } from '@/components/ui/loader'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -227,7 +230,7 @@ export default function CommunityPage() {
                 {/* Posts Feed */}
                 {isLoading ? (
                     <div className="flex justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <Loader text={t('loading')} />
                     </div>
                 ) : posts.length === 0 ? (
                     <motion.div
@@ -266,7 +269,7 @@ export default function CommunityPage() {
                                     disabled={isLoadingMore}
                                 >
                                     {isLoadingMore ? (
-                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        <Loader size="icon" className="mr-2" />
                                     ) : null}
                                     {t('loadMore')}
                                 </Button>

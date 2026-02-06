@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { motion } from 'framer-motion'
-import { Loader2, ArrowRight, ShieldCheck, Mail, Lock, Key, Fingerprint, Eye, EyeOff } from 'lucide-react'
+import { ArrowRight, ShieldCheck, Mail, Lock, Key, Fingerprint, Eye, EyeOff } from 'lucide-react'
+import { Loader } from '@/components/ui/loader'
 import { translateAuthError } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 
@@ -190,7 +191,7 @@ export default function LoginForm() {
                         className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-900/10 hover:shadow-blue-900/20 hover:scale-[1.01] active:scale-[0.99]"
                     >
                         {loading ? (
-                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <Loader size="icon" className="text-white" />
                         ) : (
                             <span className="flex items-center gap-2">
                                 {t('signIn')} <ArrowRight className="w-5 h-5" />
@@ -218,7 +219,7 @@ export default function LoginForm() {
                     className="w-full h-12 bg-background hover:bg-muted border-border text-foreground font-medium rounded-xl transition-all shadow-sm hover:shadow-md"
                 >
                     {googleLoading ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <Loader size="icon" />
                     ) : (
                         <span className="flex items-center gap-3">
                             <svg className="w-5 h-5" viewBox="0 0 24 24">

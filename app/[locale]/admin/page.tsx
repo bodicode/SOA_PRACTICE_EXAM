@@ -3,7 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useEffect, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
-import { Loader2, Users, FileQuestion, BookOpen, Activity, TrendingUp } from 'lucide-react'
+import { Users, FileQuestion, BookOpen, Activity, TrendingUp } from 'lucide-react'
+import { Loader } from '@/components/ui/loader'
 import Link from 'next/link'
 
 export default function AdminDashboard() {
@@ -35,7 +36,7 @@ export default function AdminDashboard() {
     }, [])
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>
+        return <div className="min-h-screen flex items-center justify-center"><Loader size="lg" text="Đang tải thống kê..." /></div>
     }
 
     const statCards = [

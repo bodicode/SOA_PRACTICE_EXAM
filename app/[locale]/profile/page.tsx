@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, Save, User, Mail, Calendar, Trophy, Lock, Shield, Camera, Flame } from 'lucide-react'
+import { Save, User, Mail, Calendar, Trophy, Lock, Shield, Camera, Flame } from 'lucide-react'
+import { Loader } from '@/components/ui/loader'
 import { toast } from 'react-hot-toast'
 import { useTranslations } from 'next-intl'
 
@@ -186,11 +187,11 @@ export default function ProfilePage() {
     }
 
     if (!user) {
-        return <div className="h-screen flex items-center justify-center">{t('loading')}</div>
+        return <div className="h-screen flex items-center justify-center"><Loader text={t('signInRequired')} /></div>
     }
 
     if (isLoading) {
-        return <div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin w-8 h-8 text-blue-600" /></div>
+        return <div className="h-screen flex items-center justify-center"><Loader text={t('loading')} /></div>
     }
 
     return (
@@ -255,7 +256,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <Card className="group bg-card/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                         <CardContent className="p-6 flex items-center gap-4">
                             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
@@ -277,6 +278,35 @@ export default function ProfilePage() {
                                 <p className="text-sm font-medium text-muted-foreground">{t('stats.streak')}</p>
                                 <h3 className="text-3xl font-bold text-foreground">{stats?.studyStreak || 0} <span className="text-lg font-medium text-muted-foreground">{t('stats.days')}</span></h3>
                             </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Badges Card */}
+                    <Card className="group bg-card/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 sm:col-span-2 lg:col-span-1">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-lg flex items-center gap-2">
+                                <Trophy className="w-5 h-5 text-yellow-500" />
+                                <span>{t('badges.title') || 'Badges'}</span>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-4 pt-0">
+                            {stats?.badges && stats.badges.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {stats.badges.map((ub: any) => (
+                                        <div key={ub.badge.code} className="flex items-center gap-2 bg-muted/50 p-2 rounded-lg border border-border/50" title={ub.badge.description}>
+                                            <span className="text-2xl">{ub.badge.imageUrl}</span>
+                                            <div>
+                                                <p className="text-xs font-bold text-foreground">{ub.badge.name}</p>
+                                                <p className="text-[10px] text-muted-foreground">{new Date(ub.earnedAt).toLocaleDateString()}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-4 text-muted-foreground text-sm">
+                                    {t('badges.empty') || "No badges earned yet."}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
@@ -359,7 +389,7 @@ export default function ProfilePage() {
                                             className="bg-gradient-to-r from-[#003366] to-[#0050a0] hover:from-[#002244] hover:to-[#003366] text-white shadow-lg hover:shadow-xl transition-all"
                                         >
                                             {isSaving ? (
-                                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('personalInfo.saving')}</>
+                                                <><Loader size="icon" className="mr-2 text-white" /> {t('personalInfo.saving')}</>
                                             ) : (
                                                 <><Save className="mr-2 h-4 w-4" /> {t('personalInfo.save')}</>
                                             )}
@@ -425,7 +455,7 @@ export default function ProfilePage() {
                                             className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 shadow-sm"
                                         >
                                             {isChangingPassword ? (
-                                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('security.changing')}</>
+                                                <><Loader size="icon" className="mr-2" /> {t('security.changing')}</>
                                             ) : (
                                                 <><Lock className="mr-2 h-4 w-4" /> {t('security.change')}</>
                                             )}

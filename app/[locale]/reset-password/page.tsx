@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { motion } from 'framer-motion'
-import { Loader2, ArrowRight, Lock, Eye, EyeOff, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Lock, Eye, EyeOff, ShieldCheck } from 'lucide-react'
+import { Loader } from '@/components/ui/loader'
 import { translateAuthError } from '@/lib/utils'
 
 export default function ResetPasswordPage() {
@@ -161,7 +162,7 @@ export default function ResetPasswordPage() {
                             className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-900/10 hover:shadow-indigo-900/20"
                         >
                             {loading ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <Loader size="icon" className="text-white" />
                             ) : (
                                 <span className="flex items-center gap-2">
                                     Cập nhật mật khẩu <ArrowRight className="w-5 h-5" />
