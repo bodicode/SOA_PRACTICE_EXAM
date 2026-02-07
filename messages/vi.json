@@ -597,5 +597,19 @@
         "save": "Lưu",
         "deleteConfirmTitle": "Xác nhận xóa bài",
         "deleteConfirmDescription": "Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa bài viết này không?"
+    },
+    "flashcards": {
+        "title": "Flashcard Công Thức",
+        "subtitle": "Ghi nhớ công thức Exam P với phương pháp lặp lại cách quãng",
+        "loading": "Đang tải flashcard...",
+        "mastered": "Đã thuộc",
+        "learning": "Đang học",
+        "new": "Mới",
+        "all": "Tất cả",
+        "shuffle": "Xáo trộn",
+        "reset": "Đặt lại",
+        "noCards": "Không có flashcard nào",
+        "noCardsHint": "Thử chọn danh mục khác",
+        "hint": "Nhấn vào thẻ để lật • Sử dụng nút để theo dõi tiến độ"
     }
 }

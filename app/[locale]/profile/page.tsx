@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,6 +17,7 @@ import { useTranslations } from 'next-intl'
 
 export default function ProfilePage() {
     const t = useTranslations('profile')
+    const pathname = usePathname()
     const { user, setUser } = useUserStore()
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
@@ -62,7 +64,7 @@ export default function ProfilePage() {
 
         fetchProfile()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user?.id])
+    }, [pathname, user?.id])
 
     const handleSave = async () => {
         if (!user || isSaving) return

@@ -38,6 +38,9 @@ model User {
   posts              Post[]
   reactions          Reaction[]
   comments           Comment[]
+  
+  // Flashcards
+  flashcardProgress  UserFlashcardProgress[]
 }
 
 model Badge {
@@ -138,6 +141,7 @@ model ExamSession {
   category   Category?    @relation("ExamSessionCategory", fields: [categoryId], references: [id])
   user       User         @relation(fields: [userId], references: [id])
   details    ExamDetail[]
+  aiAnalysis String?      @db.Text
 }
 
 model ExamDetail {
@@ -269,4 +273,34 @@ model Comment {
   author    User      @relation(fields: [authorId], references: [id])
   parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies   Comment[] @relation("CommentReplies")
+}
+
+// Formula Flashcards
+model FormulaCard {
+  id          Int      @id @default(autoincrement())
+  name        String   // Formula name (e.g. "Bayes' Theorem")
+  category    String   // Category (e.g. "Probability", "Distributions")
+  formula     String   @db.Text // LaTeX formula
+  explanation String?  @db.Text // Detailed explanation
+  example     String?  @db.Text // Example usage
+  difficulty  Int      @default(1) // 1-3 (Easy, Medium, Hard)
+  createdAt   DateTime @default(now())
+  
+  progress    UserFlashcardProgress[]
+}
+
+model UserFlashcardProgress {
+  id           Int          @id @default(autoincrement())
+  userId       Int
+  cardId       Int
+  status       String       @default("new") // "new", "learning", "mastered"
+  correctCount Int          @default(0)
+  wrongCount   Int          @default(0)
+  lastReviewed DateTime?
+  nextReview   DateTime?    // For spaced repetition
+  
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card         FormulaCard  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, cardId])
 }

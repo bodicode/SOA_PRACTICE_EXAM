@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { usePathname } from 'next/navigation'
 import { Card, } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TrendingUp, History, Star, Flame, FileText } from 'lucide-react'
@@ -24,8 +25,11 @@ export default function ProgressPage() {
     const { getData, fetchProgress, isLoading, cache } = useProgressStore()
     const t = useTranslations('progress')
     const format = useFormatter()
+    const pathname = usePathname()
 
     const [activeCategory, setActiveCategory] = useState<number | undefined>(undefined)
+    // Track visits to force refresh on each navigation
+    const [visitKey, setVisitKey] = useState(0)
 
     const activeData = useMemo(() => {
         return getData(activeCategory);
@@ -34,6 +38,8 @@ export default function ProgressPage() {
     const stats = activeData?.stats || null;
     const history = activeData?.history || [];
 
+    // Force fetch on EVERY mount/navigation to this page
+    // Using pathname as dependency ensures it runs when navigating to the page
     useEffect(() => {
         if (user && !isNaN(Number(user.id))) {
             const uid = Number(user.id);
@@ -43,7 +49,7 @@ export default function ProgressPage() {
             fetchProgress(uid, 2, true);       // Exam FM
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user?.id]);
+    }, [pathname, user?.id]);
 
     const isInitialLoading = isLoading(activeCategory) && !activeData;
 

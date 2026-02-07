@@ -9,14 +9,34 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause, Play, Highlighter, Trash2, FileText } from 'lucide-react'
+import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause, Play, Highlighter, Trash2, FileText, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import 'katex/dist/katex.min.css'
+import Lottie from 'lottie-react'
 
 const MathRender = dynamic(() => import('@/components/MathRender'), { ssr: false })
+
+// Simple mascot loading component
+const MascotLoading = () => {
+    const [animationData, setAnimationData] = useState<any>(null)
+    useEffect(() => {
+        fetch('/mascot.json')
+            .then(res => res.json())
+            .then(data => setAnimationData(data))
+            .catch(err => console.error(err))
+    }, [])
+    if (!animationData) return <div className="w-32 h-32 bg-purple-200 rounded-full animate-pulse" />
+    return <Lottie animationData={animationData} loop autoplay className="w-full h-full" />
+}
+
 import {
     Dialog,
     DialogContent,
@@ -74,6 +94,11 @@ export default function ExamPage() {
     const [totalQuestions, setTotalQuestions] = useState(0);
     const [loadingMore, setLoadingMore] = useState(false);
     const [examStartTime, setExamStartTime] = useState<string | null>(null);
+
+    // AI Analysis State
+    const [analysis, setAnalysis] = useState<string | null>(null)
+    const [isAnalyzing, setIsAnalyzing] = useState(false)
+    const [sessionId, setSessionId] = useState<number | null>(null)
 
     const handleHighlight = () => {
         if (!isHighlightMode) return;
@@ -141,12 +166,17 @@ export default function ExamPage() {
             if (savedState) {
                 try {
                     const parsed = JSON.parse(savedState)
-                    if (parsed.questions?.length > 0 && !parsed.isSubmitted) {
+                    // Restore state for both in-progress AND submitted exams
+                    if (parsed.questions?.length > 0) {
                         setQuestions(parsed.questions)
                         setAnswers(parsed.answers || {})
                         setFlagged(parsed.flagged || {})
                         setIsSubmitted(parsed.isSubmitted || false)
-                        setExamStartTime(parsed.examStartTime || new Date().toISOString()) // Restore or fallback
+                        setExamStartTime(parsed.examStartTime || new Date().toISOString())
+
+                        // Restore AI analysis state
+                        if (parsed.sessionId) setSessionId(parsed.sessionId)
+                        if (parsed.analysis) setAnalysis(parsed.analysis)
 
                         let defaultTotal = countParam;
                         if (mode === 'exam') defaultTotal = 30;
@@ -210,7 +240,7 @@ export default function ExamPage() {
     }, [categoryId, mode, limitParam, countParam, startParam, endParam, seed])
 
     useEffect(() => {
-        if (!isLoading && questions.length > 0 && !isSubmitted && shouldPersist.current) {
+        if (!isLoading && questions.length > 0 && shouldPersist.current) {
             const state = {
                 questions,
                 answers,
@@ -221,11 +251,13 @@ export default function ExamPage() {
                 totalQuestions,
                 highlights,
                 examStartTime,
+                sessionId,
+                analysis,
                 timestamp: Date.now()
             }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
         }
-    }, [questions, answers, flagged, currentQuestionIndex, timeLeft, isSubmitted, isLoading, highlights, totalQuestions, examStartTime])
+    }, [questions, answers, flagged, currentQuestionIndex, timeLeft, isSubmitted, isLoading, highlights, totalQuestions, examStartTime, sessionId, analysis])
 
     useEffect(() => {
         if (isLoading || isSubmitted || timeLeft <= 0 || isPaused) return
@@ -346,8 +378,14 @@ export default function ExamPage() {
                 throw new Error(errorData.error || `Server error: ${res.status}`);
             }
 
-            shouldPersist.current = false
-            localStorage.removeItem(STORAGE_KEY)
+            const data = await res.json();
+            if (data.sessionId) {
+                setSessionId(data.sessionId);
+            }
+
+            // Don't clear localStorage - keep state for reload
+            // shouldPersist.current = false
+            // localStorage.removeItem(STORAGE_KEY)
             setIsSubmitted(true);
         } catch (error) {
             console.error("Failed to save result", error);
@@ -363,6 +401,26 @@ export default function ExamPage() {
             confirmExit();
         } else {
             setShowExitDialog(true);
+        }
+    }
+
+    const handleAnalyze = async () => {
+        if (!sessionId) return;
+        setIsAnalyzing(true);
+        try {
+            const res = await fetch('/api/ai/analyze-exam', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId })
+            });
+            const data = await res.json();
+            if (data.analysis) {
+                setAnalysis(data.analysis);
+            }
+        } catch (error) {
+            console.error("Failed to analyze", error);
+        } finally {
+            setIsAnalyzing(false);
         }
     }
 
@@ -720,7 +778,44 @@ export default function ExamPage() {
                                     <Button size="sm" onClick={() => router.push('/progress')}>
                                         {t('results.progress')}
                                     </Button>
+                                    <Button
+                                        size="sm"
+                                        onClick={handleAnalyze}
+                                        disabled={isAnalyzing || !!analysis || !sessionId}
+                                        className="gap-2 bg-purple-600 hover:bg-purple-700 text-white"
+                                    >
+                                        <Sparkles className="w-4 h-4" />
+                                        {isAnalyzing ? "Analyzing..." : "Analyze Mistakes"}
+                                    </Button>
                                 </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {isAnalyzing && (
+                        <div className="mb-6 bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-lg border border-purple-200 flex flex-col items-center justify-center gap-4 animate-in fade-in">
+                            <div className="w-32 h-32">
+                                <MascotLoading />
+                            </div>
+                            <div className="text-center">
+                                <p className="text-purple-800 font-semibold text-lg">
+                                    AI đang phân tích bài thi...
+                                </p>
+                                <p className="text-purple-600 text-sm mt-1">
+                                    Vui lòng chờ trong giây lát 🤖
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {analysis && (
+                        <div className="mb-6 bg-white p-6 rounded-lg shadow-sm border border-purple-100 animate-in fade-in slide-in-from-top-4">
+                            <h3 className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
+                                <Sparkles className="w-5 h-5 text-purple-600" />
+                                AI Analysis
+                            </h3>
+                            <div className="prose prose-slate max-w-none text-gray-800 bg-purple-50/50 p-4 rounded-md">
+                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{analysis}</ReactMarkdown>
                             </div>
                         </div>
                     )}
