@@ -6,7 +6,7 @@ import { useRouter, usePathname } from '@/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useUserStore } from '@/stores/userStore'
 import { Button } from '@/components/ui/button'
-import { LogOut, Languages } from 'lucide-react'
+import { LogOut, Languages, BookOpen } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import {
@@ -36,6 +36,7 @@ export function Navbar() {
             const currentScrollY = window.scrollY
 
             if (currentScrollY > lastScrollY && currentScrollY > 100) {
+
                 setIsVisible(false)
             } else {
                 setIsVisible(true)
@@ -100,6 +101,9 @@ export function Navbar() {
                                 </Link>
                                 <Link href="/community" className="hover:text-blue-600 transition-colors">
                                     {t('community')}
+                                </Link>
+                                <Link href="/flashcards" prefetch={false} className="hover:text-blue-600 transition-colors flex items-center gap-1">
+                                    Flashcards
                                 </Link>
                             </nav>
                         )}

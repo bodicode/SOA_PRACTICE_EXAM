@@ -57,10 +57,10 @@ export function HomeProgress() {
 
 
     if (isCategoryLoading && !data) return (
-        <section className="py-12 bg-gray-50 flex justify-center">
+        <section className="py-12 bg-muted/30 flex justify-center">
             <div className="animate-pulse flex flex-col items-center">
-                <div className="h-4 w-32 bg-gray-200 rounded mb-4"></div>
-                <div className="h-64 w-full max-w-4xl bg-gray-200 rounded"></div>
+                <div className="h-4 w-32 bg-muted rounded mb-4"></div>
+                <div className="h-64 w-full max-w-4xl bg-muted rounded"></div>
             </div>
         </section>
     );
@@ -199,7 +199,7 @@ export function HomeProgress() {
                                                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" className="dark:stroke-slate-700" />
                                         <XAxis
                                             dataKey="day"
                                             axisLine={false}

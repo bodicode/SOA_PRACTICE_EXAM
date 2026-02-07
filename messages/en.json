@@ -597,5 +597,19 @@
         "save": "Save",
         "deleteConfirmTitle": "Delete Post",
         "deleteConfirmDescription": "This action cannot be undone. Are you sure you want to delete this post?"
+    },
+    "flashcards": {
+        "title": "Formula Flashcards",
+        "subtitle": "Master Exam P formulas with spaced repetition",
+        "loading": "Loading flashcards...",
+        "mastered": "Mastered",
+        "learning": "Learning",
+        "new": "New",
+        "all": "All",
+        "shuffle": "Shuffle",
+        "reset": "Reset",
+        "noCards": "No flashcards available",
+        "noCardsHint": "Try selecting a different category",
+        "hint": "Click the card to flip • Use buttons to track your progress"
     }
 }
