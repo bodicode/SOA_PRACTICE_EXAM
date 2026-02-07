@@ -142,7 +142,8 @@
         }
     },
     "profile": {
-        "loading": "Please sign in to view profile.",
+        "loading": "Loading profile...",
+        "signInRequired": "Please sign in to view profile.",
         "tabs": {
             "profile": "Profile Info",
             "security": "Security"
@@ -195,6 +196,10 @@
             "Intermediate": "Intermediate 🥈",
             "Advanced": "Advanced 🥇",
             "Expert": "Expert 🏆"
+        },
+        "badges": {
+            "title": "Your Badges",
+            "empty": "Start learning to earn badges!"
         }
     },
     "practice": {
@@ -583,6 +588,7 @@
         "loginRequired": "Sign in to post and interact",
         "loginToComment": "Sign in to comment",
         "noPosts": "No posts yet. Be the first to share!",
+        "loading": "Loading posts...",
         "loadMore": "Load More",
         "uploadFailed": "Upload failed",
         "postFailed": "Failed to create post",

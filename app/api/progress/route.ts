@@ -173,12 +173,29 @@ export async function GET(req: Request) {
             value: stats.count > 0 ? Math.round(stats.total / stats.count) : 0
         }));
 
+        // Calculate Best Score (Exam Mode Only)
+        const examSessionsForBest = await prisma.examSession.findMany({
+            where: {
+                userId,
+                categoryId: categoryId ? categoryId : undefined,
+                mode: 'exam', // Only consider Mock Exam mode
+                totalScore: { not: null },
+                questionCount: { gt: 0 }
+            },
+            select: { totalScore: true, questionCount: true }
+        });
+
+        const bestScore = examSessionsForBest.length > 0
+            ? Math.max(...examSessionsForBest.map(s => (Number(s.totalScore) / (s.questionCount || 1)) * 10))
+            : 0;
+
         return NextResponse.json({
             stats: {
                 totalQuestions: totalQuestions,
                 averageScore: averageScore.toFixed(1), // Return 1 decimal
                 totalExams: totalExams,
-                studyStreak: user?.studyStreak || 0
+                studyStreak: user?.studyStreak || 0,
+                bestScore: bestScore // Added bestScore
             },
             history: recentSessions,
             performance: performanceData

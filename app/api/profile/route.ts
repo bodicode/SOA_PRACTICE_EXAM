@@ -26,6 +26,12 @@ export async function GET(req: Request) {
                 avatarUrl: true,
                 country: true,
                 level: true,
+                badges: {
+                    include: {
+                        badge: true
+                    },
+                    orderBy: { earnedAt: 'desc' }
+                }
             }
         });
 

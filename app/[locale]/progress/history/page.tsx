@@ -4,7 +4,8 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, History, Loader2 } from 'lucide-react'
+import { ChevronLeft, History } from 'lucide-react'
+import { Loader } from '@/components/ui/loader'
 import { useUserStore } from '@/stores/userStore'
 import { useProgressStore } from '@/stores/progressStore'
 import { useTranslations, useFormatter } from 'next-intl'
@@ -165,7 +166,7 @@ function HistoryContent() {
 
                 {loading ? (
                     <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        <Loader />
                     </div>
                 ) : (
                     <div className="grid gap-4">
@@ -241,7 +242,7 @@ function HistoryContent() {
 
 export default function HistoryPage() {
     return (
-        <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
+        <Suspense fallback={<div className="p-10 flex justify-center"><Loader text="Loading..." /></div>}>
             <HistoryContent />
         </Suspense>
     )
