@@ -19,7 +19,7 @@ export const PdfCanvas = React.memo(function PdfCanvas({ url, pageIndex, scale =
     useEffect(() => {
         // Set worker locally
         if (typeof window !== "undefined" && !pdfjs.GlobalWorkerOptions.workerSrc) {
-            pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+            pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs?v=5.4.530";
         }
 
         let cancelled = false;
