@@ -7,7 +7,8 @@
         "logout": "Logout",
         "community": "Community",
         "login": "Login",
-        "register": "Sign Up"
+        "register": "Sign Up",
+        "donate": "Donate"
     },
     "hero": {
         "title": "SOA Exam Prep",
@@ -611,5 +612,36 @@
         "noCards": "No flashcards available",
         "noCardsHint": "Try selecting a different category",
         "hint": "Click the card to flip • Use buttons to track your progress"
+    },
+    "donate": {
+        "badge": "Support Us",
+        "title": "Buy Us a Coffee ☕",
+        "subtitle": "Your support helps us maintain free, high-quality SOA exam prep materials for thousands of students.",
+        "step1Title": "Donation Details",
+        "step1Desc": "Choose the amount you want to donate",
+        "step2Title": "Scan & Transfer",
+        "step2Desc": "Scan the QR code to complete your transfer",
+        "bankTransfer": "Bank Transfer",
+        "bankDesc": "Vietnamese bank QR code",
+        "scanQR": "Scan to transfer",
+        "bankName": "Bank",
+        "accountNumber": "Account Number",
+        "accountHolder": "Account Holder",
+        "selectAmount": "Select amount",
+        "yourName": "Your Name",
+        "namePlaceholder": "Anonymous",
+        "amountLabel": "Amount (VND)",
+        "amountPlaceholder": "Enter amount",
+        "messageLabel": "Message (optional)",
+        "messagePlaceholder": "Leave a message of encouragement...",
+        "nextStep": "Continue",
+        "backButton": "Back",
+        "confirmTransfer": "I've Completed the Transfer ✓",
+        "submitting": "Submitting...",
+        "note": "Please scan the QR code and complete the transfer, then click the button below to record your donation.",
+        "coffeeNote": "Every cup of coffee keeps our servers running ☕",
+        "thankYouTitle": "Thank You!",
+        "thankYouMessage": "Your generosity means the world to us. We'll keep building the best SOA prep platform!",
+        "close": "Close"
     }
 }

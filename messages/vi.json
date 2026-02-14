@@ -7,7 +7,8 @@
         "logout": "Đăng xuất",
         "community": "Cộng đồng",
         "login": "Đăng Nhập",
-        "register": "Đăng Ký"
+        "register": "Đăng Ký",
+        "donate": "Ủng hộ"
     },
     "hero": {
         "title": "Luyện Thi SOA",
@@ -611,5 +612,36 @@
         "noCards": "Không có flashcard nào",
         "noCardsHint": "Thử chọn danh mục khác",
         "hint": "Nhấn vào thẻ để lật • Sử dụng nút để theo dõi tiến độ"
+    },
+    "donate": {
+        "badge": "Ủng Hộ Chúng Tôi",
+        "title": "Mua Cho Chúng Tôi Ly Cà Phê ☕",
+        "subtitle": "Sự ủng hộ của bạn giúp chúng tôi duy trì tài liệu ôn thi SOA miễn phí, chất lượng cao cho hàng nghìn sinh viên.",
+        "step1Title": "Thông Tin Đóng Góp",
+        "step1Desc": "Chọn số tiền bạn muốn ủng hộ",
+        "step2Title": "Quét Mã & Chuyển Khoản",
+        "step2Desc": "Quét mã QR để hoàn tất chuyển khoản",
+        "bankTransfer": "Chuyển Khoản Ngân Hàng",
+        "bankDesc": "Quét mã QR ngân hàng",
+        "scanQR": "Quét mã để chuyển",
+        "bankName": "Ngân hàng",
+        "accountNumber": "Số tài khoản",
+        "accountHolder": "Chủ tài khoản",
+        "selectAmount": "Chọn số tiền",
+        "yourName": "Tên của bạn",
+        "namePlaceholder": "Ẩn danh",
+        "amountLabel": "Số tiền (VNĐ)",
+        "amountPlaceholder": "Nhập số tiền",
+        "messageLabel": "Lời nhắn (tùy chọn)",
+        "messagePlaceholder": "Để lại lời nhắn động viên...",
+        "nextStep": "Tiếp tục",
+        "backButton": "Quay lại",
+        "confirmTransfer": "Tôi Đã Chuyển Khoản Xong ✓",
+        "submitting": "Đang gửi...",
+        "note": "Vui lòng quét mã QR và hoàn tất chuyển khoản, sau đó nhấn nút bên dưới để ghi nhận đóng góp.",
+        "coffeeNote": "Mỗi ly cà phê giúp server chạy mượt hơn ☕",
+        "thankYouTitle": "Cảm Ơn Bạn!",
+        "thankYouMessage": "Sự hào phóng của bạn ý nghĩa vô cùng. Chúng tôi sẽ tiếp tục xây dựng nền tảng ôn thi SOA tốt nhất!",
+        "close": "Đóng"
     }
 }
