@@ -21,7 +21,7 @@ export function PdfQuestionDisplay({ url, pageIndex, rect, scale = 2.0 }: Props)
                 // Dynamic import to avoid SSR crash
                 const pdfjs = await import("pdfjs-dist");
                 if (typeof window !== "undefined" && !pdfjs.GlobalWorkerOptions.workerSrc) {
-                    pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+                    pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs?v=5.4.530";
                 }
 
                 const loadingTask = pdfjs.getDocument(url);
