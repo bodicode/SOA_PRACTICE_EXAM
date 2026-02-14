@@ -41,6 +41,9 @@ model User {
   
   // Flashcards
   flashcardProgress  UserFlashcardProgress[]
+  
+  // Donations
+  donations          Donation[]
 }
 
 model Badge {
@@ -303,4 +306,19 @@ model UserFlashcardProgress {
   card         FormulaCard  @relation(fields: [cardId], references: [id], onDelete: Cascade)
   
   @@unique([userId, cardId])
+}
+
+// 10. Donations
+model Donation {
+  id          Int      @id @default(autoincrement())
+  donorName   String?  // Optional name
+  donorEmail  String?  // Optional email
+  amount      Float    // Amount in VND
+  method      String   // "bank" or "momo"
+  message     String?  @db.Text // Optional message
+  status      String   @default("pending") // "pending", "confirmed", "rejected"
+  userId      Int?     // Optional: linked user if logged in
+  createdAt   DateTime @default(now())
+  
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
