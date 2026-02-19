@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { getCachedCategories } from '@/lib/categories'
 
@@ -33,6 +34,8 @@ export async function POST(request: Request) {
                 parentId: parentId ? parseInt(parentId) : null
             }
         })
+
+        revalidateTag('categories-cache', { expire: 0 })
 
         return NextResponse.json(category)
     } catch (error) {
