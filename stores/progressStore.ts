@@ -32,12 +32,14 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
     userId: null,
 
     fetchProgress: async (userId: number, categoryId?: number, force = false) => {
-        const { userId: storedUserId } = get();
         const cacheKey = categoryId !== undefined ? categoryId.toString() : 'all';
 
-        // Reset cache if user changes
-        if (storedUserId !== userId) {
+        // Reset cache if user changes - only reset without triggering fetch conflicts
+        const { userId: storedUserId } = get();
+        if (storedUserId !== null && storedUserId !== userId) {
             set({ userId, cache: {}, historyCache: {}, loadingKeys: {} });
+        } else if (storedUserId === null) {
+            set({ userId });
         }
 
         // Check cache (fresh)
@@ -45,17 +47,17 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
             return;
         }
 
-        // Check active loading
+        // Check active loading - avoid duplicate requests
         if (get().loadingKeys[cacheKey]) return;
 
+        // Mark as loading BEFORE async work to prevent race conditions
         set(state => ({
             loadingKeys: { ...state.loadingKeys, [cacheKey]: true },
-            userId
         }));
 
         try {
             let url = `/api/progress?userId=${userId}&t=${Date.now()}`;
-            if (categoryId) url += `&categoryId=${categoryId}`;
+            if (categoryId !== undefined) url += `&categoryId=${categoryId}`;
 
             const res = await fetch(url);
             if (!res.ok) throw new Error('Failed to fetch progress');

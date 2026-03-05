@@ -12,6 +12,12 @@ import ProgressChart from '@/components/ProgressChart'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts'
 import { useTranslations, useFormatter } from 'next-intl'
 
+interface Category {
+    id: number
+    name: string
+    parentId: number | null
+}
+
 interface ExamSession {
     id: number
     mode: string
@@ -28,8 +34,24 @@ export default function ProgressPage() {
     const pathname = usePathname()
 
     const [activeCategory, setActiveCategory] = useState<number | undefined>(undefined)
-    // Track visits to force refresh on each navigation
-    const [visitKey, setVisitKey] = useState(0)
+    const [categories, setCategories] = useState<Category[]>([])
+    const [categoriesLoaded, setCategoriesLoaded] = useState(false)
+
+    // Fetch top-level categories dynamically
+    useEffect(() => {
+        fetch('/api/categories')
+            .then(res => res.json())
+            .then((data: Category[]) => {
+                // Only top-level categories (parentId === null)
+                const topLevel = data.filter((c: Category) => c.parentId === null)
+                setCategories(topLevel)
+                setCategoriesLoaded(true)
+            })
+            .catch(err => {
+                console.error('Failed to load categories', err)
+                setCategoriesLoaded(true) // still mark done so we don't block forever
+            })
+    }, [])
 
     const activeData = useMemo(() => {
         return getData(activeCategory);
@@ -38,20 +60,26 @@ export default function ProgressPage() {
     const stats = activeData?.stats || null;
     const history = activeData?.history || [];
 
-    // Force fetch on EVERY mount/navigation to this page
-    // Using pathname as dependency ensures it runs when navigating to the page
+    // Fetch progress for all categories (all + each category) whenever user or categories change
     useEffect(() => {
-        if (user && !isNaN(Number(user.id))) {
+        if (user && !isNaN(Number(user.id)) && categories.length > 0) {
             const uid = Number(user.id);
-            // Force refresh on mount to ensure fresh data
             fetchProgress(uid, undefined, true); // All
-            fetchProgress(uid, 1, true);       // Exam P
-            fetchProgress(uid, 2, true);       // Exam FM
+            categories.forEach(cat => fetchProgress(uid, cat.id, true));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pathname, user?.id]);
+    }, [pathname, user?.id, categories]);
 
-    const isInitialLoading = isLoading(activeCategory) && !activeData;
+    // Safety net: if switching to a tab with no data, fetch on demand
+    useEffect(() => {
+        if (user && !isNaN(Number(user.id)) && !activeData && !isLoading(activeCategory)) {
+            const uid = Number(user.id);
+            fetchProgress(uid, activeCategory, false);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeCategory, user?.id]);
+
+    const isTabLoading = !categoriesLoaded || (isLoading(activeCategory) && !activeData);
 
     const filteredHistory = useMemo(() => {
         return [...history].sort((a: any, b: any) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
@@ -104,11 +132,7 @@ export default function ProgressPage() {
         ? Math.round((outcomes[0].value / (outcomes[0].value + outcomes[1].value)) * 100)
         : 0;
 
-    if (isInitialLoading) {
-        return <div className="p-8 flex justify-center text-gray-500">{t('loading')}</div>
-    }
-
-    if (isInitialLoading) {
+    if (isTabLoading) {
         return <div className="p-8 flex justify-center text-gray-500">{t('loading')}</div>
     }
 
@@ -125,13 +149,32 @@ export default function ProgressPage() {
                     </div>
                 </div>
 
-                {/* Category Tabs */}
+                {/* Category Tabs - Dynamic from DB */}
                 <div className="mb-6">
-                    <Tabs defaultValue="all" className="w-full" onValueChange={(val) => setActiveCategory(val === 'all' ? undefined : parseInt(val))}>
-                        <TabsList className="grid w-full max-w-md grid-cols-3 bg-muted p-1">
-                            <TabsTrigger value="all" className="data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm text-muted-foreground font-medium">{t('tabs.all')}</TabsTrigger>
-                            <TabsTrigger value="1" className="data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm text-muted-foreground font-medium">{t('tabs.examP')}</TabsTrigger>
-                            <TabsTrigger value="2" className="data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm text-muted-foreground font-medium">{t('tabs.examFM')}</TabsTrigger>
+                    <Tabs
+                        defaultValue="all"
+                        className="w-full"
+                        onValueChange={(val) => setActiveCategory(val === 'all' ? undefined : parseInt(val))}
+                    >
+                        <TabsList
+                            className="bg-muted p-1 inline-flex"
+                            style={{ gridTemplateColumns: `repeat(${categories.length + 1}, minmax(0, 1fr))` }}
+                        >
+                            <TabsTrigger
+                                value="all"
+                                className="data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm text-muted-foreground font-medium"
+                            >
+                                {t('tabs.all')}
+                            </TabsTrigger>
+                            {categories.map(cat => (
+                                <TabsTrigger
+                                    key={cat.id}
+                                    value={cat.id.toString()}
+                                    className="data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-sm text-muted-foreground font-medium"
+                                >
+                                    {cat.name}
+                                </TabsTrigger>
+                            ))}
                         </TabsList>
                     </Tabs>
                 </div>
