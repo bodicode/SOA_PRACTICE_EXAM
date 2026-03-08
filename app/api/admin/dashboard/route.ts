@@ -52,7 +52,10 @@ export async function GET() {
                 take: 5,
                 where: { endTime: { not: null } },
                 orderBy: { endTime: 'desc' },
-                include: { user: { select: { fullName: true, email: true } } }
+                include: {
+                    user: { select: { fullName: true, email: true } },
+                    category: { select: { name: true } }
+                }
             })
         ])
 
@@ -70,7 +73,12 @@ export async function GET() {
                 id: `exam-${e.id}`,
                 title: `${e.user.fullName || e.user.email} đã hoàn thành bài thi`,
                 date: e.endTime!,
-                score: e.totalScore,
+                score: e.totalScore !== null && e.totalScore !== undefined
+                    ? Number(e.totalScore)
+                    : undefined,
+                questionCount: e.questionCount,
+                mode: e.mode,
+                category: e.category?.name ?? null,
                 user: e.user
             }))
         ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 10)
