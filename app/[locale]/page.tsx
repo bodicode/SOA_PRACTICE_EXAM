@@ -54,7 +54,7 @@ export default function Home() {
           <div className="relative bg-[#1e293b] rounded-[2rem] p-8 md:p-16 overflow-hidden shadow-2xl">
             {/* Geometric Background Pattern */}
             <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-slate-900/60 to-slate-900/90" />
+              <div className="absolute inset-0 bg-linear-to-br from-blue-900/40 via-slate-900/60 to-slate-900/90" />
               <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <path d="M0 100 L0 0 L100 0 Z" fill="url(#gradHero)" />
                 <defs>
@@ -72,7 +72,7 @@ export default function Home() {
             <div className="relative z-10 max-w-3xl">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight font-display">
                 {tHero('title')} <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">{tHero('subtitle')}</span>
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-400">{tHero('subtitle')}</span>
               </h1>
 
               <p className="text-lg md:text-xl text-blue-100/80 mb-10 leading-relaxed max-w-2xl">
@@ -80,18 +80,37 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap gap-4">
-                <Link href="/practice">
-                  <Button size="lg" className="h-14 px-8 text-base bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20 rounded-xl transition-all hover:scale-105 active:scale-95 font-semibold">
-                    <Zap className="w-5 h-5 mr-2 fill-current" />
-                    {tHero('startButton')}
-                  </Button>
-                </Link>
-                <Link href="/progress">
-                  <Button size="lg" variant="outline" className="h-14 px-8 text-base bg-white/5 hover:bg-white/10 text-white border-white/10 rounded-xl backdrop-blur-sm transition-all hover:scale-105 active:scale-95 font-semibold">
-                    <LayoutDashboard className="w-5 h-5 mr-2" />
-                    {tHero('progressButton')}
-                  </Button>
-                </Link>
+                {user ? (
+                  <>
+                    <Link href="/practice">
+                      <Button size="lg" className="h-14 px-8 text-base bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20 rounded-xl transition-all hover:scale-105 active:scale-95 font-semibold">
+                        <Zap className="w-5 h-5 mr-2 fill-current" />
+                        {tHero('startButton')}
+                      </Button>
+                    </Link>
+                    <Link href="/progress">
+                      <Button size="lg" variant="outline" className="h-14 px-8 text-base bg-white/5 hover:bg-white/10 text-white border-white/10 rounded-xl backdrop-blur-sm transition-all hover:scale-105 active:scale-95 font-semibold">
+                        <LayoutDashboard className="w-5 h-5 mr-2" />
+                        {tHero('progressButton')}
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/blog">
+                      <Button size="lg" className="h-14 px-8 text-base bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20 rounded-xl transition-all hover:scale-105 active:scale-95 font-semibold">
+                        <BookOpen className="w-5 h-5 mr-2" />
+                        Khám Phá Blog
+                      </Button>
+                    </Link>
+                    <Link href="/register">
+                      <Button size="lg" variant="outline" className="h-14 px-8 text-base bg-white/5 hover:bg-white/10 text-white border-white/10 rounded-xl backdrop-blur-sm transition-all hover:scale-105 active:scale-95 font-semibold">
+                        <ArrowRight className="w-5 h-5 mr-2" />
+                        Đăng Ký Miễn Phí
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -184,7 +203,7 @@ export default function Home() {
                 whileHover={{ y: -8 }}
                 className="group relative bg-card p-8 lg:p-10 rounded-[2rem] border border-border shadow-xl shadow-border/40 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 h-full flex flex-col"
               >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-gray-50 to-transparent rounded-bl-[10rem] opacity-50 group-hover:scale-110 transition-transform duration-500" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-gray-50 to-transparent rounded-bl-[10rem] opacity-50 group-hover:scale-110 transition-transform duration-500" />
 
                 <div className={`relative w-16 h-16 ${feature.bg} rounded-2xl flex items-center justify-center shadow-lg ${feature.shadow} mb-8 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
                   {feature.icon}
@@ -230,11 +249,19 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <Link href="/practice?exam=P" className="mt-auto">
-                  <Button className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white transition-all hover:scale-[1.02] font-semibold text-lg">
-                    {tExams('p.button')}
-                  </Button>
-                </Link>
+                {user ? (
+                  <Link href="/practice?exam=P" className="mt-auto">
+                    <Button className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white transition-all hover:scale-[1.02] font-semibold text-lg">
+                      {tExams('p.button')}
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/register" className="mt-auto">
+                    <Button className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white transition-all hover:scale-[1.02] font-semibold text-lg">
+                      Đăng ký để luyện thi
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -255,11 +282,19 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <Link href="/practice?exam=FM" className="mt-auto">
-                  <Button className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white transition-all hover:scale-[1.02] font-semibold text-lg">
-                    {tExams('fm.button')}
-                  </Button>
-                </Link>
+                {user ? (
+                  <Link href="/practice?exam=FM" className="mt-auto">
+                    <Button className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white transition-all hover:scale-[1.02] font-semibold text-lg">
+                      {tExams('fm.button')}
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/register" className="mt-auto">
+                    <Button className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white transition-all hover:scale-[1.02] font-semibold text-lg">
+                      Đăng ký để luyện thi
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -277,7 +312,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 rounded-[2.5rem] p-8 md:p-12 lg:p-20 overflow-hidden shadow-2xl shadow-blue-900/20"
+            className="relative bg-linear-to-br from-blue-600 via-indigo-600 to-blue-700 rounded-[2.5rem] p-8 md:p-12 lg:p-20 overflow-hidden shadow-2xl shadow-blue-900/20"
           >
             {/* Decorative Background Elements */}
             <div className="absolute inset-0 opacity-20">
@@ -311,7 +346,7 @@ export default function Home() {
                   <div className="relative">
                     <Avatar className="w-16 h-16 border-2 border-white/50 shadow-lg">
                       <AvatarImage src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=100&h=100&q=80" alt="Nguyễn Phước Thịnh" />
-                      <AvatarFallback className="bg-gradient-to-tr from-blue-100 to-white text-blue-700 text-xl font-bold">AN</AvatarFallback>
+                      <AvatarFallback className="bg-linear-to-tr from-blue-100 to-white text-blue-700 text-xl font-bold">AN</AvatarFallback>
                     </Avatar>
                     <div className="absolute -bottom-1 -right-1 bg-green-500 p-1 rounded-full border-2 border-indigo-600">
                       <CheckCircle2 className="w-3 h-3 text-white" />
@@ -332,7 +367,7 @@ export default function Home() {
                   className="relative group w-full max-w-sm"
                 >
                   {/* Card Glow */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-300 to-indigo-300 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-1000" />
+                  <div className="absolute -inset-1 bg-linear-to-r from-blue-300 to-indigo-300 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-1000" />
 
                   <div className="relative bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl">
                     <div className="flex items-center gap-1.5 mb-6">
@@ -366,12 +401,21 @@ export default function Home() {
                       {tTestimonials('trust')}
                     </p>
 
-                    <Link href="/community" className="w-full block">
-                      <Button size="lg" className="w-full bg-white text-indigo-600 hover:bg-blue-50 font-bold text-lg h-12 rounded-xl shadow-lg hover:shadow-xl transition-all group">
-                        {tTestimonials('button')}
-                        <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                      </Button>
-                    </Link>
+                    {user ? (
+                      <Link href="/community" className="w-full block">
+                        <Button size="lg" className="w-full bg-white text-indigo-600 hover:bg-blue-50 font-bold text-lg h-12 rounded-xl shadow-lg hover:shadow-xl transition-all group">
+                          {tTestimonials('button')}
+                          <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Link href="/blog" className="w-full block">
+                        <Button size="lg" className="w-full bg-white text-indigo-600 hover:bg-blue-50 font-bold text-lg h-12 rounded-xl shadow-lg hover:shadow-xl transition-all group">
+                          Đọc Blog của chúng tôi
+                          <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </motion.div>
               </div>

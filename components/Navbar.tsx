@@ -83,6 +83,7 @@ export function Navbar() {
         { href: '/progress' as const, label: t('progress') },
         { href: '/community' as const, label: t('community') },
         { href: '/flashcards' as const, label: 'Flashcards' },
+        { href: '/blog' as const, label: 'Blog' },
         { href: '/donate' as const, label: `❤ ${t('donate')}` },
     ] : []
 

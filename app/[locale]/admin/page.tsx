@@ -1,39 +1,45 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
-import { Users, FileQuestion, BookOpen, Activity, TrendingUp } from 'lucide-react'
+import { Users, FileQuestion, BookOpen, Activity, TrendingUp, Sun, Moon, RefreshCw } from 'lucide-react'
 import { Loader } from '@/components/ui/loader'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState<any>(null)
     const [analytics, setAnalytics] = useState<any>(null)
     const [loading, setLoading] = useState(true)
+    const [refreshing, setRefreshing] = useState(false)
+    const { theme, setTheme } = useTheme()
+
+    const fetchData = useCallback(async (isRefresh = false) => {
+        if (isRefresh) setRefreshing(true)
+        else setLoading(true)
+        try {
+            const [statsRes, analyticsRes] = await Promise.all([
+                fetch('/api/admin/dashboard'),
+                fetch('/api/admin/analytics')
+            ])
+            if (statsRes.ok && analyticsRes.ok) {
+                const statsData = await statsRes.json()
+                const analyticsData = await analyticsRes.json()
+                setStats(statsData)
+                setAnalytics(analyticsData)
+            }
+        } catch (error) {
+            console.error('Failed to fetch admin data', error)
+        } finally {
+            setLoading(false)
+            setRefreshing(false)
+        }
+    }, [])
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [statsRes, analyticsRes] = await Promise.all([
-                    fetch('/api/admin/dashboard'),
-                    fetch('/api/admin/analytics')
-                ])
-
-                if (statsRes.ok && analyticsRes.ok) {
-                    const statsData = await statsRes.json()
-                    const analyticsData = await analyticsRes.json()
-                    setStats(statsData)
-                    setAnalytics(analyticsData)
-                }
-            } catch (error) {
-                console.error("Failed to fetch admin data", error)
-            } finally {
-                setLoading(false)
-            }
-        }
         fetchData()
-    }, [])
+    }, [fetchData])
 
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center"><Loader size="lg" text="Đang tải thống kê..." /></div>
@@ -50,8 +56,27 @@ export default function AdminDashboard() {
         <div className="p-8 space-y-8">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Tổng Quan</h1>
-                    <p className="text-gray-600 mt-1">Chào mừng quay lại, Admin!</p>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tổng Quan</h1>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">Chào mừng quay lại, Admin!</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    {/* Refresh button */}
+                    <button
+                        onClick={() => fetchData(true)}
+                        disabled={refreshing}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-sm font-medium shadow-sm disabled:opacity-50"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                        {refreshing ? 'Đang tải...' : 'Làm mới'}
+                    </button>
+                    {/* Theme toggle */}
+                    <button
+                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        className="flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all shadow-sm"
+                        title="Toggle theme"
+                    >
+                        {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                    </button>
                 </div>
             </div>
 
@@ -127,11 +152,30 @@ export default function AdminDashboard() {
                                 stats.recentActivity.map((activity: any, index: number) => (
                                     <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 px-2 rounded-lg transition-colors">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-2 h-2 rounded-full ${activity.type === 'USER_REGISTER' ? 'bg-green-500' : 'bg-blue-500'}`} />
+                                            <div className={`w-2 h-2 rounded-full ${activity.type === 'USER_REGISTER' ? 'bg-green-500' : activity.mode === 'exam' ? 'bg-purple-500' : 'bg-blue-500'}`} />
                                             <div>
-                                                <p className="text-sm font-medium text-gray-900">{activity.title}</p>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-sm font-medium text-gray-900">{activity.title}</p>
+                                                    {activity.mode && (
+                                                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${activity.mode === 'exam'
+                                                            ? 'bg-purple-100 text-purple-700'
+                                                            : 'bg-blue-100 text-blue-700'
+                                                            }`}>
+                                                            {activity.mode === 'exam' ? 'Thi thử' : 'Luyện tập'}
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 {activity.score !== undefined && (
-                                                    <p className="text-xs text-gray-500">Điểm số: <span className="font-semibold text-blue-600">{activity.score}</span></p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {activity.category && (
+                                                            <span className="mr-2 font-medium text-gray-600">
+                                                                📚 {activity.category}
+                                                            </span>
+                                                        )}
+                                                        Điểm số: <span className="font-semibold text-blue-600">
+                                                            {activity.score}{activity.questionCount ? `/${activity.questionCount}` : ''}
+                                                        </span>
+                                                    </p>
                                                 )}
                                             </div>
                                         </div>
@@ -173,18 +217,17 @@ export default function AdminDashboard() {
                                 <p className="text-xs text-gray-500">Xem và chỉnh sửa ngân hàng câu hỏi</p>
                             </div>
                         </Link>
-                        {/* Placeholder for future features */}
-                        <div className="flex items-center gap-3 p-3 rounded-lg opacity-60 cursor-not-allowed bg-gray-50/50">
-                            <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+                        <Link href="/admin/statistics" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-700">
+                            <div className="w-10 h-10 bg-violet-100 dark:bg-violet-900/30 rounded-lg flex items-center justify-center text-violet-600">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
                             </div>
                             <div>
-                                <p className="font-medium text-gray-900">Thống kê chi tiết</p>
-                                <p className="text-xs text-gray-500">Đang phát triển...</p>
+                                <p className="font-medium text-gray-900 dark:text-white">Thống kê chi tiết</p>
+                                <p className="text-xs text-gray-500">Phân tích chuyên sâu hành vi & kết quả</p>
                             </div>
-                        </div>
+                        </Link>
                     </CardContent>
                 </Card>
             </div>
