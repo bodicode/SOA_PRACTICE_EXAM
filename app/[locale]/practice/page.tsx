@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { getCachedCategories } from '@/lib/categories'
 import { getTranslations } from 'next-intl/server'
 import ExamCategoryList from './exam-category-list'
+import { Loader } from '@/components/ui/loader'
 
 export const revalidate = 3600 // Revalidate every hour
 export const dynamic = 'force-static'
@@ -73,7 +74,7 @@ export default async function PracticePage({ params }: { params: Promise<{ local
                     {t('chooseExam')}
                 </h2>
 
-                <Suspense fallback={<div className="text-center py-12 text-muted-foreground">{t('loading')}</div>}>
+                <Suspense fallback={<Loader text={t('loading')} />}>
                     <CategoryListLoader />
                 </Suspense>
 

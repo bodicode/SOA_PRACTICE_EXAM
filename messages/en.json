@@ -5,8 +5,10 @@
         "progress": "My Progress",
         "profile": "Profile",
         "logout": "Logout",
+        "community": "Community",
         "login": "Login",
-        "register": "Sign Up"
+        "register": "Sign Up",
+        "donate": "Donate"
     },
     "hero": {
         "title": "SOA Exam Prep",
@@ -141,7 +143,8 @@
         }
     },
     "profile": {
-        "loading": "Please sign in to view profile.",
+        "loading": "Loading profile...",
+        "signInRequired": "Please sign in to view profile.",
         "tabs": {
             "profile": "Profile Info",
             "security": "Security"
@@ -194,6 +197,10 @@
             "Intermediate": "Intermediate 🥈",
             "Advanced": "Advanced 🥇",
             "Expert": "Expert 🏆"
+        },
+        "badges": {
+            "title": "Your Badges",
+            "empty": "Start learning to earn badges!"
         }
     },
     "practice": {
@@ -228,7 +235,9 @@
         "noAccount": "No account yet?",
         "createAccount": "Create free account",
         "errorGeneric": "An error occurred. Please try again.",
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "orContinueWith": "or continue with",
+        "continueWithGoogle": "Continue with Google"
     },
     "groupLobby": {
         "title": "Group Study",
@@ -544,7 +553,95 @@
             "examPrefix": "Mock Exam",
             "practicePrefix": "Practice",
             "passStatus": "PASS",
-            "failStatus": "FAIL"
+            "failStatus": "FAIL",
+            "filters": {
+                "allExams": "All Exams",
+                "examP": "Exam P",
+                "examFM": "Exam FM"
+            },
+            "sort": {
+                "sortBy": "Sort By",
+                "newest": "Newest First",
+                "oldest": "Oldest First",
+                "highScore": "Highest Score",
+                "lowScore": "Lowest Score"
+            },
+            "pagination": {
+                "previous": "Previous",
+                "next": "Next",
+                "page": "Page"
+            }
         }
+    },
+    "community": {
+        "title": "Community",
+        "subtitle": "Share experiences and support each other on the SOA journey",
+        "createPost": "Create Post",
+        "placeholder": "Share your experience, ask questions...",
+        "addImage": "Add Image",
+        "post": "Post",
+        "like": "Like",
+        "comment": "Comment",
+        "comments": "Comments",
+        "noComments": "No comments yet",
+        "writeComment": "Write a comment...",
+        "delete": "Delete",
+        "loginRequired": "Sign in to post and interact",
+        "loginToComment": "Sign in to comment",
+        "noPosts": "No posts yet. Be the first to share!",
+        "loading": "Loading posts...",
+        "loadMore": "Load More",
+        "uploadFailed": "Upload failed",
+        "postFailed": "Failed to create post",
+        "editPost": "Edit Post",
+        "cancel": "Cancel",
+        "save": "Save",
+        "deleteConfirmTitle": "Delete Post",
+        "deleteConfirmDescription": "This action cannot be undone. Are you sure you want to delete this post?"
+    },
+    "flashcards": {
+        "title": "Formula Flashcards",
+        "subtitle": "Master Exam P formulas with spaced repetition",
+        "loading": "Loading flashcards...",
+        "mastered": "Mastered",
+        "learning": "Learning",
+        "new": "New",
+        "all": "All",
+        "shuffle": "Shuffle",
+        "reset": "Reset",
+        "noCards": "No flashcards available",
+        "noCardsHint": "Try selecting a different category",
+        "hint": "Click the card to flip • Use buttons to track your progress"
+    },
+    "donate": {
+        "badge": "Support Us",
+        "title": "Buy Us a Coffee ☕",
+        "subtitle": "Your support helps us maintain free, high-quality SOA exam prep materials for thousands of students.",
+        "step1Title": "Donation Details",
+        "step1Desc": "Choose the amount you want to donate",
+        "step2Title": "Scan & Transfer",
+        "step2Desc": "Scan the QR code to complete your transfer",
+        "bankTransfer": "Bank Transfer",
+        "bankDesc": "Vietnamese bank QR code",
+        "scanQR": "Scan to transfer",
+        "bankName": "Bank",
+        "accountNumber": "Account Number",
+        "accountHolder": "Account Holder",
+        "selectAmount": "Select amount",
+        "yourName": "Your Name",
+        "namePlaceholder": "Anonymous",
+        "amountLabel": "Amount (VND)",
+        "amountPlaceholder": "Enter amount",
+        "messageLabel": "Message (optional)",
+        "messagePlaceholder": "Leave a message of encouragement...",
+        "nextStep": "Continue",
+        "backButton": "Back",
+        "confirmTransfer": "I've Completed the Transfer ✓",
+        "submitting": "Submitting...",
+        "note": "Please scan the QR code and complete the transfer, then click the button below to record your donation.",
+        "coffeeNote": "Every cup of coffee keeps our servers running ☕",
+        "thankYouTitle": "Thank You!",
+        "thankYouMessage": "Your generosity means the world to us. We'll keep building the best SOA prep platform!",
+        "close": "Close"
     }
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 
 export async function PUT(
@@ -17,6 +18,8 @@ export async function PUT(
                 parentId: parentId ? parseInt(parentId) : null
             }
         })
+
+        revalidateTag('categories-cache', { expire: 0 })
 
         return NextResponse.json(category)
     } catch (error) {
@@ -50,6 +53,8 @@ export async function DELETE(
         await prisma.category.delete({
             where: { id: parseInt(id) }
         })
+
+        revalidateTag('categories-cache', { expire: 0 })
 
         return NextResponse.json({ success: true })
     } catch (error) {

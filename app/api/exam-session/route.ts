@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { updateUserStats } from '@/lib/leaderboard';
+import { checkAndAwardBadges } from '@/lib/badges';
 
 export async function POST(req: Request) {
     try {
@@ -90,6 +91,17 @@ export async function POST(req: Request) {
             // We do this outside the transaction to use the shared logic in lib/leaderboard.ts
             // which correctly handles normalization (0-10 scale) and unique question counting.
             await updateUserStats(userId);
+            await updateUserStats(userId);
+
+            // 5. Check & Award Badges
+            // Normalize score to 10-scale for badge checking
+            let normalizedScore = 0;
+            if (totalQuestions > 0) {
+                normalizedScore = (Number(score) / totalQuestions) * 10;
+            }
+            // We run this asynchronously so it doesn't block response time too much, 
+            // or await it if we want to be sure. Await is safer for now.
+            await checkAndAwardBadges(userId, normalizedScore);
         }
 
         return NextResponse.json({ success: true, sessionId: session.id });

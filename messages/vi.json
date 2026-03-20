@@ -5,8 +5,10 @@
         "progress": "Tiến độ học tập",
         "profile": "Hồ sơ cá nhân",
         "logout": "Đăng xuất",
+        "community": "Cộng đồng",
         "login": "Đăng Nhập",
-        "register": "Đăng Ký"
+        "register": "Đăng Ký",
+        "donate": "Ủng hộ"
     },
     "hero": {
         "title": "Luyện Thi SOA",
@@ -141,7 +143,8 @@
         }
     },
     "profile": {
-        "loading": "Vui lòng đăng nhập để xem hồ sơ.",
+        "loading": "Đang tải hồ sơ...",
+        "signInRequired": "Vui lòng đăng nhập để xem hồ sơ.",
         "tabs": {
             "profile": "Hồ sơ cá nhân",
             "security": "Bảo mật"
@@ -194,6 +197,10 @@
             "Intermediate": "Intermediate (Trung bình) 🥈",
             "Advanced": "Advanced (Nâng cao) 🥇",
             "Expert": "Expert (Chuyên gia) 🏆"
+        },
+        "badges": {
+            "title": "Huy hiệu & Thành tích",
+            "empty": "Hãy học tập để nhận huy hiệu nhé!"
         }
     },
     "practice": {
@@ -228,7 +235,9 @@
         "noAccount": "Chưa có tài khoản?",
         "createAccount": "Tạo tài khoản miễn phí",
         "errorGeneric": "Đã có lỗi xảy ra. Vui lòng thử lại.",
-        "loading": "Đang tải..."
+        "loading": "Đang tải...",
+        "orContinueWith": "hoặc tiếp tục với",
+        "continueWithGoogle": "Tiếp tục với Google"
     },
     "groupLobby": {
         "title": "Học Nhóm",
@@ -544,7 +553,95 @@
             "examPrefix": "Bài Thi Thử",
             "practicePrefix": "Luyện Tập",
             "passStatus": "ĐẠT",
-            "failStatus": "CHƯA ĐẠT"
+            "failStatus": "CHƯA ĐẠT",
+            "filters": {
+                "allExams": "Tất Cả Bài Thi",
+                "examP": "Exam P",
+                "examFM": "Exam FM"
+            },
+            "sort": {
+                "sortBy": "Sắp Xếp Theo",
+                "newest": "Mới Nhất",
+                "oldest": "Cũ Nhất",
+                "highScore": "Điểm Cao Nhất",
+                "lowScore": "Điểm Thấp Nhất"
+            },
+            "pagination": {
+                "previous": "Trước",
+                "next": "Sau",
+                "page": "Trang"
+            }
         }
+    },
+    "community": {
+        "title": "Cộng Đồng",
+        "subtitle": "Chia sẻ kinh nghiệm và hỗ trợ lẫn nhau trong hành trình chinh phục SOA",
+        "createPost": "Đăng bài",
+        "placeholder": "Chia sẻ kinh nghiệm, hỏi đáp...",
+        "addImage": "Thêm ảnh",
+        "post": "Đăng",
+        "like": "Thích",
+        "comment": "Bình luận",
+        "comments": "Bình luận",
+        "noComments": "Chưa có bình luận nào",
+        "writeComment": "Viết bình luận...",
+        "delete": "Xóa bài",
+        "loginRequired": "Đăng nhập để đăng bài và tương tác",
+        "loginToComment": "Đăng nhập để bình luận",
+        "noPosts": "Chưa có bài đăng nào. Hãy là người đầu tiên chia sẻ!",
+        "loading": "Đang tải các bài viết...",
+        "loadMore": "Xem thêm",
+        "uploadFailed": "Tải ảnh thất bại",
+        "postFailed": "Đăng bài thất bại",
+        "editPost": "Sửa bài viết",
+        "cancel": "Hủy",
+        "save": "Lưu",
+        "deleteConfirmTitle": "Xác nhận xóa bài",
+        "deleteConfirmDescription": "Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa bài viết này không?"
+    },
+    "flashcards": {
+        "title": "Flashcard Công Thức",
+        "subtitle": "Ghi nhớ công thức Exam P với phương pháp lặp lại cách quãng",
+        "loading": "Đang tải flashcard...",
+        "mastered": "Đã thuộc",
+        "learning": "Đang học",
+        "new": "Mới",
+        "all": "Tất cả",
+        "shuffle": "Xáo trộn",
+        "reset": "Đặt lại",
+        "noCards": "Không có flashcard nào",
+        "noCardsHint": "Thử chọn danh mục khác",
+        "hint": "Nhấn vào thẻ để lật • Sử dụng nút để theo dõi tiến độ"
+    },
+    "donate": {
+        "badge": "Ủng Hộ Chúng Tôi",
+        "title": "Mua Cho Chúng Tôi Ly Cà Phê ☕",
+        "subtitle": "Sự ủng hộ của bạn giúp chúng tôi duy trì tài liệu ôn thi SOA miễn phí, chất lượng cao cho hàng nghìn sinh viên.",
+        "step1Title": "Thông Tin Đóng Góp",
+        "step1Desc": "Chọn số tiền bạn muốn ủng hộ",
+        "step2Title": "Quét Mã & Chuyển Khoản",
+        "step2Desc": "Quét mã QR để hoàn tất chuyển khoản",
+        "bankTransfer": "Chuyển Khoản Ngân Hàng",
+        "bankDesc": "Quét mã QR ngân hàng",
+        "scanQR": "Quét mã để chuyển",
+        "bankName": "Ngân hàng",
+        "accountNumber": "Số tài khoản",
+        "accountHolder": "Chủ tài khoản",
+        "selectAmount": "Chọn số tiền",
+        "yourName": "Tên của bạn",
+        "namePlaceholder": "Ẩn danh",
+        "amountLabel": "Số tiền (VNĐ)",
+        "amountPlaceholder": "Nhập số tiền",
+        "messageLabel": "Lời nhắn (tùy chọn)",
+        "messagePlaceholder": "Để lại lời nhắn động viên...",
+        "nextStep": "Tiếp tục",
+        "backButton": "Quay lại",
+        "confirmTransfer": "Tôi Đã Chuyển Khoản Xong ✓",
+        "submitting": "Đang gửi...",
+        "note": "Vui lòng quét mã QR và hoàn tất chuyển khoản, sau đó nhấn nút bên dưới để ghi nhận đóng góp.",
+        "coffeeNote": "Mỗi ly cà phê giúp server chạy mượt hơn ☕",
+        "thankYouTitle": "Cảm Ơn Bạn!",
+        "thankYouMessage": "Sự hào phóng của bạn ý nghĩa vô cùng. Chúng tôi sẽ tiếp tục xây dựng nền tảng ôn thi SOA tốt nhất!",
+        "close": "Đóng"
     }
 }

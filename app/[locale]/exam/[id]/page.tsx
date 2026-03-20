@@ -9,13 +9,34 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
-import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause, Play, Highlighter, Trash2, FileText } from 'lucide-react'
+import { Clock, Flag, ChevronLeft, ChevronRight, Grid, ChevronDown, Check, Pause, Play, Highlighter, Trash2, FileText, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
+import { useTheme } from 'next-themes'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import 'katex/dist/katex.min.css'
+import Lottie from 'lottie-react'
 
 const MathRender = dynamic(() => import('@/components/MathRender'), { ssr: false })
+
+// Simple mascot loading component
+const MascotLoading = () => {
+    const [animationData, setAnimationData] = useState<any>(null)
+    useEffect(() => {
+        fetch('/mascot.json')
+            .then(res => res.json())
+            .then(data => setAnimationData(data))
+            .catch(err => console.error(err))
+    }, [])
+    if (!animationData) return <div className="w-32 h-32 bg-purple-200 rounded-full animate-pulse" />
+    return <Lottie animationData={animationData} loop autoplay className="w-full h-full" />
+}
+
 import {
     Dialog,
     DialogContent,
@@ -28,6 +49,13 @@ import {
 export default function ExamPage() {
     // Hooks
     const t = useTranslations('examRunner')
+    const { setTheme } = useTheme()
+
+    // Force light theme
+    useEffect(() => {
+        setTheme('light')
+    }, [setTheme])
+
     const params = useParams()
     const searchParams = useSearchParams()
     const router = useRouter()
@@ -45,9 +73,9 @@ export default function ExamPage() {
     // State
     const [questions, setQuestions] = useState<Question[]>([])
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-    const [answers, setAnswers] = useState<Record<string, number>>({}) // questionId -> optionIndex
-    const [flagged, setFlagged] = useState<Record<string, boolean>>({}) // questionId -> boolean
-    const [timeLeft, setTimeLeft] = useState<number>(0) // in seconds
+    const [answers, setAnswers] = useState<Record<string, number>>({})
+    const [flagged, setFlagged] = useState<Record<string, boolean>>({})
+    const [timeLeft, setTimeLeft] = useState<number>(0)
     const [isLoading, setIsLoading] = useState(true)
     const [isSubmitted, setIsSubmitted] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
@@ -63,10 +91,14 @@ export default function ExamPage() {
 
     // Pagination State
     const [seed] = useState<number>(Date.now());
-    const [totalQuestions, setTotalQuestions] = useState(0); // Target total for this session
+    const [totalQuestions, setTotalQuestions] = useState(0);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [examStartTime, setExamStartTime] = useState<string | null>(null);
 
-    // ... (keep existing persistence code, assume it handles the new shape naturally) ...
+    // AI Analysis State
+    const [analysis, setAnalysis] = useState<string | null>(null)
+    const [isAnalyzing, setIsAnalyzing] = useState(false)
+    const [sessionId, setSessionId] = useState<number | null>(null)
 
     const handleHighlight = () => {
         if (!isHighlightMode) return;
@@ -77,28 +109,19 @@ export default function ExamPage() {
         const text = selection.toString().trim();
         if (!text) return;
 
-        // Calculate occurrence index
-        // We find the container element for the question text
-        // Note: This relies on the structure. We should traverse up to find the container.
         let container = selection.anchorNode?.parentElement;
-        while (container && !container.classList.contains('prose')) { // MathRender uses 'prose' class
+        while (container && !container.classList.contains('prose')) {
             container = container.parentElement;
         }
 
         let index = 0;
         if (container) {
-            // Get all text content up to the selection start
             const range = selection.getRangeAt(0);
             const preSelectionRange = range.cloneRange();
             preSelectionRange.selectNodeContents(container);
             preSelectionRange.setEnd(range.startContainer, range.startOffset);
 
             const preText = preSelectionRange.toString();
-            // Count occurrences of 'text' in 'preText'
-            // We need to match exact trimming logic if possible, but simple regex count is a good approximation
-            // Warning: Selection.toString() might differ from raw text with spaces.
-
-            // Allow loose matching: simple regex for the token
             const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(escapedText, 'gi');
             const matches = preText.match(regex);
@@ -108,7 +131,6 @@ export default function ExamPage() {
         const qId = questions[currentQuestionIndex].id;
         setHighlights(prev => {
             const currentHighlights = prev[qId] || [];
-            // Check for duplicates
             if (currentHighlights.some(h => h.text === text && h.index === index)) return prev;
             return { ...prev, [qId]: [...currentHighlights, { text, index }] };
         });
@@ -117,12 +139,10 @@ export default function ExamPage() {
     };
     const STORAGE_KEY = `exam_state_${categoryId}_${mode}`
 
-    // Font Settings State
     const [fontSize, setFontSize] = useState(13)
     const [fontFamily, setFontFamily] = useState<'serif' | 'sans'>('serif')
     const [showFontSettings, setShowFontSettings] = useState(false)
 
-    // Load Font Settings
     useEffect(() => {
         const savedFont = localStorage.getItem('exam_font_settings')
         if (savedFont) {
@@ -136,35 +156,34 @@ export default function ExamPage() {
         }
     }, [])
 
-    // Save Font Settings
     useEffect(() => {
         localStorage.setItem('exam_font_settings', JSON.stringify({ fontSize, fontFamily }))
     }, [fontSize, fontFamily])
-
-    // Init Exam
     useEffect(() => {
         const initExam = async () => {
             if (isNaN(categoryId)) return
-
-            // ... (rest of init code) ...
-            // Try to load from local storage first
             const savedState = localStorage.getItem(STORAGE_KEY)
             if (savedState) {
                 try {
                     const parsed = JSON.parse(savedState)
-                    // Basic validation: ensure it's not expired (optional) or data is valid
-                    if (parsed.questions?.length > 0 && !parsed.isSubmitted) {
+                    // Restore state for both in-progress AND submitted exams
+                    if (parsed.questions?.length > 0) {
                         setQuestions(parsed.questions)
                         setAnswers(parsed.answers || {})
                         setFlagged(parsed.flagged || {})
                         setIsSubmitted(parsed.isSubmitted || false)
+                        setExamStartTime(parsed.examStartTime || new Date().toISOString())
 
-                        // Auto-show Reference Sheet for Exam P (Category 1) if not submitted
+                        // Restore AI analysis state
+                        if (parsed.sessionId) setSessionId(parsed.sessionId)
+                        if (parsed.analysis) setAnalysis(parsed.analysis)
+
+                        let defaultTotal = countParam;
+                        if (mode === 'exam') defaultTotal = 30;
+                        setTotalQuestions(parsed.totalQuestions || defaultTotal)
                         if (categoryId === 1 && !parsed.isSubmitted) {
                             setShowReferenceSheet(true);
                         }
-
-                        // Legacy support for highlights
                         if (parsed.highlights) {
                             const valid = Object.values(parsed.highlights).every((arr: any) =>
                                 Array.isArray(arr) && arr.every(item => typeof item === 'object' && item.text !== undefined)
@@ -172,7 +191,6 @@ export default function ExamPage() {
                             if (valid) {
                                 setHighlights(parsed.highlights)
                             } else {
-                                // Reset invalid highlights to avoid crash
                                 setHighlights({})
                             }
                         }
@@ -180,7 +198,7 @@ export default function ExamPage() {
                         setCurrentQuestionIndex(parsed.currentQuestionIndex || 0)
                         setTimeLeft(parsed.timeLeft || 0)
                         setIsLoading(false)
-                        return // Skip fetching from API
+                        return
                     }
                 } catch (e) {
                     console.error("Failed to parse saved state", e)
@@ -197,22 +215,20 @@ export default function ExamPage() {
                     tLimit = 180 * 60
                 }
 
-                setTotalQuestions(qCount) // Set target total
+                setTotalQuestions(qCount)
                 setTimeLeft(tLimit)
+                setExamStartTime(new Date().toISOString()) // Set initial start time
 
-                // Fetch questions (First Batch)
-                const BATCH_SIZE = 20;
+                const BATCH_SIZE = 50;
                 const { questions: data, total: apiTotal } = await examService.getQuestions({
                     categoryId: categoryId,
-                    limit: Math.min(qCount, BATCH_SIZE), // Don't fetch more than needed
+                    limit: Math.min(qCount, BATCH_SIZE),
                     start: startParam,
                     end: endParam,
                     seed: seed,
                     page: 1
                 })
 
-                // If API returns fewer than requested (end of list), adjust total?
-                // No, keep it robust.
                 setQuestions(data)
             } catch (error) {
                 console.error('Failed to load exam', error)
@@ -223,9 +239,8 @@ export default function ExamPage() {
         initExam()
     }, [categoryId, mode, limitParam, countParam, startParam, endParam, seed])
 
-    // Save State
     useEffect(() => {
-        if (!isLoading && questions.length > 0 && !isSubmitted && shouldPersist.current) {
+        if (!isLoading && questions.length > 0 && shouldPersist.current) {
             const state = {
                 questions,
                 answers,
@@ -233,18 +248,17 @@ export default function ExamPage() {
                 currentQuestionIndex,
                 timeLeft,
                 isSubmitted,
-
+                totalQuestions,
                 highlights,
+                examStartTime,
+                sessionId,
+                analysis,
                 timestamp: Date.now()
             }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
         }
-    }, [questions, answers, flagged, currentQuestionIndex, timeLeft, isSubmitted, isLoading, highlights])
+    }, [questions, answers, flagged, currentQuestionIndex, timeLeft, isSubmitted, isLoading, highlights, totalQuestions, examStartTime, sessionId, analysis])
 
-    // Clear storage on unmount is NOT desired because we want to persist on reload.
-    // We only clear on explicit exit or submit.
-
-    // Timer Logic
     useEffect(() => {
         if (isLoading || isSubmitted || timeLeft <= 0 || isPaused) return
 
@@ -252,7 +266,7 @@ export default function ExamPage() {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
                     clearInterval(timer)
-                    handleSubmit() // Auto submit when time runs out
+                    handleSubmit()
                     return 0
                 }
                 return prev - 1
@@ -284,26 +298,38 @@ export default function ExamPage() {
         setShowSubmitDialog(false)
         setIsSaving(true);
         try {
-            // Validate User
-            let currentUserId = 0;
+            let currentUserId = 1;
+            let userIdSource = "default";
+
             if (user && user.id) {
                 const parsedId = parseInt(user.id);
-                if (!isNaN(parsedId)) {
+                if (!isNaN(parsedId) && parsedId > 0) {
                     currentUserId = parsedId;
-                } else {
-                    console.warn("User ID is not a number (likely UUID):", user.id);
-                    // Attempt to use 1 as fallback or handle error?
-                    // For now, let's alert if we can't identify the user
-                    // alert(t('error.user'));
-                    // return;
+                    userIdSource = "store";
                 }
             }
 
-            if (currentUserId === 0) {
-                // Try to fallback to '1' if we want to allow guest saves, BUT 
-                // this might be risky if User 1 doesn't exist or is a real user.
-                // Let's assume for now we NEED a valid user.
-                console.error("No valid numeric user ID found");
+            if (userIdSource === "default" && typeof window !== 'undefined') {
+                try {
+                    const storedUser = localStorage.getItem('user-storage');
+                    if (storedUser) {
+                        const parsed = JSON.parse(storedUser);
+                        const storageUser = parsed.state?.user;
+                        if (storageUser && storageUser.id) {
+                            const parsedId = parseInt(storageUser.id);
+                            if (!isNaN(parsedId) && parsedId > 0) {
+                                currentUserId = parsedId;
+                                userIdSource = "localStorage";
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to parse user-storage", e);
+                }
+            }
+
+            if (currentUserId === 1) {
+                console.warn("Using Guest User ID (1) for submission.");
             }
 
             const details = questions.map(q => {
@@ -326,13 +352,17 @@ export default function ExamPage() {
 
             const score = questions.reduce((acc, q) => acc + (answers[q.id] === q.correctOption ? 1 : 0), 0);
 
+            // Fallback if examStartTime is missing for some reason
+            const calculatedStartTime = new Date(Date.now() - (mode === 'exam' ? 180 : (limitParam || 30)) * 60000 + timeLeft * 1000).toISOString();
+            const finalStartTime = examStartTime || calculatedStartTime;
+
             const payload = {
                 userId: currentUserId,
                 mode: mode,
                 categoryId: isNaN(categoryId) ? null : categoryId,
                 score: score,
-                totalQuestions: questions.length,
-                startTime: new Date(Date.now() - (limitParam || 30) * 60000 + timeLeft * 1000).toISOString(),
+                totalQuestions: totalQuestions,
+                startTime: finalStartTime,
                 endTime: new Date().toISOString(),
                 details: details
             };
@@ -348,14 +378,14 @@ export default function ExamPage() {
                 throw new Error(errorData.error || `Server error: ${res.status}`);
             }
 
-            // Invalidate/Reset progress store so home page refetches fresh data
-            useProgressStore.getState().reset();
+            const data = await res.json();
+            if (data.sessionId) {
+                setSessionId(data.sessionId);
+            }
 
-            // Redirect to results page (or home)
-            // ... existing code ...
-
-            shouldPersist.current = false // Stop saving
-            localStorage.removeItem(STORAGE_KEY)
+            // Don't clear localStorage - keep state for reload
+            // shouldPersist.current = false
+            // localStorage.removeItem(STORAGE_KEY)
             setIsSubmitted(true);
         } catch (error) {
             console.error("Failed to save result", error);
@@ -374,14 +404,31 @@ export default function ExamPage() {
         }
     }
 
+    const handleAnalyze = async () => {
+        if (!sessionId) return;
+        setIsAnalyzing(true);
+        try {
+            const res = await fetch('/api/ai/analyze-exam', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId })
+            });
+            const data = await res.json();
+            if (data.analysis) {
+                setAnalysis(data.analysis);
+            }
+        } catch (error) {
+            console.error("Failed to analyze", error);
+        } finally {
+            setIsAnalyzing(false);
+        }
+    }
+
     const confirmExit = () => {
         shouldPersist.current = false
         localStorage.removeItem(STORAGE_KEY)
         router.push('/practice')
     }
-
-    // Highlighting Logic
-
 
     const clearHighlights = () => {
         setShowClearHighlightDialog(true);
@@ -401,14 +448,12 @@ export default function ExamPage() {
         const qId = questions[currentQuestionIndex].id;
         const currentHighlights = highlights[qId];
         if (!currentHighlights || currentHighlights.length === 0) return content;
-        // Step 1: Calculate absolute ranges for all highlights
         const ranges: { start: number, end: number }[] = [];
         currentHighlights.forEach(({ text, index }) => {
             const escapedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`(${escapedText})`, 'gi');
             let match;
             let matchIndex = 0;
-            // Find the Nth occurrence
             while ((match = regex.exec(content)) !== null) {
                 if (matchIndex === index) {
                     ranges.push({ start: match.index, end: match.index + match[0].length });
@@ -425,31 +470,24 @@ export default function ExamPage() {
         for (let i = 1; i < ranges.length; i++) {
             const nextRange = ranges[i];
             if (nextRange.start <= currentRange.end) {
-                // Overlap or adjacent, merge
                 currentRange.end = Math.max(currentRange.end, nextRange.end);
             } else {
-                // No overlap, push current and start new
                 mergedRanges.push(currentRange);
                 currentRange = nextRange;
             }
         }
         mergedRanges.push(currentRange);
-        // Step 3: Reconstruct string with merged marks
         let result = '';
         let lastIndex = 0;
         mergedRanges.forEach(range => {
-            // Append text before the highlight
             result += content.substring(lastIndex, range.start);
-            // Append highlighted text
             result += `<mark class="bg-yellow-200 rounded-sm px-0.5 text-black">${content.substring(range.start, range.end)}</mark>`;
             lastIndex = range.end;
         });
-        // Append remaining text
         result += content.substring(lastIndex);
         return result;
     };
 
-    // Determine correctness for review
     const isCorrect = (q: Question) => {
         return answers[q.id] === q.correctOption
     }
@@ -462,12 +500,8 @@ export default function ExamPage() {
 
         setLoadingMore(true);
         try {
-            const BATCH_SIZE = 20;
+            const BATCH_SIZE = 50;
             const page = Math.floor(index / BATCH_SIZE) + 1;
-
-            // Calculate limit for this fetch? No, standard batch size.
-            // But we need to make sure we don't fetch beyond total?
-            // API handles slicing, but we requested specific page/limit.
 
             const { questions: newQuestions } = await examService.getQuestions({
                 categoryId: categoryId,
@@ -517,7 +551,8 @@ export default function ExamPage() {
 
     const formatQuestionContent = (index: number, content: string) => {
         const trimmed = content?.trim() || "";
-        return trimmed.replace(/^(\d+)\./, "$1\\.");
+        // Remove leading number and dot (e.g. "82. ")
+        return trimmed.replace(/^\d+\.\s*/, "");
     };
 
     return (
@@ -660,7 +695,7 @@ export default function ExamPage() {
                             <Grid className="w-4 h-4" /> {t('sidebar.title')}
                         </span>
                         <div className="text-xs text-gray-500">
-                            {Object.keys(answers).length}/{questions.length} {t('sidebar.done')}
+                            {Object.keys(answers).length}/{totalQuestions} {t('sidebar.done')}
                         </div>
                     </div>
                     <div className="flex-1 overflow-y-auto p-4 font-sans">
@@ -680,7 +715,7 @@ export default function ExamPage() {
                                                 : "border-gray-200 hover:bg-gray-50 text-gray-600",
                                             isLoaded && answers[q.id] !== undefined && currentQuestionIndex !== idx && !flagged[q.id] && "bg-blue-600 text-white border-blue-600",
                                             isLoaded && flagged[q.id] && "bg-yellow-400 border-yellow-500 text-yellow-900 font-bold",
-                                            !isLoaded && "opacity-50 border-dashed bg-gray-50"
+                                            !isLoaded && "border-dashed bg-gray-50 text-gray-400"
                                         )}
                                     >
                                         {isLoaded ? idx + 1 : (loadingMore && idx === currentQuestionIndex ? "..." : idx + 1)}
@@ -726,7 +761,7 @@ export default function ExamPage() {
                             </div>
                             <div className="text-right flex flex-col items-end gap-2">
                                 <div className="text-4xl font-bold text-blue-600">
-                                    {questions.reduce((acc, q) => acc + (answers[q.id] === q.correctOption ? 1 : 0), 0)} / {questions.length}
+                                    {questions.reduce((acc, q) => acc + (answers[q.id] === q.correctOption ? 1 : 0), 0)} / {totalQuestions}
                                 </div>
                                 <div className="text-sm font-medium text-gray-500">{t('results.correct')}</div>
                                 <div className="flex gap-2 mt-2">
@@ -743,7 +778,44 @@ export default function ExamPage() {
                                     <Button size="sm" onClick={() => router.push('/progress')}>
                                         {t('results.progress')}
                                     </Button>
+                                    <Button
+                                        size="sm"
+                                        onClick={handleAnalyze}
+                                        disabled={isAnalyzing || !!analysis || !sessionId}
+                                        className="gap-2 bg-purple-600 hover:bg-purple-700 text-white"
+                                    >
+                                        <Sparkles className="w-4 h-4" />
+                                        {isAnalyzing ? "Analyzing..." : "Analyze Mistakes"}
+                                    </Button>
                                 </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {isAnalyzing && (
+                        <div className="mb-6 bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-lg border border-purple-200 flex flex-col items-center justify-center gap-4 animate-in fade-in">
+                            <div className="w-32 h-32">
+                                <MascotLoading />
+                            </div>
+                            <div className="text-center">
+                                <p className="text-purple-800 font-semibold text-lg">
+                                    AI đang phân tích bài thi...
+                                </p>
+                                <p className="text-purple-600 text-sm mt-1">
+                                    Vui lòng chờ trong giây lát 🤖
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {analysis && (
+                        <div className="mb-6 bg-white p-6 rounded-lg shadow-sm border border-purple-100 animate-in fade-in slide-in-from-top-4">
+                            <h3 className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
+                                <Sparkles className="w-5 h-5 text-purple-600" />
+                                AI Analysis
+                            </h3>
+                            <div className="prose prose-slate max-w-none text-gray-800 bg-purple-50/50 p-4 rounded-md">
+                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{analysis}</ReactMarkdown>
                             </div>
                         </div>
                     )}
@@ -883,7 +955,7 @@ export default function ExamPage() {
                         <DialogDescription>
                             {t('dialog.submitDesc')}
                             <br />
-                            {t('dialog.submitStat')} {Object.keys(answers).length}/{questions.length} {t('sidebar.done').toLowerCase()}.
+                            {t('dialog.submitStat')} {Object.keys(answers).length}/{totalQuestions} {t('sidebar.done').toLowerCase()}.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>

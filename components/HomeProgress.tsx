@@ -9,6 +9,20 @@ import { useProgressStore } from '@/stores/progressStore';
 import { useUserStore } from '@/stores/userStore';
 import { useTranslations } from 'next-intl';
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-white dark:bg-slate-950 p-3 border border-gray-100 dark:border-slate-800 shadow-md rounded-lg text-sm">
+                <p className="font-semibold text-gray-700 dark:text-gray-200 mb-1">{label}</p>
+                <div className="text-blue-600 dark:text-blue-400 font-bold">
+                    Điểm trung bình : {Number(payload[0].value).toFixed(1)}/10
+                </div>
+            </div>
+        )
+    }
+    return null
+}
+
 export function HomeProgress() {
     const { user } = useUserStore();
     const { getData, isLoading, fetchProgress } = useProgressStore();
@@ -43,10 +57,10 @@ export function HomeProgress() {
 
 
     if (isCategoryLoading && !data) return (
-        <section className="py-12 bg-gray-50 flex justify-center">
+        <section className="py-12 bg-muted/30 flex justify-center">
             <div className="animate-pulse flex flex-col items-center">
-                <div className="h-4 w-32 bg-gray-200 rounded mb-4"></div>
-                <div className="h-64 w-full max-w-4xl bg-gray-200 rounded"></div>
+                <div className="h-4 w-32 bg-muted rounded mb-4"></div>
+                <div className="h-64 w-full max-w-4xl bg-muted rounded"></div>
             </div>
         </section>
     );
@@ -185,7 +199,7 @@ export function HomeProgress() {
                                                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" className="dark:stroke-slate-700" />
                                         <XAxis
                                             dataKey="day"
                                             axisLine={false}
@@ -195,9 +209,8 @@ export function HomeProgress() {
                                         />
                                         <YAxis hide domain={[0, 10]} />
                                         <Tooltip
-                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            content={<CustomTooltip />}
                                             cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }}
-                                            formatter={(value: any) => [`${Number(value).toFixed(1)}/10`, "Điểm trung bình"]}
                                         />
                                         <Area
                                             type="monotone"

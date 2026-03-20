@@ -6,6 +6,7 @@ import { TrendingUp } from 'lucide-react'
 
 interface ProgressChartProps {
     data: {
+        id: number
         date: string
         score: number
         total: number
@@ -21,11 +22,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     const t = useTranslations('progress.charts')
     if (active && payload && payload.length) {
         return (
-            <div className="bg-white p-3 border border-gray-100 shadow-md rounded-lg text-sm">
-                <p className="font-semibold text-gray-700 mb-1">{label}</p>
-                <div className="text-blue-600 font-bold">
+            <div className="bg-white dark:bg-slate-950 p-3 border border-gray-100 dark:border-slate-800 shadow-md rounded-lg text-sm">
+                <p className="font-semibold text-gray-700 dark:text-gray-200 mb-1">{payload[0].payload.fullDate}</p>
+                <div className="text-blue-600 dark:text-blue-400 font-bold">
                     {payload[0].value}/10
-                    <span className="text-xs font-normal text-gray-500 ml-1">
+                    <span className="text-xs font-normal text-gray-500 dark:text-gray-400 ml-1">
                         ({t('tooltipCorrect')} {payload[0].payload.score}/{payload[0].payload.total} {t('tooltipQuestions')}) - {payload[0].payload.mode}
                     </span>
                 </div>
@@ -73,12 +74,13 @@ export default function ProgressChart({ data }: ProgressChartProps) {
                                 </linearGradient>
                             </defs>
                             <XAxis
-                                dataKey="date"
+                                dataKey="id"
                                 axisLine={false}
                                 tickLine={false}
                                 tick={{ fill: '#6B7280', fontSize: 11 }}
                                 dy={10}
                                 interval="preserveStartEnd"
+                                tickFormatter={(value) => data.find(item => item.id === value)?.date || ''}
                             />
                             <YAxis
                                 axisLine={false}

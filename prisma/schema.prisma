@@ -33,6 +33,17 @@ model User {
   roomParticipations RoomParticipant[]
   pdfAssetsUploaded  PdfAsset[]        @relation("PdfAssetUploader")
   badges             UserBadge[]
+  
+  // Community
+  posts              Post[]
+  reactions          Reaction[]
+  comments           Comment[]
+  
+  // Flashcards
+  flashcardProgress  UserFlashcardProgress[]
+  
+  // Donations
+  donations          Donation[]
 }
 
 model Badge {
@@ -133,6 +144,7 @@ model ExamSession {
   category   Category?    @relation("ExamSessionCategory", fields: [categoryId], references: [id])
   user       User         @relation(fields: [userId], references: [id])
   details    ExamDetail[]
+  aiAnalysis String?      @db.Text
 }
 
 model ExamDetail {
@@ -223,4 +235,90 @@ model PdfRegionQuestion {
   examDetails ExamDetail[]
 
   @@unique([pdfAssetId, questionNo])
+}
+
+// 7. Community
+model Post {
+  id        Int       @id @default(autoincrement())
+  authorId  Int
+  content   String    @db.Text
+  imageUrl  String?   // Supabase Storage URL
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  author    User      @relation(fields: [authorId], references: [id])
+  reactions Reaction[]
+  comments  Comment[]
+}
+
+model Reaction {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  userId    Int
+  type      String   // "like", "love", "haha", "wow", "sad", "angry"
+  createdAt DateTime @default(now())
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  authorId  Int
+  content   String   @db.Text
+  parentId  Int?     // For reply functionality
+  createdAt DateTime @default(now())
+
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id])
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+}
+
+// Formula Flashcards
+model FormulaCard {
+  id          Int      @id @default(autoincrement())
+  name        String   // Formula name (e.g. "Bayes' Theorem")
+  category    String   // Category (e.g. "Probability", "Distributions")
+  formula     String   @db.Text // LaTeX formula
+  explanation String?  @db.Text // Detailed explanation
+  example     String?  @db.Text // Example usage
+  difficulty  Int      @default(1) // 1-3 (Easy, Medium, Hard)
+  createdAt   DateTime @default(now())
+  
+  progress    UserFlashcardProgress[]
+}
+
+model UserFlashcardProgress {
+  id           Int          @id @default(autoincrement())
+  userId       Int
+  cardId       Int
+  status       String       @default("new") // "new", "learning", "mastered"
+  correctCount Int          @default(0)
+  wrongCount   Int          @default(0)
+  lastReviewed DateTime?
+  nextReview   DateTime?    // For spaced repetition
+  
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  card         FormulaCard  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, cardId])
+}
+
+// 10. Donations
+model Donation {
+  id          Int      @id @default(autoincrement())
+  donorName   String?  // Optional name
+  donorEmail  String?  // Optional email
+  amount      Float    // Amount in VND
+  method      String   // "bank" or "momo"
+  message     String?  @db.Text // Optional message
+  status      String   @default("pending") // "pending", "confirmed", "rejected"
+  userId      Int?     // Optional: linked user if logged in
+  createdAt   DateTime @default(now())
+  
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
