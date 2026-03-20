@@ -72,6 +72,9 @@ export const metadata: Metadata = {
     // Add your verification tokens here when ready
     // google: 'your-google-verification-code',
     // yandex: 'your-yandex-verification-code',
+    other: {
+      'google-adsense-account': 'ca-pub-6681066040358545',
+    },
   },
 };
 
@@ -92,7 +95,7 @@ export default async function LocaleLayout({
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6681066040358545"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
         />
       </head>
       <body
