@@ -91,16 +91,16 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6681066040358545"
-          crossOrigin="anonymous"
-          strategy="beforeInteractive"
-        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6681066040358545"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <StructuredData />
         <NextIntlClientProvider messages={messages} locale={locale}>
           <AuthProvider>

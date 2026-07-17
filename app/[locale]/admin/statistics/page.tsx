@@ -238,7 +238,7 @@ export default function StatisticsPage() {
                                 <XAxis type="number" fontSize={12} allowDecimals={false} />
                                 <YAxis type="category" dataKey="name" fontSize={11} width={80} />
                                 <Tooltip
-                                    formatter={(val: any, name?: string) => [val, name === 'sessions' ? 'Lượt thi' : 'Điểm TB']}
+                                    formatter={(val: any, name: any) => [val, name === 'sessions' ? 'Lượt thi' : 'Điểm TB']}
                                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                 />
                                 <Bar dataKey="sessions" name="sessions" fill="#059669" radius={[0, 4, 4, 0]} />
