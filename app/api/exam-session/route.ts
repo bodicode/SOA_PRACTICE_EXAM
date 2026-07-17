@@ -2,27 +2,48 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { updateUserStats } from '@/lib/leaderboard';
 import { checkAndAwardBadges } from '@/lib/badges';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
-        const { userId, mode, score, totalQuestions, startTime, endTime, details, categoryId } = body;
+        // 1. Authenticate user via Supabase session (server-side, trustworthy)
+        const supabase = await createClient();
+        const { data: { user: supabaseUser }, error: authError } = await supabase.auth.getUser();
 
-        // 1. Validate User ID
-        if (!userId || userId === 0) {
-            console.warn("Exam session submitted without valid userId (0 or null). Skipping user stats update.");
-            // We can still save the session with userId=1 (Guest) or fail? 
-            // If we require login, we should fail.
-            // Let's check if User 1 exists? Or just fail for now to enforce login.
-            // return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
-
-            // Allow generic saving if strictly needed, but better to enforce valid user.
+        if (authError || !supabaseUser) {
+            return NextResponse.json({ error: 'Unauthorized. Please log in to save your results.' }, { status: 401 });
         }
 
-        // 1. Create Exam Session
+        // 2. Lookup the DB user record by email (source of truth for integer userId)
+        const dbUser = await prisma.user.findUnique({
+            where: { email: supabaseUser.email! },
+            select: { id: true }
+        });
+
+        let userId: number;
+        if (!dbUser) {
+            // User is authenticated in Supabase but not yet synced to DB
+            // Auto-sync them now
+            const newUser = await prisma.user.create({
+                data: {
+                    email: supabaseUser.email!,
+                    fullName: supabaseUser.user_metadata?.full_name || null,
+                    role: 'STUDENT',
+                    avatarUrl: supabaseUser.user_metadata?.avatar_url || null,
+                }
+            });
+            userId = newUser.id;
+        } else {
+            userId = dbUser.id;
+        }
+
+        const body = await req.json();
+        const { mode, score, totalQuestions, startTime, endTime, details, categoryId } = body;
+
+        // 3. Create Exam Session
         const session = await prisma.examSession.create({
             data: {
-                userId: userId, // This will fail if userId doesn't exist in User table
+                userId: userId,
                 mode: mode,
                 categoryId: categoryId ? Number(categoryId) : null,
                 startTime: new Date(startTime),
@@ -32,7 +53,7 @@ export async function POST(req: Request) {
             }
         });
 
-        // 2. Create Details
+        // 4. Create Details
         const detailsData = details.map((d: any) => ({
             sessionId: session.id,
             questionId: d.questionId, // Might be undefined if PDF question
@@ -48,68 +69,59 @@ export async function POST(req: Request) {
             });
         }
 
-        // 3. Update User Stats (Only if valid user)
-        if (userId > 0) {
-            await prisma.$transaction(async (tx) => {
-                const user = await tx.user.findUnique({
-                    where: { id: userId },
-                    select: { lastStudyDate: true, studyStreak: true } // Select minimal fields
-                });
-
-                if (user) {
-                    let newStreak = user.studyStreak;
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-
-                    if (user.lastStudyDate) {
-                        const lastDate = new Date(user.lastStudyDate);
-                        lastDate.setHours(0, 0, 0, 0);
-
-                        const diffTime = Math.abs(today.getTime() - lastDate.getTime());
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                        if (diffDays === 1) {
-                            newStreak += 1; // Consecutive day
-                        } else if (diffDays > 1) {
-                            newStreak = 1; // Broken streak
-                        }
-                    } else {
-                        newStreak = 1; // First time
-                    }
-
-                    await tx.user.update({
-                        where: { id: userId },
-                        data: {
-                            studyStreak: newStreak,
-                            lastStudyDate: new Date()
-                        }
-                    });
-                }
+        // 5. Update User Stats (streak)
+        await prisma.$transaction(async (tx: any) => {
+            const user = await tx.user.findUnique({
+                where: { id: userId },
+                select: { lastStudyDate: true, studyStreak: true }
             });
 
-            // 4. Update Leaderboard Stats (Score, Questions, Level)
-            // We do this outside the transaction to use the shared logic in lib/leaderboard.ts
-            // which correctly handles normalization (0-10 scale) and unique question counting.
-            await updateUserStats(userId);
-            await updateUserStats(userId);
+            if (user) {
+                let newStreak = user.studyStreak;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
 
-            // 5. Check & Award Badges
-            // Normalize score to 10-scale for badge checking
-            let normalizedScore = 0;
-            if (totalQuestions > 0) {
-                normalizedScore = (Number(score) / totalQuestions) * 10;
+                if (user.lastStudyDate) {
+                    const lastDate = new Date(user.lastStudyDate);
+                    lastDate.setHours(0, 0, 0, 0);
+
+                    const diffTime = Math.abs(today.getTime() - lastDate.getTime());
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays === 1) {
+                        newStreak += 1; // Consecutive day
+                    } else if (diffDays > 1) {
+                        newStreak = 1; // Broken streak
+                    }
+                } else {
+                    newStreak = 1; // First time
+                }
+
+                await tx.user.update({
+                    where: { id: userId },
+                    data: {
+                        studyStreak: newStreak,
+                        lastStudyDate: new Date()
+                    }
+                });
             }
-            // We run this asynchronously so it doesn't block response time too much, 
-            // or await it if we want to be sure. Await is safer for now.
-            await checkAndAwardBadges(userId, normalizedScore);
+        });
+
+        // 6. Update Leaderboard Stats (Score, Questions, Level)
+        await updateUserStats(userId);
+
+        // 7. Check & Award Badges
+        let normalizedScore = 0;
+        if (totalQuestions > 0) {
+            normalizedScore = (Number(score) / totalQuestions) * 10;
         }
+        await checkAndAwardBadges(userId, normalizedScore);
 
         return NextResponse.json({ success: true, sessionId: session.id });
     } catch (error: any) {
         console.error('Error saving exam session:', error);
-        // Better error message
         let msg = 'Failed to save session';
-        if (error.code === 'P2003') { // Foreign key constraint failed
+        if (error.code === 'P2003') {
             msg = 'User ID not found in database.';
         }
         return NextResponse.json({ error: msg, details: error.message }, { status: 500 });

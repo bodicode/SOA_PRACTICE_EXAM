@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  serverExternalPackages: ['@prisma/client', 'pg'],
 };
 
 export default withNextIntl(nextConfig);
